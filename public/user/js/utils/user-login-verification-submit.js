@@ -13,13 +13,16 @@ formOtp.addEventListener("submit", async (e) => {
     const response = await apiClient.post("/loginVerification", formData);
 
     if (response.success) {
-      showToast(response.message, true);
+      showToast(response.message, true, "center");
 
       setTimeout(() => {
         window.location.href = "/";
       }, 2000);
     } else {
       otpErrorMessage.style.display = "block";
+      setTimeout(() => {
+        otpErrorMessage.style.display = "none";
+      }, 3000);
     }
   } catch (error) {
     console.error(errorMessage);

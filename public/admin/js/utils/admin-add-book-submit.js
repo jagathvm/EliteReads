@@ -1,4 +1,5 @@
 import HttpRequest from "../../../helpers/http-request.js";
+import { addBookValidator } from "../validators/admin-add-book-validator.js";
 import { showToast, errorMessage } from "../../../helpers/toast.js";
 
 const addBookForm = document.getElementById("addBookForm");
@@ -7,6 +8,11 @@ const categorySelect = document.getElementById("book_category");
 const subcategorySelect = document.getElementById("book_subcategory");
 
 saveBookButton.addEventListener("click", async (e) => {
+  const isValid = await addBookValidator.revalidate();
+  if (!isValid) {
+    return showToast("Kindly fill in all fields to continue.", false);
+  }
+
   const formData = new FormData(addBookForm);
   try {
     const apiClient = new HttpRequest("/admin/books");
