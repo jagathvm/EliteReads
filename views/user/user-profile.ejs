@@ -1,0 +1,40 @@
+<main class="main">
+  <div class="page-header breadcrumb-wrap">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="/" rel="nofollow">Home</a>
+        <span></span> Pages <span></span> Profie
+      </div>
+    </div>
+  </div>
+  <section class="pt-150 pb-150">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-10 m-auto">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="dashboard-menu">
+                <%-
+                include('partials/profile/dashboard-menu')
+                %>
+              </div>
+            </div>
+            <div class="col-md-8">
+              <div class="tab-content dashboard-content">
+                <%-
+                include('partials/profile/dashboard-content-dashboard')
+                %> <%-
+                include('partials/profile/dashboard-content-orders')
+                %> <%-
+                include('partials/profile/dashboard-content-address')
+                %> <%-
+                include('partials/profile/dashboard-content-account-details')
+                %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>

@@ -1,0 +1,148 @@
+<section class="content-main">
+  <div class="row">
+    <div class="col-lg-10">
+      <div class="content-header">
+        <a href="/admin/books">
+          <i class="material-icons md-arrow_back"></i> Go back
+        </a>
+        <h2 class="content-title">Add New Book</h2>
+        <div>
+          <button class="btn btn-md rounded font-sm hover-up" id="saveBookButton">
+            Save Book
+          </button>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header">
+          <h4>Book Details</h4>
+        </div>
+        <div class="card-body">
+          <form id="addBookForm" enctype="multipart/form-data">
+            <div class="row">
+              <div class="col-lg-8">
+                <!-- Book Details Section -->
+                <div class="mb-4">
+                  <label for="book_title" class="form-label">Book Title</label>
+                  <input type="text" placeholder="Type here" class="form-control" id="book_title" name="title">
+                </div>
+                <div class="mb-4">
+                  <label for="book_author" class="form-label">Author</label>
+                  <input type="text" placeholder="Type here" class="form-control" id="book_author" name="author">
+                </div>
+                <div class="mb-4">
+                  <label for="book_description" class="form-label">Book Description</label>
+                  <textarea placeholder="Type here" class="form-control" rows="4" id="book_description" name="description"></textarea>
+                </div>
+                <div class="row">
+                  <div class="col-lg-6">
+                    <div class="mb-4">
+                      <label for="book_price" class="form-label">Price</label>
+                      <input placeholder="₹" type="text" class="form-control" id="book_price" name="price">
+                    </div>
+                  </div>
+                  <div class="col-lg-6">
+                    <div class="mb-4">
+                      <label for="book_isbn" class="form-label">ISBN</label>
+                      <input type="text" placeholder="ISBN Number" class="form-control" id="book_isbn" name="isbn">
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-4">
+                  <label for="book_publisher" class="form-label">Publisher</label>
+                  <input type="text" placeholder="Publisher Name" class="form-control" id="book_publisher" name="publisher">
+                </div>
+                <div class="row">
+                  <div class="col-lg-6">
+                    <div class="mb-4">
+                      <label for="book_year" class="form-label">Publication Year</label>
+                      <input type="text" placeholder="Publication Year" class="form-control" id="book_year" name="year">
+                    </div>
+                  </div>
+                  <div class="col-lg-6">
+                    <div class="mb-4">
+                      <label for="book_language" class="form-label">Language</label>
+                      <input type="text" placeholder="English" class="form-control" id="book_language" name="language">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-6">
+                    <div class="mb-4">
+                      <label for="book_pages" class="form-label">Pages</label>
+                      <input type="text" placeholder="Pages" class="form-control" id="book_pages" name="pages">
+                    </div>
+                  </div>
+                  <div class="col-lg-6">
+                    <div class="mb-4">
+                      <label for="book_weight" class="form-label">Weight</label>
+                      <input type="text" placeholder="Weight in grams" class="form-control" id="book_weight" name="weight">
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-4">
+                  <label class="form-check mb-4">
+                    <input class="form-check-input" type="checkbox" id="book_featured" name="featured">
+                    <span class="form-check-label">
+                      Featured Book
+                    </span>
+                  </label>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <!-- Media Upload Section -->
+                <div class="card mb-4">
+                  <div class="card-header">
+                    <h4>Media</h4>
+                  </div>
+                  <div class="card-body">
+                    <div class="input-upload">
+                      <img src="/admin/imgs/theme/upload.svg" alt="">
+                      <input class="form-control" type="file" accept="image/*" id="book_cover_image" name="cover_image" multiple>
+                      <p class="mt-2">Upload book cover image</p>
+                    </div>
+                    <!-- Image Preview Section -->
+                    <div id="imagePreview" class="row mt-4" style="display: flex; flex-wrap: wrap;"></div>
+                  </div>
+                </div>
+                <!-- Organization Section -->
+                <div class="card mb-4">
+                  <div class="card-header">
+                    <h4>Organization</h4>
+                  </div>
+                  <div class="card-body">
+                    <div class="row gx-2">
+                      <div class="col-sm-12 mb-3">
+                        <label class="form-label">Category</label>
+                        <select class="form-select" id="book_category" name="category">
+                          <option value="" selected disabled hidden>Select Category</option>
+                          <% categories.forEach(category => { %>
+                          <option id="book_<%= category.name %>" value="<%= category.name %>" data-subcategories='<%= JSON.stringify(category.subCategories) %>'>
+                            <%= category.name %></option>
+                          <% }) %>
+                        </select>
+                      </div>
+                      <div class="col-sm-12 mb-3">
+                        <label class="form-label">Sub-category</label>
+                        <select class="form-select" id="book_subcategory" name="subcategory">
+                          <option value="">Select Subcategory</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- End of Organization Section -->
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script defer type="module" src="/admin/js/validators/admin-add-book-validator.js"></script>
+
+<script defer type="module" src="/admin/js/utils/admin-add-book-submit.js"></script>
+
+<script defer type="module" src="/admin/js/helpers/add-book-image-preview.js"></script>

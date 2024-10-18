@@ -1,0 +1,197 @@
+<section class="content-main">
+  <div class="content-header">
+    <div>
+      <h2 class="content-title card-title">Books</h2>
+    </div>
+    <div>
+      <a href="/admin/books/add-book" class="btn btn-primary btn-sm rounded">Add Book</a>
+    </div>
+  </div>
+
+  <header class="card card-body mb-4">
+    <div class="row gx-3">
+      <div class="col-lg-4 col-md-6 me-auto">
+        <input type="text" placeholder="Search by title, author..." class="form-control">
+      </div>
+      <div class="col-lg-2 col-6 col-md-3">
+        <select class="form-select">
+          <option>All categories</option>
+          <% categories.forEach(category => { %>
+          <option value="<%= category.name %>"><%= category.name %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="col-lg-2 col-6 col-md-3">
+        <select class="form-select">
+          <option>Recently added</option>
+          <option>Price Low to High</option>
+          <option>Price High to Low</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+
+  <div class="row">
+    <!-- book -->
+    <% books.forEach(book => { %>
+    <div class="col-xl-3 col-lg-4 col-md-6">
+      <div class="card card-product-grid">
+        <a href="/admin/books/<%= book.slugWithIsbn %>" class="img-wrap">
+          <img src="<%= book.coverImageUrls[0] %>" style="height: 200px; object-fit: cover;" alt="Book Cover">
+        </a>
+        <div class="info-wrap">
+          <div class="title mt-1 h6"><%= book.title %></div>
+          <div class="author mt-1"><%= book.author %></div>
+          <div class="price mt-1">₹ <%= book.price %></div>
+        </div>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+
+  <div class="pagination-area mt-15 mb-50">
+    <nav aria-label="Page navigation example">
+      <ul class="pagination justify-content-start">
+        <li class="page-item active">
+          <a class="page-link" href="#">01</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="#">02</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="#">03</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link dot" href="#">...</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="#">16</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</section>
+
+<!-- Edit Book Modal -->
+<div class="modal fade" id="editBookModal1" tabindex="-1" aria-labelledby="editBookModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editBookModalLabel">Edit Book Information</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="row">
+            <div class="col-lg-8">
+              <div class="card mb-4">
+                <div class="card-header">
+                  <h4>Book Details</h4>
+                </div>
+                <div class="card-body">
+                  <div class="mb-4">
+                    <label for="edit_book_title" class="form-label">Book Title</label>
+                    <input type="text" placeholder="Type here" class="form-control" id="edit_book_title">
+                  </div>
+                  <div class="mb-4">
+                    <label for="edit_book_author" class="form-label">Author</label>
+                    <input type="text" placeholder="Type here" class="form-control" id="edit_book_author">
+                  </div>
+                  <div class="mb-4">
+                    <label for="edit_book_description" class="form-label">Full Description</label>
+                    <textarea placeholder="Type here" class="form-control" rows="4" id="edit_book_description"></textarea>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <div class="mb-4">
+                        <label for="edit_book_price" class="form-label">Price</label>
+                        <input placeholder="$" type="text" class="form-control" id="edit_book_price">
+                      </div>
+                    </div>
+                    <div class="col-lg-6">
+                      <div class="mb-4">
+                        <label for="edit_book_isbn" class="form-label">ISBN</label>
+                        <input type="text" placeholder="ISBN Number" class="form-control" id="edit_book_isbn">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mb-4">
+                    <label for="edit_book_publisher" class="form-label">Publisher</label>
+                    <input type="text" placeholder="Publisher Name" class="form-control" id="edit_book_publisher">
+                  </div>
+                  <div class="mb-4">
+                    <label for="edit_book_year" class="form-label">Publication Year</label>
+                    <input type="text" placeholder="Publication Year" class="form-control" id="edit_book_year">
+                  </div>
+                  <div class="mb-4">
+                    <label for="edit_book_genre" class="form-label">Genre</label>
+                    <input type="text" placeholder="Genre" class="form-control" id="edit_book_genre">
+                  </div>
+                  <div class="mb-4">
+                    <label class="form-check mb-4">
+                      <input class="form-check-input" type="checkbox" id="edit_book_featured">
+                      <span class="form-check-label">
+                        Featured Book
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-4">
+              <div class="card mb-4">
+                <div class="card-header">
+                  <h4>Media</h4>
+                </div>
+                <div class="card-body">
+                  <div class="input-upload">
+                    <img src="/admin/imgs/theme/upload.svg" alt="">
+                    <input class="form-control" type="file" accept="image/*" id="edit_book_cover">
+                    <p class="mt-2">Upload book cover image</p>
+                  </div>
+                </div>
+              </div>
+              <div class="card mb-4">
+                <div class="card-header">
+                  <h4>Organization</h4>
+                </div>
+                <div class="card-body">
+                  <div class="row gx-2">
+                    <div class="col-sm-6 mb-3">
+                      <label class="form-label">Category</label>
+                      <select class="form-select" id="edit_book_category">
+                        <option>Fiction</option>
+                        <option>Non-fiction</option>
+                        <option>Biography</option>
+                        <option>Science</option>
+                        <option>History</option>
+                        <option>Children's</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                      <label class="form-label">Sub-category</label>
+                      <select class="form-select" id="edit_book_subcategory">
+                        <option>Thriller</option>
+                        <option>Romance</option>
+                        <option>Science Fiction</option>
+                        <option>Self-help</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="saveBookChanges">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>

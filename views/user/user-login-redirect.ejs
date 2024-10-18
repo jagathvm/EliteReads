@@ -1,0 +1,18 @@
+<section class="content-main" style="overflow: hidden; width: 100%;">
+  <div class="row mt-60 justify-content-center">
+    <div class="col-sm-12 text-center">
+      <div class="w-50 mx-auto">
+        <img src="/admin/imgs/theme/404.png" width="200" alt="Page Not Found" class="img-fluid" />
+        <!-- Dynamic heading for login issues -->
+        <h3 id="error-heading" class="mt-40 mb-15"><%= errorMessage %></h3>
+        <p>
+          You may have been logged out or your session expired. <br>
+          Don't worry... it happens. We'll help you get back on track.
+        </p>
+        <a href="/api/auth/login" class="btn btn-primary mt-4">
+          <i class="material-icons md-keyboard_return"></i> Go to Login
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

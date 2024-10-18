@@ -1,0 +1,115 @@
+/*PRODUCT LIST*/
+.product-list {
+  position: relative;
+}
+
+.product-list .product-cart-wrap {
+  border: 0;
+  border-radius: 0;
+  overflow: unset;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.product-list .product-cart-wrap:not(:last-child) {
+  margin-bottom: 30px;
+}
+
+.product-list .product-cart-wrap:hover {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.product-list .product-cart-wrap:hover .product-img {
+  -webkit-box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+}
+
+.product-list
+  .product-cart-wrap
+  .product-badges.product-badges-position {
+  left: 30px;
+  top: 28px;
+}
+
+.product-list .product-cart-wrap .product-img-action-wrap {
+  max-width: 33%;
+  position: relative;
+}
+
+.product-list
+  .product-cart-wrap
+  .product-img-action-wrap
+  .product-img {
+  border: 1px solid #e2e9e1;
+  border-radius: 10px;
+}
+
+.product-list
+  .product-cart-wrap
+  .product-img-action-wrap
+  .product-img
+  .product-img-inner {
+  overflow: hidden;
+  padding: 10px;
+}
+
+.product-list
+  .product-cart-wrap
+  .product-img-action-wrap
+  .product-img
+  .product-img-inner
+  a
+  img {
+  height: auto;
+}
+
+.product-list .product-cart-wrap h2 {
+  font-size: 22px;
+}
+
+.product-list
+  .product-cart-wrap
+  .product-content-wrap
+  .product-action-1 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  position: relative;
+  bottom: unset;
+  padding: 0 20px;
+  margin-top: 20px;
+}
+
+.product-list
+  .product-cart-wrap
+  .product-content-wrap
+  .product-action-1
+  a.action-btn {
+  border: none;
+  width: auto;
+  border-radius: 50px;
+  background-color: #088178;
+  color: #fff;
+  text-align: center;
+  margin-right: 0;
+  position: relative;
+  display: inline-block;
+  padding: 0px 23px;
+  height: 44px;
+  font-weight: 500;
+}
+
+.product-list
+  .product-cart-wrap
+  .product-content-wrap
+  .product-action-1
+  a.action-btn
+  i {
+  margin-right: 8px;
+  color: #fff;
+}

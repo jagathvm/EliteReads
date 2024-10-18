@@ -1,0 +1,58 @@
+<section class="content-main">
+  <div class="content-header">
+    <a href="/admin/categories">
+      <i class="material-icons md-arrow_back"></i> Go back
+    </a>
+    <h2 class="content-title card-title">Add New Category</h2>
+    <div>
+      <button class="btn btn-md rounded font-sm hover-up" id="saveCategoryButton">
+        Save Category
+      </button>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h4>Category Details</h4>
+    </div>
+    <div class="card-body">
+      <form id="addCategoryForm">
+        <div class="row">
+          <div class="col-lg-6">
+            <!-- Category Details Section -->
+            <div class="mb-4">
+              <label for="category_name" class="form-label">Name</label>
+              <input type="text" placeholder="Category Name" class="form-control" id="category_name" name="name" />
+            </div>
+            <div class="mb-4">
+              <label for="category_description" class="form-label">Description</label>
+              <textarea placeholder="Description" class="form-control" rows="4" id="category_description" name="description"></textarea>
+            </div>
+            <div class="mb-4">
+              <label for="category_slug" class="form-label">Slug</label>
+              <input type="text" placeholder="Slug" class="form-control" id="category_slug" name="slug" />
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <!-- Parent Category Section -->
+            <div class="mb-4">
+              <label for="parent_category" class="form-label">Select Parent Category (optional)</label>
+              <select class="form-select" id="parent_category" name="parent_category" required>
+                <option value="">None</option>
+                <% categories.forEach(category => { %>
+                <% if (!category.parent_category || category.parent_category === '') { %>
+                <option value="<%= category.name %>"><%= category.name %></option>
+                <% } %>
+                <% }) %>
+              </select>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script defer type="module" src="/admin/js/utils/admin-add-category-submit.js"></script>
+
+<script defer type="module" src="/admin/js/validators/admin-add-category-validator.js"></script>

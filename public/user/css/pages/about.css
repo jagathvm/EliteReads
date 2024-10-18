@@ -1,0 +1,184 @@
+/*Page > About*/
+.hero-2 {
+  padding: 160px 0 100px;
+  min-height: 640px;
+}
+
+.parallax-wrapper {
+  position: absolute;
+  z-index: 3;
+  width: 100%;
+}
+
+.parallax-wrapper .parallax-img-area {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  position: relative;
+  z-index: 2;
+  margin: 0 auto;
+}
+
+.parallax-wrapper .parallax-img-area .parallax-img {
+  position: absolute;
+  z-index: 2;
+  text-align: right;
+}
+
+.parallax-wrapper .parallax-img-area .parallax-img.img-1 {
+  right: 0;
+  width: 52%;
+  z-index: 2;
+  top: 100px;
+}
+
+.parallax-wrapper .parallax-img-area .parallax-img.img-2 {
+  right: 220px;
+  width: 52%;
+  top: 40px;
+  z-index: 3;
+}
+
+.parallax-wrapper .parallax-img-area .parallax-img.img-3 {
+  opacity: 0.1 !important;
+  left: -210px;
+  width: 320px;
+  top: 193px;
+}
+
+.parallax-wrapper .parallax-img-area .parallax-img.img-4 {
+  opacity: 0.08 !important;
+  width: 180px;
+  left: 50%;
+}
+
+.parallax-wrapper .parallax-img-area .parallax-img.img-5 {
+  right: 0;
+  width: 12%;
+  z-index: 2;
+  opacity: 0.3;
+  bottom: 20%;
+}
+
+.parallax-wrapper .parallax-img-area .parallax-img.img-6 {
+  width: 25%;
+  z-index: 3;
+  opacity: 0.2;
+  bottom: 0;
+  left: -150px;
+}
+
+.parallax-wrapper .parallax-img-area .parallax-img.img-7 {
+  opacity: 0.2 !important;
+  width: 16%;
+  top: 10%;
+  left: 10%;
+}
+
+.parallax-wrapper .parallax-img-area .parallax-img.img-8 {
+  opacity: 0.2 !important;
+  width: 10%;
+  bottom: 40%;
+  left: 50%;
+}
+
+.hero-content {
+  position: absolute;
+  z-index: 4;
+  width: 100%;
+}
+
+.hero-content h1 {
+  line-height: 1.1;
+}
+
+.about-count {
+  z-index: 100;
+  position: relative;
+  margin-bottom: -100px;
+}
+
+.about-count .achievements-grid {
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  grid-column-gap: 80px;
+  -ms-grid-columns: auto auto auto auto;
+  grid-template-columns: auto auto auto auto;
+  -ms-grid-rows: auto;
+  grid-template-rows: auto;
+}
+
+.about-count .w-layout-grid {
+  display: -ms-grid;
+  display: grid;
+  grid-auto-columns: 1fr;
+  -ms-grid-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  -ms-grid-rows: auto auto;
+  grid-template-rows: auto auto;
+  grid-row-gap: 16px;
+  grid-column-gap: 16px;
+}
+
+.about-count .achievement-wrapper {
+  text-align: center;
+}
+
+.about-count .achievement-number {
+  margin-bottom: 8px;
+  color: #1f2559;
+  font-size: 3rem;
+  line-height: 1.042em;
+  font-weight: 800;
+}
+
+.about-count .achievement-text {
+  max-width: 110px;
+  margin: 0 auto;
+}
+
+.hero-card-icon {
+  width: 65px;
+  height: 65px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+.hero-card-icon.icon-left {
+  width: 165px;
+  -webkit-box-align: start;
+  -ms-flex-align: start;
+  align-items: start;
+}
+
+.single-content > ol {
+  list-style-type: decimal;
+  margin-bottom: 30px;
+  padding-left: 1em;
+}
+
+.single-content > ol li:not(:last-child) {
+  margin-bottom: 16px;
+}
+
+.single-content > ol ol {
+  list-style-type: lower-alpha;
+  margin: 20px 0 30px;
+  padding-left: 25px;
+}
+
+.single-content > ol ol ol {
+  list-style-type: lower-roman;
+}

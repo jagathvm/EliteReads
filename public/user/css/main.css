@@ -1,0 +1,68 @@
+/***
+ Theme Name: Evara
+ Theme URI: http://wp.alithemes.com/html/Evara
+ Description: eCommerce HTML + Admin Template
+ Author: alithemes.com
+ Author URI: http://alithemes.com
+ Version: 1.0
+ License: GNU General Public License v2 or later
+ License URI: http://www.gnu.org/licenses/gpl-2.0.html
+==============================
+TABLE CONTENT
+ Import Google Fonts
+ Include Third Party CSS Library
+ GENERAL
+ HEADER
+ Offcanvas Sidebar
+ Search form
+ Main header
+ Mega menu
+ Header layouts
+ Page layouts
+ Pagination
+ Breadcrumb
+ CATEGORY PAGES
+ SINGLE POST
+ Author box
+ comment
+ Post share social
+ WP STYPE
+ Custom amine
+***/
+@import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,300;1,400;1,700;1,900&amp;display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Spartan:wght@300;400;500;600;700&amp;display=swap");
+/*import vendors*/
+@import url(vendors/vendors.css);
+
+/*import plugins*/
+@import url(plugins/plugins.css);
+
+/*import utils*/
+@import url(utils/utils.css);
+
+/*import components*/
+@import url(components/components.css);
+
+/*import pages*/
+@import url(pages/pages.css);
+
+/*import layouts*/
+@import url(layouts/layouts.css);
+
+/* Class applied to error fields */
+.error-field {
+  border: 1px solid #dc3545; /* Red border to indicate an error */
+  color: #dc3545; /* Red text color */
+}
+
+/* Class applied to error messages */
+.error-label {
+  color: #dc3545; /* Red text color */
+  font-weight: 400; /* Slightly smaller text size */
+}
+
+/* Class applied to valid fields */
+.success-field {
+  border: 1px solid #28a745; /* Green border to indicate success */
+  color: #28a745; /* Green text color */
+}

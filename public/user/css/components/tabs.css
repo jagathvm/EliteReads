@@ -1,0 +1,133 @@
+/*COMPONENTS -> TABS*/
+.nav-tabs {
+  margin-bottom: 25px;
+  border: 0;
+}
+
+.nav-tabs .nav-link {
+  background-color: #eeeeee;
+  font-size: 15px;
+  margin: 0 10px;
+  margin-left: 10px;
+  color: #444;
+  border-radius: 4px;
+  padding: 15px 24px;
+  -webkit-transition: 0.2s;
+  transition: 0.2s;
+  border: 0;
+  border-top-color: currentcolor;
+  border-right-color: currentcolor;
+  border-bottom-color: currentcolor;
+  border-left-color: currentcolor;
+  font-family: 'Spartan', sans-serif;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.nav-tabs .nav-link.active {
+  color: #088178;
+  background-color: #fde1bd;
+}
+
+.nav-tabs .nav-link:hover {
+  color: #088178;
+  background-color: #fde1bd;
+  -webkit-transform: translateY(-3px);
+  transform: translateY(-3px);
+  -webkit-transition: 0.2s;
+  transition: 0.2s;
+}
+
+.nav-tabs .nav-link:first-child {
+  margin-left: 0 !important;
+}
+
+.nav-tabs.no-border {
+  border: none;
+}
+
+.nav-tabs.right .nav-item:last-child .nav-link {
+  margin-right: 0;
+}
+
+.nav.right {
+  -webkit-box-pack: end;
+  -ms-flex-pack: end;
+  justify-content: end;
+}
+
+.dashboard-menu {
+  border: 1px solid #e2e9e1;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.dashboard-menu ul {
+  padding: 0;
+  margin: 0;
+}
+
+.dashboard-menu ul li {
+  position: relative;
+}
+
+.dashboard-menu ul li a {
+  font-size: 14px;
+  color: #242424;
+  padding: 15px 30px;
+}
+
+.dashboard-menu ul li a i {
+  color: #90908e;
+  font-size: 12px;
+}
+
+.dashboard-menu ul li a.active {
+  color: #fff;
+  background-color: #088178;
+}
+
+.dashboard-menu ul li a.active i {
+  color: #fff;
+}
+
+.dashboard-menu ul li:not(:last-child) {
+  border-bottom: 1px solid #e2e9e1;
+}
+
+.tab-header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.tab-header .view-more {
+  font-family: 'Spartan', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  border-bottom: 2px solid #cce7d0;
+  margin-bottom: 20px;
+}
+
+.tab-header .view-more i {
+  margin-left: 5px;
+  margin-top: 5px;
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+}
+
+.tab-header .view-more:hover i {
+  -webkit-transform: translateX(5px);
+  transform: translateX(5px);
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+}

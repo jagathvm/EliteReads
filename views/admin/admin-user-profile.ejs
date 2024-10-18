@@ -1,0 +1,159 @@
+<section class="content-main">
+  <div class="content-header">
+    <h2 class="content-title">User Profile</h2>
+  </div>
+  <div class="card mb-4">
+    <header class="card-header">
+      <div class="row gx-3">
+        <div class="col-lg-4 col-md-6 me-auto">
+          <a href="/admin/users">
+            <i class="material-icons md-arrow_back"></i> Go back
+          </a>
+        </div>
+      </div>
+    </header>
+    <!-- card-header end// -->
+    <div class="card-header bg-primary" style="height: 150px;"></div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-xl col-lg flex-grow-0" style="flex-basis: 230px;">
+          <div class="img-thumbnail shadow w-100 bg-white position-relative text-center" style="height: 200px; width: 200px; margin-top: -120px;">
+            <img src="/admin/imgs/theme/image-profile.png" class="center-xy img-fluid" alt="User Profile Picture">
+          </div>
+        </div>
+        <!-- col.// -->
+        <div class="col-xl col-lg">
+          <h3><%= user.email %></h3>
+          <p>Email: <%= user.email %></p>
+          <p>Joined: January 1, 2023</p>
+        </div>
+        <!-- col.// -->
+        <div class="col-xl-4 text-md-end">
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+            Edit Profile
+          </button>
+          <button type="button" class="btn btn-danger ms-2" data-bs-toggle="modal" data-bs-target="#blockUnblockModal">
+            Block User
+          </button>
+        </div>
+        <!-- col.// -->
+      </div>
+      <!-- card-body.// -->
+      <hr class="my-4">
+      <div class="row g-4">
+        <div class="col-md-12 col-lg-4 col-xl-2">
+          <article class="box">
+            <p class="mb-0 text-muted">Total Orders:</p>
+            <h5 class="text-success">150</h5>
+            <p class="mb-0 text-muted">Total Spent:</p>
+            <h5 class="text-success mb-0">$5,000</h5>
+          </article>
+        </div>
+        <!-- col.// -->
+        <div class="col-sm-6 col-lg-4 col-xl-3">
+          <h6>Contact Information</h6>
+          <p>
+            Phone: <%= user.phone %> <br>
+            Address: 1234 Elm St, Springfield, IL <br>
+            Postal code: 62701
+          </p>
+        </div>
+        <!-- col.// -->
+        <div class="col-sm-6 col-lg-4 col-xl-3">
+          <h6>Account Settings</h6>
+          <p>
+            Role: User <br>
+            Status: Active <br>
+            Last Login: August 21, 2024
+          </p>
+        </div>
+        <!-- col.// -->
+        <div class="col-sm-6 col-xl-4 text-xl-end">
+          <select class="form-select w-auto d-inline-block">
+            <option>Actions</option>
+            <option>Deactivate Account</option>
+            <option>Delete Account</option>
+          </select>
+        </div>
+        <!-- col.// -->
+      </div>
+      <!-- row.// -->
+    </div>
+    <!-- card-body.// -->
+  </div>
+  <!-- card.// -->
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Recent Activity</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">Order #12345 - $250.00 - Completed on August 15, 2024</li>
+        <li class="list-group-item">Updated profile information on August 10, 2024</li>
+        <li class="list-group-item">Password changed on July 30, 2024</li>
+        <li class="list-group-item">Logged in from a new device on July 25, 2024</li>
+        <li class="list-group-item">Account created on January 1, 2023</li>
+      </ul>
+    </div>
+    <!-- card-body.// -->
+  </div>
+  <!-- card.// -->
+
+  <!-- Block/Unblock Modal -->
+  <div class="modal fade" id="blockUnblockModal" tabindex="-1" aria-labelledby="blockUnblockModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="blockUnblockModalLabel">Block/Unblock User</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to <span id="blockUnblockAction">block</span> this user?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmBlockUnblock">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Profile Modal -->
+  <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editProfileForm">
+            <div class="mb-3">
+              <label for="profileName" class="form-label">Name</label>
+              <input type="text" class="form-control" id="profileName" placeholder="Enter your name" value="<%= user.email %>">
+            </div>
+            <div class="mb-3">
+              <label for="profileEmail" class="form-label">Email address</label>
+              <input type="email" class="form-control" id="profileEmail" placeholder="Enter your email" value="<%= user.email %>">
+            </div>
+            <div class="mb-3">
+              <label for="profilePhone" class="form-label">Phone Number</label>
+              <input type="text" class="form-control" id="profilePhone" placeholder="Enter your phone number" value="<%= user.phone %>">
+            </div>
+            <div class="mb-3">
+              <label for="profileAddress" class="form-label">Address</label>
+              <textarea class="form-control" id="profileAddress" rows="3" placeholder="Enter your address"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="profilePassword" class="form-label">Password</label>
+              <input type="password" class="form-control" id="profilePassword" placeholder="Enter a new password">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveProfileChanges">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

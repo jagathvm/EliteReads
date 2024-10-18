@@ -1,0 +1,12 @@
+/*page 404*/
+.page-404 {
+  background-color: #fff;
+}
+
+.page-404 img {
+  max-width: 300px;
+}
+
+.page-404 img.logo {
+  max-width: 150px;
+}

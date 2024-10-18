@@ -1,0 +1,42 @@
+<main class="main">
+  <section class="pt-150 pb-150">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-10">
+          <div class="row justify-content-center">
+            <div class="col-lg-5">
+              <div class="login_wrap widget-taber-content p-30 background-white border-radius-10 mb-md-5 mb-lg-0 mb-sm-5">
+                <div class="padding_eight_all bg-white">
+                  <div class="heading_s1">
+                    <h3 class="mb-30">Enter OTP</h3>
+                  </div>
+                  <!-- Hidden error message div -->
+                  <div id="otpErrorMessage" class="text-center" style="display: none; color: red; background-color: transparent;">
+                    OTP verification failed. Please try again.
+                  </div>
+                  <form id="formOtp">
+                    <div class="form-group">
+                      <input id="otp" type="text" name="otp" placeholder="Enter OTP" required maxlength="6" class="form-control" />
+                    </div>
+                    <div class="d-grid text-center form-group">
+                      <button type="submit" class="btn btn-fill-out btn-block hover-up" name="verifyOtp">
+                        Verify OTP
+                      </button>
+                    </div>
+                    <div class="text-muted text-center">
+                      Didn't receive the code?
+                      <a href="/api/auth/resend-otp">
+                        Resend OTP</a>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script defer type="module" src="/user/js/utils/user-login-verification-submit.js"></script>

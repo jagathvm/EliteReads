@@ -1,0 +1,155 @@
+<section class="content-main">
+  <div class="content-header mb-4">
+    <a href="/admin/categories" class="text-decoration-none text-muted">
+      <i class="material-icons md-arrow_back"></i> Go back
+    </a>
+  </div>
+
+  <div class="card card-user shadow-sm">
+    <div class="row g-0">
+      <!-- Details -->
+      <div class="col-md-8">
+        <div class="card-body">
+          <!-- Category Name -->
+          <h3 class="card-title text-primary mb-4 text-start"><%= category.name %></h3>
+          <!-- Category Details -->
+          <div class="mb-3">
+            <p class="mb-1 text-secondary text-start">
+              <strong>Description: </strong>
+              <span class="text-dark"><%= category.description %></span>
+            </p>
+          </div>
+
+          <div class="mb-3">
+            <p class="mb-1 text-secondary text-start">
+              <strong>Slug: </strong>
+              <span class="text-dark">/<%= category.slug %></span>
+            </p>
+          </div>
+
+          <div class="mb-3">
+            <p class="mb-1 text-secondary text-start">
+              <strong>Parent Category: </strong>
+              <span class="text-dark"><%= category.parent_category ? category.parent_category : 'None' %></span>
+            </p>
+          </div>
+
+          <!-- Subcategories -->
+          <% if (subCategories && subCategories.length > 0) { %>
+          <div class="mb-3">
+            <p class="mb-1 text-secondary text-start"><strong>Subcategories:</strong></p>
+            <div class="row">
+              <% subCategories.forEach((subCategory) => { %>
+              <div class="col-md-3 mb-3">
+                <a href="/admin/categories/<%= category.slug %>/<%= subCategory.slug %>">
+                  <div class="card shadow-sm border-0">
+                    <div class="card-body text-center p-2 bg-light">
+                      <h6 class="card-title text-primary fw-bold mb-0"><%= subCategory.name %></h6>
+                    </div>
+                  </div>
+                </a>
+              </div>
+              <% }) %>
+            </div>
+          </div>
+          <% } else { %>
+          <div class="mb-3">
+            <p class="mb-1 text-secondary text-start">
+              <strong>Subcategories:</strong>
+              <span class="text-dark">None</span>
+            </p>
+          </div>
+          <% } %>
+
+          <!-- Action Buttons -->
+          <div class="d-flex justify-content-start mt-4">
+            <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editCategoryModal">
+              Edit Category Details
+            </button>
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal">
+              Delete Category
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Edit Category Modal -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Form for editing category details -->
+        <form id="editCategoryForm">
+          <div class="mb-4">
+            <label for="edit_category_name" class="form-label">Category Name</label>
+            <input type="text" class="form-control" id="edit_category_name" name="name" value="<%= category.name %>" />
+          </div>
+          <div class="mb-4">
+            <label for="edit_category_description" class="form-label">Description</label>
+            <textarea class="form-control" rows="4" id="edit_category_description" name="description"><%= category.description %></textarea>
+          </div>
+          <div class="mb-4">
+            <label for="edit_category_slug" class="form-label">Slug</label>
+            <input type="text" class="form-control" id="edit_category_slug" name="slug" value="<%= category.slug %>" />
+          </div>
+          <div class="mb-4">
+            <label for="edit_category_parent" class="form-label">Parent Category</label>
+            <select class="form-select" id="edit_category_parent" name="parent_category">
+              <option value="<%= category.parent_category ? category.parent_category : '' %>" selected hidden><%= category.parent_category ? category.parent_category : 'None' %></option>
+              <option value="">None</option>
+              <% categories.forEach(categoryList => { %>
+              <option value="<%= categoryList.name %>" <%= categoryList.parent_category === categoryList.slug ? 'selected' : '' %>>
+                <%= categoryList.name %>
+              </option>
+              <% }) %>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" id="saveCategoryButton" data-category-slug="<%= category.slug %>">
+          Save changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Category Modal -->
+<div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteCategoryModalLabel">
+          Confirm Delete
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this category?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <button type="button" id="deleteCategoryButton" class="btn btn-danger" data-category-slug="<%= category.slug %>">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/admin/js/validators/admin-edit-category-validator.js"></script>
+
+<script defer type="module" src="/admin/js/utils/admin-edit-category-submit.js"></script>
+
+<script defer type="module" src="/admin/js/utils/admin-delete-category-submit.js"></script>

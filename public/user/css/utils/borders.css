@@ -1,0 +1,57 @@
+/*****************************
+*********  BORDER  *****
+******************************/
+.border-1 {
+  border-width: 1px !important;
+}
+
+.border-2 {
+  border-width: 2px !important;
+}
+
+.border-3 {
+  border-width: 3px !important;
+}
+
+.border-dotted {
+  border-style: dotted !important;
+}
+
+.border-solid {
+  border-style: solid !important;
+}
+
+.border-double {
+  border-style: double !important;
+}
+
+.border-dashed {
+  border-style: dashed !important;
+}
+
+.border-brand {
+  border-color: #088178 !important;
+}
+
+.border-muted {
+  border-color: #f7f8f9;
+}
+
+.section-border {
+  border-top: 1px solid #e6e9ec;
+  border-bottom: 1px solid #e6e9ec;
+}
+
+.border-color-1 {
+  border-color: #e0dede;
+}
+
+a,
+button,
+img,
+input,
+span,
+h4 {
+  -webkit-transition: all 0.3s ease 0s;
+  transition: all 0.3s ease 0s;
+}
