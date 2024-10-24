@@ -1,5 +1,3 @@
-import { adminLogInSchema } from "../validators/adminSchema.js";
-import { userSignUpSchema, userLogInSchema } from "../validators/userSchema.js";
 import {
   generateAccessToken,
   setCookie,
@@ -7,37 +5,24 @@ import {
   verifyPassword,
 } from "../services/authServices.js";
 import { sendOTP, verifyOTP } from "../services/otpServices.js";
-import { getCheckboxValue } from "../utils/utils.js";
 import { sendResponse, renderResponse } from "../utils/responseHandler.js";
 import { addUser, getAdmin, getUser } from "../services/dbServices.js";
 
-const getAdminLogin = (req, res) => {
-  return renderResponse(res, 200, "admin/admin-login", { req });
-};
+const getAdminLogin = (req, res) =>
+  renderResponse(res, 200, "admin/admin-login", { req });
 
-const getUserLogin = (req, res) => {
-  return renderResponse(res, 200, "user/user-login", { req });
-};
+const getUserLogin = (req, res) =>
+  renderResponse(res, 200, "user/user-login", { req });
 
-const getUserLoginVerification = (req, res) => {
-  return renderResponse(res, 200, "user/user-login-verify", { req });
-};
+const getUserLoginVerification = (req, res) =>
+  renderResponse(res, 200, "user/user-login-verify", { req });
 
-const getUserSignup = (req, res) => {
-  return renderResponse(res, 200, "user/user-signup", { req });
-};
+const getUserSignup = (req, res) =>
+  renderResponse(res, 200, "user/user-signup", { req });
 
 const postAdminLogin = async (req, res) => {
-  const data = { ...req.body };
   try {
-    const { error: validationError, value: validData } =
-      adminLogInSchema.validate(data, { abortEarly: false });
-
-    // Send error response if validation fails
-    if (validationError)
-      return sendResponse(res, 400, "Invalid Credentials", false);
-
-    const { email, password } = validData;
+    const { email, password } = req.validData;
     const { found: adminFound, value: admin } = await getAdmin({ email });
 
     // Send error response if admin is not found
@@ -65,23 +50,8 @@ const postAdminLogin = async (req, res) => {
 };
 
 const postUserSignup = async (req, res) => {
-  const data = { ...req.body };
-  data.checkbox = getCheckboxValue(data.checkbox);
-
   try {
-    const { error: validationError, value: validData } =
-      userSignUpSchema.validate(data, { abortEarly: true });
-
-    // Send error response if validation fails with the valida
-    if (validationError)
-      return sendResponse(
-        res,
-        400,
-        validationError.details.map((error) => error.message),
-        false
-      );
-
-    const { email, phone, password } = validData;
+    const { email, phone, password } = req.validData;
     const { found: userExists } = await getUser({
       $or: [{ email }, { phone }],
     });
@@ -120,24 +90,8 @@ const postUserSignup = async (req, res) => {
 };
 
 const postUserLogin = async (req, res) => {
-  const data = { ...req.body };
-  data.checkbox = getCheckboxValue(data.checkbox);
-
   try {
-    const { error: validationError, value: validData } =
-      userLogInSchema.validate(data, {
-        abortEarly: true,
-      });
-    if (validationError) {
-      return sendResponse(
-        res,
-        400,
-        validationError.details.map((error) => error.message),
-        false
-      );
-    }
-
-    const { emailOrPhone, password } = validData;
+    const { emailOrPhone, password } = req.validData;
 
     const { found: userFound, value: user } = await getUser({
       $or: [{ email: emailOrPhone }, { phone: emailOrPhone }],
@@ -146,7 +100,6 @@ const postUserLogin = async (req, res) => {
       return sendResponse(res, 404, "Invalid Username / Password", false);
 
     const passwordsMatch = await verifyPassword(password, user.password);
-
     if (!passwordsMatch)
       return sendResponse(res, 400, "Invalid Username / Password", false);
 
@@ -176,10 +129,7 @@ const postUserLogin = async (req, res) => {
 
 const postVerifyOtp = async (req, res) => {
   try {
-    const { otp } = { ...req.body };
-    const { phone } = req.cookies;
-
-    const otpVerification = await verifyOTP(phone, otp);
+    const otpVerification = await verifyOTP(req.cookies.phone, req.body.otp);
     if (!otpVerification || otpVerification.status !== "approved")
       return sendResponse(
         res,
@@ -192,7 +142,7 @@ const postVerifyOtp = async (req, res) => {
       found: userFound,
       value: user,
       errorMessage: userNotFound,
-    } = await getUser({ phone });
+    } = await getUser({ phone: req.cookies.phone });
     if (!userFound) return sendResponse(res, 404, userNotFound, false);
 
     setCookie(res, "accessToken", generateAccessToken({ userId: user._id }));

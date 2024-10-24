@@ -11,6 +11,7 @@ formOtp.addEventListener("submit", async (e) => {
   try {
     const apiClient = new HttpRequest("/api/auth");
     const response = await apiClient.post("/loginVerification", formData);
+    console.log(response);
 
     if (response.success) {
       showToast(response.message, true, "center");
@@ -25,7 +26,6 @@ formOtp.addEventListener("submit", async (e) => {
       }, 3000);
     }
   } catch (error) {
-    console.error(errorMessage);
     showToast(errorMessage, false);
   }
 });

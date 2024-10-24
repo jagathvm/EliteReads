@@ -1,8 +1,12 @@
 import HttpRequest from "../../../helpers/http-request.js";
+import { userSignupValidator } from "../validators/user-signup-validator.js";
 import { errorMessage, showToast } from "../../../helpers/toast.js";
 const postUserSignUpForm = document.getElementById("formSignUp");
 
 postUserSignUpForm.addEventListener("submit", async (e) => {
+  const isValid = await userSignupValidator.revalidate();
+  if (!isValid) return;
+
   const formData = new FormData(postUserSignUpForm);
 
   try {

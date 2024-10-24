@@ -1,5 +1,8 @@
 import { Router } from "express";
 import upload from "../middlewares/upload.js";
+import validateData from "../middlewares/validateData.js";
+import { adminLogInSchema } from "../validators/adminSchema.js";
+import { userSignUpSchema, userLogInSchema } from "../validators/userSchema.js";
 import {
   getAdminLogin,
   postAdminLogin,
@@ -18,9 +21,24 @@ router.get("/login", getUserLogin);
 router.get("/loginVerification", getUserLoginVerification);
 router.get("/signup", getUserSignup);
 
-router.post("/adminLogin", upload.none(), postAdminLogin);
-router.post("/login", upload.none(), postUserLogin);
+router.post(
+  "/adminLogin",
+  upload.none(),
+  validateData(adminLogInSchema),
+  postAdminLogin
+);
+router.post(
+  "/login",
+  upload.none(),
+  validateData(userLogInSchema),
+  postUserLogin
+);
 router.post("/loginVerification", upload.none(), postVerifyOtp);
-router.post("/signup", upload.none(), postUserSignup);
+router.post(
+  "/signup",
+  upload.none(),
+  validateData(userSignUpSchema),
+  postUserSignup
+);
 
 export default router;

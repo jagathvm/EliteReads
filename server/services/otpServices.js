@@ -18,7 +18,7 @@ const verifyOTP = async (to, otp) => {
     return await client.verify.v2
       .services(process.env.TWILIO_SERVICE_SID)
       .verificationChecks.create({
-        to: `+91${to}`,
+        to: `+91 ${to}`,
         code: otp,
       });
   } catch (error) {
