@@ -1,67 +1,18 @@
-export const editBookValidator = new JustValidate("#editBookForm", {
+export const editBookDetailsValidator = new JustValidate("#editBookForm", {
   errorFieldCssClass: "error-field",
   errorLabelCssClass: "error-label",
 });
 
-editBookValidator
-  // File Input (Book Cover Image)
-  .addField("#editCoverImage", [
-    {
-      validator: (value, fields) => {
-        const fileInput = fields["#editCoverImage"].elem;
-        return fileInput.files.length === 0 || fileInput.files.length >= 1;
-      },
-      errorMessage: "Upload at least one image.",
-    },
-    {
-      validator: (value, fields) => {
-        const fileInput = fields["#editCoverImage"].elem;
-        return fileInput.files.length === 0 || fileInput.files.length <= 6;
-      },
-      errorMessage: "Uploading more than 6 images is not allowed.",
-    },
-    {
-      validator: (value, fields) => {
-        const fileInput = fields["#editCoverImage"].elem;
-        if (fileInput.files.length === 0) return true; // Skip validation if no files
-        return Array.from(fileInput.files).every(
-          (file) =>
-            ["image/jpeg", "image/png", "image/jpg"].includes(file.type) &&
-            file.size >= 10000 &&
-            file.size <= 2000000
-        );
-      },
-      errorMessage:
-        "Please upload a valid image (JPEG/JPG/PNG, size 10KB - 2MB).",
-    },
-  ])
+export const editBookImageValidator = new JustValidate(
+  "#updateCoverImageForm",
+  {
+    errorFieldCssClass: "error-field",
+    errorLabelCssClass: "error-label",
+    successFieldCssClass: "success-field",
+  }
+);
 
-  // // File Input (Book Cover Image)
-  // .addField("#editCoverImage", [
-  //   {
-  //     rule: "minFilesCount",
-  //     value: 1,
-  //     errorMessage: "Upload atleast one image.",
-  //   },
-  //   {
-  //     rule: "maxFilesCount",
-  //     value: 6,
-  //     errorMessage: "Uploading more than 6 images is not allowed.",
-  //   },
-  //   {
-  //     rule: "files",
-  //     value: {
-  //       files: {
-  //         types: ["image/jpeg", "image/png", "image/jpg"],
-  //         minSize: 10000,
-  //         maxSize: 2000000,
-  //       },
-  //     },
-  //     errorMessage:
-  //       "Please upload a valid image (JPEG/JPG/PNG, size 10KB - 2MB)",
-  //   },
-  // ])
-
+editBookDetailsValidator
   // Book Title
   .addField("#editTitle", [
     {
@@ -226,6 +177,33 @@ editBookValidator
       value: 1,
       errorMessage: "Subcategory selection is invalid",
     },
+  ]);
+
+editBookImageValidator
+  // File Input (Book Cover Image)
+  .addField("#updateCoverImage", [
+    {
+      rule: "minFilesCount",
+      value: 1,
+      errorMessage: "Upload atleast one image.",
+    },
+    {
+      rule: "maxFilesCount",
+      value: 6,
+      errorMessage: "Uploading more than 6 images is not allowed.",
+    },
+    {
+      rule: "files",
+      value: {
+        files: {
+          types: ["image/jpeg", "image/png", "image/jpg"],
+          minSize: 10000,
+          maxSize: 2000000,
+        },
+      },
+      errorMessage:
+        "Please upload a valid image (JPEG/JPG/PNG, size 10KB - 2MB)",
+    },
   ])
 
   // Add the removedImageUrls field
@@ -253,31 +231,41 @@ editBookValidator
   ]);
 
 // Attach event listeners
+
 document
   .querySelectorAll(
-    "#editBookForm input, #editBookForm textarea, #editBookForm select"
+    "#editBookForm textarea, #editBookForm select, #updateCoverImageForm input"
   )
   .forEach((element) => {
     const selector = `#${element.id}`;
 
-    if (element.tagName === "INPUT" || element.tagName === "TEXTAREA") {
-      element.addEventListener("blur", () => {
-        editBookValidator.revalidateField(selector);
+    if (element.tagName === "TEXTAREA") {
+      element.addEventListener("input", () => {
+        editBookDetailsValidator.revalidateField(selector);
       });
 
+      element.addEventListener("blur", () => {
+        editBookDetailsValidator.revalidateField(selector);
+      });
+    }
+
+    if (element.tagName === "INPUT") {
       element.addEventListener("input", () => {
-        editBookValidator.revalidateField(selector);
+        editBookImageValidator.revalidateField(selector);
+      });
+
+      element.addEventListener("blur", () => {
+        editBookImageValidator.revalidateField(selector);
       });
     }
 
     if (element.tagName === "SELECT") {
       element.addEventListener("change", () => {
-        editBookValidator.revalidateField(selector);
+        editBookDetailsValidator.revalidateField(selector);
       });
 
-      // Add blur event for SELECT elements
       element.addEventListener("blur", () => {
-        editBookValidator.revalidateField(selector);
+        editBookDetailsValidator.revalidateField(selector);
       });
     }
   });

@@ -18,6 +18,7 @@ import {
   getBooks,
   getBook,
   addBook,
+  updateBook,
   removeBook,
 } from "../services/booksServices.js";
 
@@ -328,21 +329,27 @@ const getAdminAuthorProfile = (req, res) => {
 
 const postAdminAddBook = async (req, res) => {
   const isFeatured = req.validData.featured === "on";
+  const { title, isbn } = req.validData;
   const coverImages = req.files;
 
   try {
+    const { found: bookFound } = await getBook({
+      $or: [{ title }, { isbn }],
+    });
+    if (bookFound) return sendResponse(res, 400, "Book already exists", false);
+
     if (!coverImages || coverImages.length === 0)
       return sendResponse(res, 400, "No cover images uploaded", false);
 
     const coverImageUrls = await uploadImagesToCloudinary(coverImages, "books");
-    const bookSlug = slugWithIsbn(req.validData.title, req.validData.isbn);
+    const bookSlug = slugWithIsbn(title, isbn);
 
     const newBook = {
-      title: req.validData.title,
+      title,
       author: req.validData.author,
       description: req.validData.description,
       price: req.validData.price,
-      isbn: req.validData.isbn,
+      isbn,
       publisher: req.validData.publisher,
       year: req.validData.year,
       language: req.validData.language,
@@ -369,97 +376,74 @@ const postAdminAddBook = async (req, res) => {
 };
 
 const editAdminBook = async (req, res) => {
-  // console.log(req.validData);
-  // console.log(req.files);
-  // console.log(bookSlug);
   const { bookSlug } = req.params;
-  const { removedImageUrls, featured: isFeatured, ...data } = { ...req.body };
-  // Convert 'featured' checkbox to boolean
-  data.featured = isFeatured === "true" ? true : false;
-  // Extract updated image files from the request
-  const updatedImages = req.files;
-  // Parse removed image file URLs if provided
-  const parsedRemovedImageUrls = removedImageUrls
-    ? JSON.parse(removedImageUrls)
-    : [];
+  const { title, isbn } = req.validData;
+  const updatedBookData = {
+    title,
+    author: req.validData.author,
+    language: req.validData.language,
+    featured: Boolean(req.validData.featured),
+    description: req.validData.description,
+    price: req.validData.price,
+    isbn,
+    publisher: req.validData.publisher,
+    year: req.validData.year,
+    pages: req.validData.pages,
+    weight: req.validData.weight,
+    category: new ObjectId(req.validData.category),
+    subcategory: req.validData.subcategory
+      ? new ObjectId(req.validData.subcategory)
+      : "",
+  };
+
   try {
     const {
-      found,
+      found: bookFound,
+      errorMessage: bookNotFound,
       value: book,
-      errorMessage: bookError,
     } = await getBook({ bookSlug });
-    if (!found) {
-      // Send error response if book is not found
-      return sendResponse(res, 404, bookError, false);
-    }
-    // Generate new slug if title or ISBN changes
-    if (
-      book.title !== updatedBookData.title ||
-      book.isbn !== updatedBookData.isbn
-    ) {
-      updatedBookData.slugWithIsbn = slugWithIsbn(updatedBookData);
+    if (!bookFound) return sendResponse(res, 404, bookNotFound, false);
+
+    if (book.title !== title || book.isbn !== isbn) {
+      updatedBookData.bookSlug = slugWithIsbn(title, isbn);
+
       // Check if the new slug already exists to avoid conflicts
-      const { value: existingBook } = await getBook({
-        slugWithIsbn: updatedBookData.slugWithIsbn,
+      const { found: bookExists } = await getBook({
+        bookSlug: updatedBookData.bookSlug,
       });
-      if (existingBook) {
+
+      if (bookExists)
         return sendResponse(
           res,
           400,
-          "A book with the same title or ISBN already exists.",
+          "A book with the same title and ISBN already exists.",
           false
         );
-      }
-    }
-    // Filter remaining image URLs
-    const currentImageUrls = book.coverImageUrls || [];
-    const remainingImageUrls = currentImageUrls.filter(
-      (url) => !parsedRemovedImageUrls.includes(url)
-    );
-    // Ensure there is at least one image (either uploaded or remaining)
-    if (updatedImages.length === 0 && remainingImageUrls.length === 0)
-      return sendResponse(res, 404, "No files uploaded.", false);
-    // Remove the images from Cloudinary that are marked for removal
-    if (parsedRemovedImageUrls.length > 0) {
-      await deleteImagesFromCloudinary(parsedRemovedImageUrls, "books");
-    }
-    // Update the book's image URLs by removing the old ones
-    await updateBook(
-      { slugWithIsbn: bookSlug },
-      { $pull: { coverImageUrls: { $in: parsedRemovedImageUrls } } }
-    );
-    if (updatedImages.length > 0) {
-      const updatedImagesUrls = await uploadImagesToCloudinary(
-        updatedImages,
-        "books"
-      );
-      // Update the book's image URLs by adding the new ones
-      await updateBook(
-        { slugWithIsbn: bookSlug },
+
+      // Update the book in the database
+      const { acknowledged } = await updateBook(
+        { bookSlug },
         {
-          $push: { coverImageUrls: { $each: updatedImagesUrls } },
           $set: updatedBookData,
         }
       );
-      // Send success response
-      return sendResponse(
-        res,
-        200,
-        "Updated Book Details",
-        true,
-        updatedBookData.slugWithIsbn
-      );
+      if (!acknowledged)
+        return sendResponse(res, 400, "Failed to update book", false);
+
+      return sendResponse(res, 200, "Book updated successfully", true);
     }
-    // If no new images are uploaded, just update the book data
-    await updateBook({ slugWithIsbn: bookSlug }, { $set: updatedBookData });
-    // Send success response
-    return sendResponse(
-      res,
-      200,
-      "Updated Book Details",
-      true,
-      updatedBookData.slugWithIsbn
+
+    // Update the book in the database
+    const { acknowledged } = await updateBook(
+      { bookSlug },
+      {
+        $set: updatedBookData,
+      }
     );
+    if (!acknowledged)
+      return sendResponse(res, 400, "Failed to update book", false);
+
+    return sendResponse(res, 200, "Book updated successfully", true);
   } catch (error) {
     console.error(`An unexpected error occurred. ${error}`);
     // Send error response
@@ -470,6 +454,11 @@ const editAdminBook = async (req, res) => {
       false
     );
   }
+};
+
+const editAdminBookImage = async (req, res) => {
+  console.log(req.body);
+  console.log(req.files);
 };
 
 const deleteAdminBook = async (req, res) => {
@@ -487,7 +476,6 @@ const deleteAdminBook = async (req, res) => {
 
     // Remove the book from the database
     const { deletedCount } = await removeBook({ bookSlug });
-    console.log(deletedCount);
     if (!deletedCount)
       // Send error response if deletion fails
       return sendResponse(res, 400, "Failed to Delete Book Data", false);
@@ -496,7 +484,6 @@ const deleteAdminBook = async (req, res) => {
     return sendResponse(res, 204);
   } catch (error) {
     console.error("Error deleting book:", error);
-
     // Send error response
     return sendResponse(
       res,
@@ -675,6 +662,7 @@ export {
   getAdminAuthorProfile,
   postAdminAddBook,
   editAdminBook,
+  editAdminBookImage,
   deleteAdminBook,
   postAdminAddCategory,
   editAdminCategory,

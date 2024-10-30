@@ -55,6 +55,11 @@
             Edit Book Details
           </button>
 
+          <!-- Update Cover Image Button -->
+          <button type="button" class="btn btn-secondary mt-3" data-bs-toggle="modal" data-bs-target="#updateCoverImageModal">
+            Update Cover Image
+          </button>
+
           <!-- Delete Button -->
           <button type="button" class="btn btn-danger mt-3" data-bs-toggle="modal" data-bs-target="#deleteBookModal">
             Delete Book
@@ -78,6 +83,7 @@
         </div>
       </div>
       <div class="modal-body">
+        <!-- Main Book Details Form -->
         <form id="editBookForm" data-book-bookSlug="<%= book.bookSlug %>" enctype="multipart/form-data">
           <div class="row">
             <!-- Title and Author on the left side -->
@@ -91,32 +97,20 @@
                 <input type="text" class="form-control" id="editAuthor" name="author" value="<%= book.author %>">
               </div>
             </div>
-
-            <!-- Cover Image on the right side -->
             <div class="col-md-6">
               <div class="mb-3">
-                <label for="editCoverImage" class="form-label">Cover Image</label>
-                <div id="coverImagePreviews" class="mt-2 d-flex flex-wrap">
-                  <% if (book.coverImageUrls && book.coverImageUrls.length > 0) { %>
-                  <% book.coverImageUrls.forEach((coverImageUrl, index) => { %>
-                  <div class="position-relative me-2 mb-2 preview-container">
-                    <img src="<%= coverImageUrl %>" alt="<%= book.title %> Cover Image" class="img-fluid preview-image" style="height: 100px; object-fit: cover;">
-                    <button type="button" class="btn btn-link text-danger text-decoration-none p-0 remove-preview-image" data-index="<%= index %>">
-                      &times;
-                    </button>
-                  </div>
-                  <% }) %>
-                  <% } else { %>
-                  <p>No cover images available.</p>
-                  <% } %>
-                </div>
-                <input type="file" class="form-control" id="editCoverImage" name="cover_image" multiple hidden>
-                <div id="newImagePreviews" class="mt-2 d-flex flex-wrap"></div>
+                <label for="editLanguage" class="form-label">Language</label>
+                <input type="text" class="form-control" id="editLanguage" name="language" value="<%= book.language %>">
+              </div>
+              <div class="mb-3">
+                <label for="editFeatured" class="form-label">Featured</label>
+                <select class="form-select" id="editFeatured" name="featured">
+                  <option selected hidden><%= book.featured ? 'Yes' : 'No' %></option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
               </div>
             </div>
-
-            <!-- Hidden input for storing removedImageUrls -->
-            <input type="hidden" id="removedImageUrls" name="removedImageUrls">
           </div>
 
           <div class="mb-3">
@@ -125,18 +119,7 @@
           </div>
 
           <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="editLanguage" class="form-label">Language</label>
-              <input type="text" class="form-control" id="editLanguage" name="language" value="<%= book.language %>">
-            </div>
-            <div class="col-md-6 mb-3">
-              <label for="editFeatured" class="form-label">Featured</label>
-              <select class="form-select" id="editFeatured" name="featured">
-                <option selected hidden><%= book.featured ? 'Yes' : 'No' %></option>
-                <option value="true">Yes</option>
-                <option value="false">No</option>
-              </select>
-            </div>
+
           </div>
 
           <div class="row">
@@ -199,6 +182,51 @@
             </div>
           </div>
         </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Update Cover Image Modal -->
+<div class="modal fade" id="updateCoverImageModal" tabindex="-1" aria-labelledby="updateCoverImageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header d-flex justify-content-between align-items-start">
+        <div>
+          <h5 class="modal-title" id="updateCoverImageModalLabel">Update Cover Image</h5>
+        </div>
+        <div>
+          <button type="submit" id="saveCoverImageButton" class="btn btn-primary">Save Changes</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <form id="updateCoverImageForm" data-book-bookSlug="<%= book.bookSlug %>" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label for="updateCoverImage" class="form-label">New Cover Image</label>
+            <input type="file" class="form-control" id="updateCoverImage" name="cover_image" multiple>
+          </div>
+          <div class="mb-3">
+            <div id="coverImagePreviews" class="mt-2 d-flex flex-wrap">
+              <% if (book.coverImageUrls && book.coverImageUrls.length > 0) { %>
+              <% book.coverImageUrls.forEach((coverImageUrl, index) => { %>
+              <div class="position-relative me-2 mb-2 preview-container">
+                <img src="<%= coverImageUrl %>" alt="<%= book.title %> Cover Image" class="img-fluid preview-image" style="height: 100px; object-fit: cover;">
+                <button type="button" class="btn btn-link text-danger text-decoration-none p-0 remove-preview-image" data-index="<%= index %>">
+                  &times;
+                </button>
+              </div>
+              <% }) %>
+              <% } else { %>
+              <p>No cover images available.</p>
+              <% } %>
+            </div>
+            <!-- newImagePreviews -->
+            <div id="newImagePreviews" class="mt-2 d-flex flex-wrap"></div>
+          </div>
+          <!-- Hidden input for storing removedImageUrls -->
+          <input id="removedImageUrls" name="removedImageUrls" hidden>
+        </form>
       </div>
     </div>
   </div>
@@ -226,7 +254,7 @@
 
 <script type="module" src="/admin/js/validators/admin-edit-book-validator.js"></script>
 
-<script type="module" src="/admin/js/utils/admin-edit-book.js"></script>
+<script type="module" src="/admin/js/utils/admin-edit-book-submit.js"></script>
 
 <script type="module" src="/admin/js/utils/admin-delete-book-submit.js"></script>
 

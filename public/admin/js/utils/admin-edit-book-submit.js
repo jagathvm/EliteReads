@@ -1,14 +1,18 @@
 import HttpRequest from "../../../helpers/http-request.js";
-import { editBookValidator } from "../validators/admin-edit-book-validator.js";
+import {
+  editBookDetailsValidator,
+  editBookImageValidator,
+} from "../validators/admin-edit-book-validator.js";
 import { errorMessage, showToast } from "../../../helpers/toast.js";
 
 const editBookForm = document.getElementById("editBookForm");
+const updateCoverImageForm = document.getElementById("updateCoverImageForm");
 const saveBookButton = document.getElementById("saveBookButton");
+const saveCoverImageButton = document.getElementById("saveCoverImageButton");
 const categorySelect = document.getElementById("editCategory");
 const subcategorySelect = document.getElementById("editSubcategory");
 
 const originalData = {
-  cover_image: document.getElementById("editCoverImage").value,
   title: document.getElementById("editTitle").value,
   author: document.getElementById("editAuthor").value,
   description: document.getElementById("editDescription").value,
@@ -26,7 +30,6 @@ const originalData = {
 
 saveBookButton.addEventListener("click", async (e) => {
   const currentData = {
-    cover_image: document.getElementById("editCoverImage").value,
     title: document.getElementById("editTitle").value,
     author: document.getElementById("editAuthor").value,
     description: document.getElementById("editDescription").value,
@@ -48,7 +51,7 @@ saveBookButton.addEventListener("click", async (e) => {
   if (isUnchanged)
     return showToast("Please modify the fields before submitting.", false);
 
-  const isValid = await editBookValidator.revalidate();
+  const isValid = await editBookDetailsValidator.revalidate();
   if (!isValid)
     return showToast(
       "Please review the form and correct any errors before submitting.",
@@ -61,6 +64,33 @@ saveBookButton.addEventListener("click", async (e) => {
   try {
     const apiClient = new HttpRequest("/admin/books");
     const response = await apiClient.patch(`/${bookSlug}`, formData);
+    if (response.success) {
+      const slug = response.data ? response.data : bookSlug;
+      showToast(response.message, true);
+      setTimeout(() => {
+        window.location.href = `/admin/books/${slug}`;
+      }, 2000);
+    } else {
+      return showToast(
+        response.message || response.error || errorMessage,
+        false
+      );
+    }
+  } catch (error) {
+    console.error(error);
+    showToast(response.message || response.error || errorMessage, false);
+  }
+});
+
+saveCoverImageButton.addEventListener("click", async (e) => {
+  const isValid = await editBookImageValidator.revalidate();
+  if (!isValid) return e.preventDefault();
+
+  const bookSlug = updateCoverImageForm.getAttribute("data-book-bookSlug");
+  const formData = new FormData(updateCoverImageForm);
+  try {
+    const apiClient = new HttpRequest("/admin/books");
+    const response = await apiClient.patch(`/${bookSlug}/upload`, formData);
     if (response.success) {
       const slug = response.data ? response.data : bookSlug;
       showToast(response.message, true);

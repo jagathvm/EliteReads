@@ -38,8 +38,13 @@ router.post(
   adminController.postAdminAddBook
 );
 router.patch(
-  "/books/:bookSlug",
+  "/books/:bookSlug/upload",
   upload.array("cover_image", 6),
+  adminController.editAdminBookImage
+);
+router.patch(
+  "/books/:bookSlug",
+  upload.none(),
   validateData(bookSchema),
   adminController.editAdminBook
 );
