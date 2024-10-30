@@ -5,6 +5,28 @@ export const userSignupValidator = new JustValidate("#formSignUp", {
 });
 
 userSignupValidator
+  .addField("#username", [
+    {
+      rule: "required",
+      errorMessage: "Username is required",
+    },
+    {
+      rule: "minLength",
+      value: 3,
+      errorMessage: "Username must be at least 3 characters",
+    },
+    {
+      rule: "maxLength",
+      value: 20,
+      errorMessage: "Username must not exceed 20 characters",
+    },
+    {
+      rule: "customRegexp",
+      value: /^[a-z0-9_]+$/,
+      errorMessage:
+        "Username can contain only lowercase letters, numbers, and underscores",
+    },
+  ])
   .addField("#email", [
     {
       rule: "required",

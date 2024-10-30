@@ -1,39 +1,25 @@
 import { ObjectId } from "mongodb";
-import {
-  capitalisation,
-  attachSubCategoriesToCategories,
-  slugWithIsbn,
-} from "../utils/utils.js";
-import { validateData } from "../utils/validationHandler.js";
-import {
-  bookSchema,
-  categorySchema,
-  subCategorySchema,
-} from "../validators/adminSchema.js";
+import { capitalisation, slugWithIsbn } from "../utils/utils.js";
 import { sendResponse, renderResponse } from "../utils/responseHandler.js";
 import {
   deleteImagesFromCloudinary,
   uploadImagesToCloudinary,
 } from "../utils/cloudinaryHandler.js";
 import {
+  getAggregatedCategories,
+  getCategories,
+  getCategory,
+  addCategory,
+  updateCategory,
+  removeCategory,
+} from "../services/categoriesServices.js";
+import {
+  getAggregatedBooks,
+  getBooks,
   getBook,
   addBook,
   removeBook,
-  updateBook,
-  getCategory,
-  getSubcategory,
-  addSubcategory,
-  updateCategory,
-  addCategory,
-  removeCategory,
-  removeSubcategory,
-  updateSubcategory,
-  getBooks,
-  getCategories,
-  getSubcategories,
-  getUsers,
-  getUser,
-} from "../services/dbServices.js";
+} from "../services/booksServices.js";
 
 const getAdminDashboard = (req, res) => {
   req.app.set("layout", "admin/layout/layout-admin");
@@ -42,22 +28,8 @@ const getAdminDashboard = (req, res) => {
 
 const getAdminBooks = async (req, res) => {
   try {
-    const {
-      found: booksFound,
-      errorMessage: booksNotFound,
-      value: books,
-    } = await getBooks();
-
-    if (!booksFound) return sendResponse(res, 404, booksNotFound, false);
-
-    const {
-      found: categoriesFound,
-      errorMessage: categoriesNotFound,
-      value: categories,
-    } = await getCategories();
-
-    if (!categoriesFound)
-      return sendResponse(res, 404, categoriesNotFound, false);
+    const { value: books } = await getBooks();
+    const { value: categories } = await getCategories();
 
     return renderResponse(res, 200, "admin/admin-books", {
       req,
@@ -72,16 +44,30 @@ const getAdminBooks = async (req, res) => {
 
 const getAdminAddBook = async (req, res) => {
   try {
+    const pipeline = [
+      {
+        $match: {
+          parentCategory: "",
+        },
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "_id",
+          foreignField: "parentCategory",
+          as: "subCategories",
+        },
+      },
+    ];
+
     const {
       found: categoriesFound,
       errorMessage: categoriesNotFound,
       value: categories,
-    } = await getCategories();
+    } = await getAggregatedCategories(pipeline);
 
     if (!categoriesFound)
       return sendResponse(res, 404, categoriesNotFound, false);
-
-    await attachSubCategoriesToCategories(categories);
 
     return renderResponse(res, 200, "admin/admin-add-book", {
       req,
@@ -94,27 +80,77 @@ const getAdminAddBook = async (req, res) => {
 };
 
 const getAdminBookDetails = async (req, res) => {
-  const { slugWithIsbn } = req.params;
+  const { bookSlug } = req.params;
 
   try {
+    const bookPipeline = [
+      {
+        $match: {
+          bookSlug,
+        },
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      {
+        $unwind: {
+          path: "$category",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "subcategory",
+          foreignField: "_id",
+          as: "subcategory",
+        },
+      },
+      {
+        $unwind: {
+          path: "$subcategory",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+    ];
+
     const {
       found: bookFound,
       errorMessage: bookNotFound,
-      value: book,
-    } = await getBook({ slugWithIsbn });
+      value: [book],
+    } = await getAggregatedBooks(bookPipeline);
 
     if (!bookFound) return sendResponse(res, 404, bookNotFound, false);
+
+    const categoriesPipeline = [
+      {
+        $match: {
+          parentCategory: "",
+        },
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "_id",
+          foreignField: "parentCategory",
+          as: "subCategories",
+        },
+      },
+    ];
 
     const {
       found: categoriesFound,
       errorMessage: categoriesNotFound,
       value: categories,
-    } = await getCategories();
+    } = await getAggregatedCategories(categoriesPipeline);
 
     if (!categoriesFound)
       return sendResponse(res, 404, categoriesNotFound, false);
-
-    await attachSubCategoriesToCategories(categories);
 
     return renderResponse(res, 200, "admin/admin-book-details", {
       req,
@@ -138,14 +174,7 @@ const getAdminOrderDetails = (req, res) => {
 
 const getAdminAddCategory = async (req, res) => {
   try {
-    const {
-      found: categoriesFound,
-      errorMessage: categoriesNotFound,
-      value: categories,
-    } = await getCategories();
-
-    if (!categoriesFound)
-      return sendResponse(res, 400, categoriesNotFound, false);
+    const { value: categories } = await getCategories();
 
     return renderResponse(res, 200, "admin/admin-add-category", {
       req,
@@ -160,14 +189,22 @@ const getAdminAddCategory = async (req, res) => {
 
 const getAdminCategories = async (req, res) => {
   try {
-    const {
-      found: categoriesFound,
-      errorMessage: categoriesNotFound,
-      value: categories,
-    } = await getCategories();
-
-    if (!categoriesFound)
-      return sendResponse(res, 400, categoriesNotFound, false);
+    const pipeline = [
+      {
+        $match: {
+          parentCategory: "",
+        },
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "_id",
+          foreignField: "parentCategory",
+          as: "subCategories",
+        },
+      },
+    ];
+    const { value: categories } = await getAggregatedCategories(pipeline);
 
     return renderResponse(res, 200, "admin/admin-categories", {
       req,
@@ -180,63 +217,47 @@ const getAdminCategories = async (req, res) => {
 };
 
 const getAdminCategoryDetails = async (req, res) => {
+  const { categorySlug: slug } = req.params;
   try {
-    const { categorySlug: slug } = req.params;
+    const pipeline = [
+      {
+        $match: { slug },
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "parentCategory",
+          foreignField: "_id",
+          as: "parentCategory",
+        },
+      },
+      {
+        $unwind: {
+          path: "$parentCategory",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "_id",
+          foreignField: "parentCategory",
+          as: "subCategories",
+        },
+      },
+    ];
 
-    const { found: categoryFound, value: category } = await getCategory({
-      slug,
-    });
+    const {
+      found: categoryFound,
+      value: [category],
+    } = await getAggregatedCategories(pipeline);
     if (!categoryFound) return renderResponse(res, 404, "admin/404", { req });
 
-    const { found: categoriesFound, value: categories } = await getCategories();
-    if (!categoriesFound)
-      return sendResponse(res, 404, "Oops! Something went wrong.", false);
-
-    const { found: subCategoriesFound, value: subCategories } =
-      await getSubcategories({ _id: { $in: category.subCategories || [] } });
-    if (!subCategoriesFound)
-      return sendResponse(res, 404, "Oops! Something went wrong.", false);
+    const { value: categories } = await getCategories();
 
     return renderResponse(res, 200, "admin/admin-category-details", {
       req,
       category,
-      categories,
-      subCategories,
-    });
-  } catch (error) {
-    console.error(`An unexpected error occurred. ${error}`);
-    return sendResponse(res, 500, error.message, false);
-  }
-};
-
-const getAdminSubCategoryDetails = async (req, res) => {
-  try {
-    const { subCategorySlug: slug } = req.params;
-
-    const { found: subCategoryFound, value: subCategory } =
-      await getSubcategory({ slug });
-    if (!subCategoryFound)
-      return renderResponse(res, 404, "admin/404", { req });
-
-    const { found: subCategoriesFound, value: subCategories } =
-      await getSubcategories({ _id: { $in: category.subCategories || [] } });
-    if (!subCategoriesFound)
-      return sendResponse(res, 404, "Oops! Something went wrong.", false);
-
-    const { found: parentCategoryFound, value: parentCategory } =
-      await getCategory({ name: subCategory.parent_category });
-    if (!parentCategoryFound)
-      return sendResponse(res, 404, "Oops! Something went wrong.", false);
-
-    const { found: categoriesFound, value: categories } = await getCategories();
-    if (!categoriesFound)
-      return sendResponse(res, 404, "Oops! Something went wrong.", false);
-
-    return renderResponse(res, 200, "admin/admin-subcategory-details", {
-      req,
-      subCategory,
-      subCategories,
-      parentCategory,
       categories,
     });
   } catch (error) {
@@ -284,11 +305,9 @@ const getAdminUsers = async (req, res) => {
 };
 
 const getAdminUserProfile = async (req, res) => {
-  const { id: userId } = req.params;
+  const { username } = req.params;
 
-  const { found: userFound, value: user } = await getUser({
-    _id: new ObjectId(userId),
-  });
+  const { found: userFound, value: user } = await getUser({ username });
   if (!userFound) return renderResponse(res, 404, "admin/404", { req });
 
   return renderResponse(res, 200, "admin/admin-user-profile", {
@@ -308,98 +327,77 @@ const getAdminAuthorProfile = (req, res) => {
 };
 
 const postAdminAddBook = async (req, res) => {
-  const rawData = { ...req.body };
+  const isFeatured = req.validData.featured === "on";
   const coverImages = req.files;
-  const { featured: isFeatured, ...data } = rawData;
-  data.featured = isFeatured === "on" ? true : false;
 
   try {
-    // validate data to upload
-    const {
-      valid,
-      value: bookData,
-      errorMessage,
-    } = validateData(data, bookSchema);
+    if (!coverImages || coverImages.length === 0)
+      return sendResponse(res, 400, "No cover images uploaded", false);
 
-    if (!valid) {
-      // Send validation error response if data is invalid
-      return sendResponse(res, 400, errorMessage, false);
-    }
-
-    // Check for uploaded images
-    if (!coverImages || coverImages.length === 0) {
-      return sendResponse(res, 400, "No files uploaded", false);
-    }
-
-    // Upload images and retrieve URLS
     const coverImageUrls = await uploadImagesToCloudinary(coverImages, "books");
+    const bookSlug = slugWithIsbn(req.validData.title, req.validData.isbn);
 
-    // Add image URLS and slugWithIsbn value to the bookData
-    bookData.coverImageUrls = coverImageUrls;
-    bookData.slugWithIsbn = slugWithIsbn(bookData);
+    const newBook = {
+      title: req.validData.title,
+      author: req.validData.author,
+      description: req.validData.description,
+      price: req.validData.price,
+      isbn: req.validData.isbn,
+      publisher: req.validData.publisher,
+      year: req.validData.year,
+      language: req.validData.language,
+      pages: req.validData.pages,
+      weight: req.validData.weight,
+      featured: isFeatured,
+      coverImageUrls,
+      bookSlug,
+      category: new ObjectId(req.validData.category),
+      subcategory: req.validData.subcategory
+        ? new ObjectId(req.validData.subcategory)
+        : "",
+    };
 
-    // Add the book data to the database
-    const result = await addBook(bookData);
-    if (!result.acknowledged) {
-      return sendResponse(res, 400, "Book Upload Failed.", false);
-    }
+    const { acknowledged } = await addBook(newBook);
+    if (!acknowledged)
+      return sendResponse(res, 400, "Failed to add book", false);
 
-    // Send success response
-    return sendResponse(res, 200, "Book Added Successfully", true);
+    return sendResponse(res, 200, "Book added successfully", true);
   } catch (error) {
-    console.error(`An unexpected error occurred. ${error}`);
-
-    // Send error response
-    return sendResponse(res, 500, "An unexpected error occurred.", false);
+    console.error(`Error: ${error.message}`);
+    return sendResponse(res, 500, "An unexpected error occurred", false);
   }
 };
 
 const editAdminBook = async (req, res) => {
-  // Extract book identifier from request parameters
-  const { slugWithIsbn: bookSlug } = req.params;
+  // console.log(req.validData);
+  // console.log(req.files);
+  // console.log(bookSlug);
+  const { bookSlug } = req.params;
   const { removedImageUrls, featured: isFeatured, ...data } = { ...req.body };
-
   // Convert 'featured' checkbox to boolean
   data.featured = isFeatured === "true" ? true : false;
-
   // Extract updated image files from the request
   const updatedImages = req.files;
   // Parse removed image file URLs if provided
   const parsedRemovedImageUrls = removedImageUrls
     ? JSON.parse(removedImageUrls)
     : [];
-
   try {
-    // Validate book data
-    const {
-      valid,
-      value: updatedBookData,
-      errorMessage: updatedBookDataError,
-    } = validateData(data, bookSchema);
-
-    if (!valid) {
-      // Send validation error response if data is invalid
-      return sendResponse(res, 400, updatedBookDataError, false);
-    }
-
-    // Retrieve the existing book by its slugWithIsbn
     const {
       found,
       value: book,
       errorMessage: bookError,
-    } = await getBook({ slugWithIsbn: bookSlug });
+    } = await getBook({ bookSlug });
     if (!found) {
       // Send error response if book is not found
       return sendResponse(res, 404, bookError, false);
     }
-
     // Generate new slug if title or ISBN changes
     if (
       book.title !== updatedBookData.title ||
       book.isbn !== updatedBookData.isbn
     ) {
       updatedBookData.slugWithIsbn = slugWithIsbn(updatedBookData);
-
       // Check if the new slug already exists to avoid conflicts
       const { value: existingBook } = await getBook({
         slugWithIsbn: updatedBookData.slugWithIsbn,
@@ -413,34 +411,28 @@ const editAdminBook = async (req, res) => {
         );
       }
     }
-
     // Filter remaining image URLs
     const currentImageUrls = book.coverImageUrls || [];
     const remainingImageUrls = currentImageUrls.filter(
       (url) => !parsedRemovedImageUrls.includes(url)
     );
-
     // Ensure there is at least one image (either uploaded or remaining)
     if (updatedImages.length === 0 && remainingImageUrls.length === 0)
       return sendResponse(res, 404, "No files uploaded.", false);
-
     // Remove the images from Cloudinary that are marked for removal
     if (parsedRemovedImageUrls.length > 0) {
       await deleteImagesFromCloudinary(parsedRemovedImageUrls, "books");
     }
-
     // Update the book's image URLs by removing the old ones
     await updateBook(
       { slugWithIsbn: bookSlug },
       { $pull: { coverImageUrls: { $in: parsedRemovedImageUrls } } }
     );
-
     if (updatedImages.length > 0) {
       const updatedImagesUrls = await uploadImagesToCloudinary(
         updatedImages,
         "books"
       );
-
       // Update the book's image URLs by adding the new ones
       await updateBook(
         { slugWithIsbn: bookSlug },
@@ -449,7 +441,6 @@ const editAdminBook = async (req, res) => {
           $set: updatedBookData,
         }
       );
-
       // Send success response
       return sendResponse(
         res,
@@ -459,10 +450,8 @@ const editAdminBook = async (req, res) => {
         updatedBookData.slugWithIsbn
       );
     }
-
     // If no new images are uploaded, just update the book data
     await updateBook({ slugWithIsbn: bookSlug }, { $set: updatedBookData });
-
     // Send success response
     return sendResponse(
       res,
@@ -473,7 +462,6 @@ const editAdminBook = async (req, res) => {
     );
   } catch (error) {
     console.error(`An unexpected error occurred. ${error}`);
-
     // Send error response
     return sendResponse(
       res,
@@ -485,28 +473,24 @@ const editAdminBook = async (req, res) => {
 };
 
 const deleteAdminBook = async (req, res) => {
+  const { bookSlug } = req.params;
   try {
-    // Extract book identifier from request parameters
-    const { slugWithIsbn } = req.params;
-
     // Retrieve the book to ensure it exists before deletion
-    const { found, value: book } = await getBook({ slugWithIsbn });
-    if (!found) {
+    const { found, value: book } = await getBook({ bookSlug });
+    if (!found)
       // Send error response if book is not found
       return sendResponse(res, 404, "Book Not Found.", false);
-    }
 
     // Delete associated images from Cloudinary
-    if (book.coverImageUrls?.length > 0) {
+    if (book.coverImageUrls?.length > 0)
       await deleteImagesFromCloudinary(book.coverImageUrls, "books");
-    }
 
     // Remove the book from the database
-    const result = await removeBook({ slugWithIsbn });
-    if (result.deletedCount !== 1) {
+    const { deletedCount } = await removeBook({ bookSlug });
+    console.log(deletedCount);
+    if (!deletedCount)
       // Send error response if deletion fails
       return sendResponse(res, 400, "Failed to Delete Book Data", false);
-    }
 
     // Send success response with no content
     return sendResponse(res, 204);
@@ -525,76 +509,36 @@ const deleteAdminBook = async (req, res) => {
 
 const postAdminAddCategory = async (req, res) => {
   try {
-    const { parent_category, ...data } = { ...req.body };
-
-    // Validate incoming category data
-    const {
-      valid,
-      value: categoryData,
-      errorMessage: categoryDataError,
-    } = validateData(data, categorySchema);
-
-    if (!valid)
-      // Send error response
-      return sendResponse(res, 400, categoryDataError, false);
-
-    // Add parent_category to categoryData object
-    categoryData.parent_category = parent_category;
+    const { name, slug, description, parentCategory } = req.validData;
 
     // Check if a category with the same name or slug already exists
     const { found: categoryFound } = await getCategory({
-      $or: [{ name: categoryData.name }, { slug: categoryData.slug }],
+      $or: [{ name }, { slug }],
     });
 
+    // Send error response if category exists
     if (categoryFound)
-      // Send error response if category exists
-      return sendResponse(res, 400, "Category already exists.", false);
+      return sendResponse(
+        res,
+        400,
+        "Category already exists with the same name or slug.",
+        false
+      );
 
-    // Check if a subcategory with the same name or slug already exists
-    const { found: subCategoryFound } = await getSubcategory({
-      $or: [{ name: categoryData.name }, { slug: categoryData.slug }],
+    // Handle category addition
+    const { acknowledged } = await addCategory({
+      name,
+      description,
+      slug,
+      parentCategory: parentCategory ? new ObjectId(parentCategory) : "",
     });
 
-    if (subCategoryFound)
-      // Send error response if subCategory exists
-      return sendResponse(res, 400, "Subcategory already exists.", false);
+    // Send error response if category was not added
+    if (!acknowledged)
+      return sendResponse(res, 400, "Error adding category.", false);
 
-    // Handle category addition if parent_category is not present
-    if (!parent_category) {
-      const { acknowledged } = await addCategory(categoryData);
-
-      if (!acknowledged)
-        // Send error response
-        return sendResponse(res, 400, "Error Adding Category.", false);
-
-      // Send success response
-      return sendResponse(res, 200, "Category Added Successfully.", true);
-    }
-
-    // Handle subcategory addition if parent_category is present
-    const { acknowledged: subCategoryAdded, insertedId: subCategoryId } =
-      await addSubcategory(categoryData);
-    if (!subCategoryAdded)
-      // Send error response
-      return sendResponse(res, 400, "Failed to add subcategory.", false);
-
-    // Update the parent category by pushing the new subcategory ID
-    const { acknowledged: categoryUpdated } = await updateCategory(
-      { name: parent_category },
-      { $push: { subCategories: subCategoryId } }
-    );
-
-    if (!categoryUpdated)
-      // Send error response
-      return sendResponse(res, 400, "Failed to update parent category.", false);
-
-    // Send success response
-    return sendResponse(
-      res,
-      200,
-      "Subcategory Added and parent category Updated.",
-      true
-    );
+    // Send success response if category was added
+    return sendResponse(res, 200, `Category ${name} added.`, true);
   } catch (error) {
     console.error(`An unexpected error occurred. ${error}`);
     return sendResponse(
@@ -607,104 +551,50 @@ const postAdminAddCategory = async (req, res) => {
 };
 
 const editAdminCategory = async (req, res) => {
-  const { categorySlug: slug } = req.params;
+  const { categorySlug } = req.params;
+  const { name, description, slug, parentCategory } = req.validData;
 
   try {
-    const { parent_category, ...data } = { ...req.body };
-
-    // Validate incoming category data
-    const {
-      valid,
-      value: updatedCategoryData,
-      errorMessage: validationError,
-    } = validateData(data, categorySchema);
-
-    // If validation fails, return a 400 status with the error message
-    if (!valid) return sendResponse(res, 400, validationError, false);
-
-    // Add parent_category to the updatedCategoryData
-    updatedCategoryData.parent_category = parent_category;
-
-    // Check if the category with the given slug exists in the database
     const {
       found: categoryFound,
       value: category,
       errorMessage: categoryNotFound,
-    } = await getCategory({ slug });
+    } = await getCategory({ slug: categorySlug });
 
-    if (!categoryFound)
-      // If category is not found, return a 404 status
-      return sendResponse(res, 404, categoryNotFound, false);
+    // If category is not found, return a 404 status
+    if (!categoryFound) return sendResponse(res, 404, categoryNotFound, false);
 
-    // Check if the updated data is the same as the existing category data
-    const isDataUnchanged =
-      updatedCategoryData.name === category.name &&
-      updatedCategoryData.description === category.description &&
-      updatedCategoryData.slug === category.slug &&
-      (updatedCategoryData.parent_category === category.parent_category ||
-        (!updatedCategoryData.parent_category && !category.parent_category));
+    // Check if any data has changed when the front-end validation fails
+    const isUnchanged =
+      category.name === name &&
+      category.description === description &&
+      category.slug === slug &&
+      category.parentCategory === parentCategory;
 
-    // If there are no changes, return a 200 status with a message
-    if (isDataUnchanged)
-      return sendResponse(
-        res,
-        200,
-        "No changes were made to the category.",
-        true
-      );
-
-    // If parent_category is not provided, update the category with the new data
-    if (!parent_category) {
-      const updateCategoryResult = await updateCategory(
-        { slug },
-        { $set: updatedCategoryData }
-      );
-
-      // If the update fails, return a 400 status
-      if (!updateCategoryResult.modifiedCount)
-        return sendResponse(
-          res,
-          400,
-          "Error occurred while updating category.",
-          false
-        );
-
-      // Success: return a 200 status with a success message
-      return sendResponse(res, 200, "Category updated successfully.", true);
-    }
-
-    // Prevent changing the parent_category if the category has subcategories
-    if (parent_category && category.subCategories?.length > 0)
+    // If no changes were made, return a 400 status
+    if (isUnchanged)
       return sendResponse(
         res,
         400,
-        "Cannot change parent category as this category contains subcategories.",
+        "No changes were made to the category.",
         false
       );
 
-    // Insert the category as subcategory of parent_category
-    const { acknowledged, insertedId } =
-      await addSubcategory(updatedCategoryData);
-
-    // If subcategory insertion fails, return a 400 status
-    if (!acknowledged)
-      return sendResponse(res, 400, "Unable to process your request", false);
-
-    // Reference the subCategory ID to the parent_category
-    const updateParentCategoryResult = await updateCategory(
-      { name: parent_category },
-      { $push: { subCategories: insertedId } }
+    // Update the category in the database
+    const { acknowledged } = await updateCategory(
+      { slug: categorySlug },
+      {
+        $set: {
+          name,
+          description,
+          slug,
+          parentCategory: new ObjectId(parentCategory),
+        },
+      }
     );
 
-    // If updating the parent category fails, return a 400 status
-    if (!updateParentCategoryResult.modifiedCount)
-      return sendResponse(res, 400, "Unable to process your request.", false);
-
-    // After successful addition of subcategory, delete the original category
-    const deleteCategoryResult = await removeCategory({ slug });
-
-    // If deletion of the original category fails, return a 400 status
-    if (!deleteCategoryResult.deletedCount)
+    // If update was not acknowledged, return a 400 status
+    if (!acknowledged)
       return sendResponse(res, 400, "Error updating category.", false);
 
     // Success: return a 200 status with a success message
@@ -763,187 +653,6 @@ const deleteAdminCategory = async (req, res) => {
   }
 };
 
-const editAdminSubCategory = async (req, res) => {
-  const { subCategorySlug: slug } = req.params;
-  const { parent_category, ...data } = { ...req.body };
-
-  try {
-    // Validate the subcategory data against subcategory schema
-    const {
-      valid,
-      value: updatedSubCategoryData,
-      errorMessage: validationError,
-    } = validateData(data, subCategorySchema);
-    if (!valid)
-      // Send error response
-      return sendResponse(res, 400, validationError, false);
-
-    updatedSubCategoryData.parent_category = parent_category;
-
-    // Find the subcategory by slug
-    const {
-      found: subCategoryFound,
-      value: subCategory,
-      errorMessage: subCategoryNotFound,
-    } = await getSubcategory({ slug });
-
-    if (!subCategoryFound)
-      // Send error response
-      return sendResponse(res, 404, subCategoryNotFound, false);
-
-    // Case 1: If no parent_category, convert subcategory to a main category
-    if (!parent_category) {
-      // Create a new main category
-      const insertAsCategory = await addCategory({
-        ...updatedSubCategoryData,
-        subCategories: [],
-      });
-
-      if (!insertAsCategory.acknowledged)
-        return sendResponse(res, 400, "Unable to process your request.", false);
-
-      // Remove subcategory from its old parent category
-      const parentCategoryUpdateResult = await updateCategory(
-        { name: subCategory.parent_category },
-        { $pull: { subCategories: subCategory._id } }
-      );
-
-      if (!parentCategoryUpdateResult.modifiedCount)
-        return sendResponse(res, 400, "Unable to process your request.", false);
-
-      // Delete the subcategory
-      const deleteSubcategoryResult = await removeSubcategory({ slug });
-
-      if (!deleteSubcategoryResult.deletedCount)
-        // Send error response
-        return sendResponse(res, 400, "Unable to process your request.", false);
-
-      // Send success response
-      return sendResponse(
-        res,
-        201,
-        "Subcategory successfully updated to a main category.",
-        true,
-        `${slug}`
-      );
-    }
-
-    // Case 2: If parent_category has changed, move the subcategory under the new parent
-    if (parent_category !== subCategory.parent_category) {
-      // Remove the subcategory ID from the old parent category's subCategories array
-      const [oldParentUpdate, newParentUpdate] = await Promise.all([
-        updateCategory(
-          { name: subCategory.parent_category },
-          { $pull: { subCategories: subCategory._id } }
-        ),
-        updateCategory(
-          { name: parent_category },
-          { $push: { subCategories: subCategory._id } }
-        ),
-      ]);
-
-      if (!(oldParentUpdate.modifiedCount && newParentUpdate.modifiedCount))
-        return sendResponse(res, 400, "Unable to update subcategory.", false);
-
-      //Update the subcategory data
-      const updateSubCategoryResult = await updateSubcategory(
-        { slug },
-        { $set: updatedSubCategoryData }
-      );
-
-      if (!updateSubCategoryResult.modifiedCount)
-        // Send error response
-        return sendResponse(res, 400, "Error updating subcategory.", false);
-
-      // Send success response
-      return sendResponse(
-        res,
-        200,
-        `Subcategory successfully moved to "${parent_category}".`,
-        true,
-        `${parent_category}`
-      );
-    }
-
-    // Case 3: If parent_category hasn't changed
-    //Update the subcategory data
-    const updateSubCategoryResult = await updateSubcategory(
-      { slug },
-      { $set: updatedSubCategoryData }
-    );
-
-    if (!updateSubCategoryResult.modifiedCount)
-      // Send error response
-      return sendResponse(res, 400, "Error updating subcategory.", false);
-
-    // Send success response
-    return sendResponse(
-      res,
-      200,
-      "Subcategory updated successfully",
-      true,
-      `${subCategory.parent_category}/${slug}`
-    );
-  } catch (error) {
-    // If any unexpected error occurs, log it and send a 500 response
-    console.error(`An unexpected error occured. ${error}`);
-    return sendResponse(res, 500, "An unexpected error occured.", false);
-  }
-};
-
-const deleteAdminSubcategory = async (req, res) => {
-  const { subCategorySlug: slug } = req.params;
-
-  try {
-    // Fetch the subcategory by slug
-    const {
-      found: subCategoryFound,
-      value: subCategory,
-      errorMessage: subCategoryNotFound,
-    } = await getSubcategory({ slug });
-
-    // If subcategory not found, return a 404 response
-    if (!subCategoryFound) {
-      return sendResponse(res, 404, subCategoryNotFound, false);
-    }
-
-    // Update parent category by removing the subcategory from subCategories array
-    const updateParentCategoryResult = await updateCategory(
-      {
-        name: subCategory.parent_category,
-      },
-      { $pull: { subCategories: subCategory._id } }
-    );
-
-    // If parent category wasn't updated, return a general error
-    if (!updateParentCategoryResult.modifiedCount)
-      return sendResponse(
-        res,
-        500,
-        "An error occurred while processing your request.",
-        false
-      );
-
-    // Remove the subcategory
-    const deleteSubcategoryResult = await removeSubcategory({ slug });
-
-    // If subcategory wasn't deleted, return a 404 response
-    if (!deleteSubcategoryResult.deletedCount)
-      return sendResponse(
-        res,
-        404,
-        "Subcategory not found or already deleted.",
-        false
-      );
-
-    // If everything goes fine, return a 204 No Content response
-    return sendResponse(res, 204);
-  } catch (error) {
-    console.error(`An unexpected error occured. ${error}`);
-    return sendResponse(res, 500, "An unexpected error occured.", false);
-  }
-};
-
 export {
   getAdminDashboard,
   getAdminBooks,
@@ -954,7 +663,6 @@ export {
   getAdminAddCategory,
   getAdminCategories,
   getAdminCategoryDetails,
-  getAdminSubCategoryDetails,
   getAdminSellers,
   getAdminSellerProfile,
   getAdminTransactions,
@@ -971,6 +679,4 @@ export {
   postAdminAddCategory,
   editAdminCategory,
   deleteAdminCategory,
-  editAdminSubCategory,
-  deleteAdminSubcategory,
 };

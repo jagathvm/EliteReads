@@ -1,25 +1,28 @@
-import { getBook, getBooks, getCategories } from "../services/dbServices.js";
+import { ObjectId } from "mongodb";
+import { getBooks, getBook } from "../services/booksServices.js";
+import { getCategories } from "../services/categoriesServices.js";
+import { getUser } from "../services/userServices.js";
+import { renderResponse } from "../utils/responseHandler.js";
 
 const getUserHome = async (req, res) => {
   try {
-    const {
-      found: categoriesFound,
-      errorMessage: categoriesNotFound,
-      value: categories,
-    } = await getCategories();
+    const { value: categories } = await getCategories();
+    const { value: books } = await getBooks();
 
-    if (!categoriesFound)
-      return sendResponse(res, 400, categoriesNotFound, false);
+    let user = null;
+    if (req.user) {
+      const { value: userData } = await getUser({
+        _id: new ObjectId(req.user.userId),
+      });
+      user = userData;
+    }
 
-    const {
-      found: booksFound,
-      errorMessage: booksNotFound,
-      value: books,
-    } = await getBooks();
-
-    if (!booksFound) return sendResponse(res, 404, booksNotFound, false);
-
-    res.status(200).render("user/user-home", { req, categories, books });
+    return renderResponse(res, 200, "user/user-home", {
+      req,
+      user,
+      categories,
+      books,
+    });
   } catch (error) {
     console.error(`An unexpected error occurred. ${error}`);
     return res.status(500).json({

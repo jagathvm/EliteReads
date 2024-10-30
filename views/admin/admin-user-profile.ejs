@@ -23,9 +23,9 @@
         </div>
         <!-- col.// -->
         <div class="col-xl col-lg">
-          <h3><%= user.email %></h3>
+          <h3><%= user.username %></h3>
           <p>Email: <%= user.email %></p>
-          <p>Joined: January 1, 2023</p>
+          <p>Joined: <%= user.accountStatus.createdAt %></p>
         </div>
         <!-- col.// -->
         <div class="col-xl-4 text-md-end">
@@ -54,23 +54,22 @@
           <h6>Contact Information</h6>
           <p>
             Phone: <%= user.phone %> <br>
-            Address: 1234 Elm St, Springfield, IL <br>
-            Postal code: 62701
+            Address: <%= user?.address || "Not Updated" %>
           </p>
         </div>
         <!-- col.// -->
         <div class="col-sm-6 col-lg-4 col-xl-3">
           <h6>Account Settings</h6>
           <p>
-            Role: User <br>
-            Status: Active <br>
-            Last Login: August 21, 2024
+            Role: <%= user.role.name %> <br>
+            Status: <%= user.accountStatus.status %> <br>
+            Last Login: <%= user.accountStatus?.lastLogin?.replace(' at', ',') || "Recently" %>
           </p>
         </div>
         <!-- col.// -->
         <div class="col-sm-6 col-xl-4 text-xl-end">
           <select class="form-select w-auto d-inline-block">
-            <option>Actions</option>
+            <option hidden>Actions</option>
             <option>Deactivate Account</option>
             <option>Delete Account</option>
           </select>

@@ -4,7 +4,10 @@ import { getCheckboxValue } from "../utils/utils.js";
 const validateData = (schema) => {
   return async (req, res, next) => {
     try {
-      req.body.checkbox = getCheckboxValue(req.body?.checkbox);
+      if (req.body.checkbox) {
+        req.body.checkbox = getCheckboxValue(req.body.checkbox);
+      }
+
       const { error: validationError, value: validData } = schema.validate(
         req.body,
         { abortEarly: false }

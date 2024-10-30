@@ -9,9 +9,8 @@ const invalidCredentialsMessage = document.getElementById(
 
 postUserLoginForm.addEventListener("submit", async (e) => {
   const isValid = await userLoginValidator.revalidate();
-  if (!isValid) {
+  if (!isValid)
     return showToast("Kindly fill in all fields to continue.", false, "center");
-  }
 
   const formData = new FormData(postUserLoginForm);
   formData.checkbox = formData.checkbox === "on";
@@ -31,7 +30,6 @@ postUserLoginForm.addEventListener("submit", async (e) => {
       setTimeout(() => {
         invalidCredentialsMessage.style.display = "none";
       }, 3000);
-      // showToast(response.message || response.error, false);
     }
   } catch (error) {
     console.error(`Error during login: `, error);

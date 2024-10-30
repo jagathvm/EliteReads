@@ -4,13 +4,11 @@ import { showToast, errorMessage } from "../../../helpers/toast.js";
 const confirmDeleteButton = document.getElementById("confirmDeleteButton");
 
 confirmDeleteButton.addEventListener("click", async (e) => {
-  const bookSlugWithIsbn = confirmDeleteButton.getAttribute(
-    "data-book-slugWithIsbn"
-  );
+  const bookSlug = confirmDeleteButton.getAttribute("data-book-bookSlug");
 
   try {
     const apiClient = new HttpRequest("/admin/books");
-    const response = await apiClient.delete(`/${bookSlugWithIsbn}`);
+    const response = await apiClient.delete(`/${bookSlug}`);
 
     if (response.status === 204) {
       showToast("Book Removed.", true);

@@ -84,7 +84,7 @@
                   <label class="form-check mb-4">
                     <input class="form-check-input" type="checkbox" id="book_featured" name="featured">
                     <span class="form-check-label">
-                      Featured Book
+                      Featured Book (optional)
                     </span>
                   </label>
                 </div>
@@ -117,13 +117,13 @@
                         <select class="form-select" id="book_category" name="category">
                           <option value="" selected disabled hidden>Select Category</option>
                           <% categories.forEach(category => { %>
-                          <option id="book_<%= category.name %>" value="<%= category.name %>" data-subcategories='<%= JSON.stringify(category.subCategories) %>'>
+                          <option id="book_<%= category.name %>" value="<%= category._id %>" data-subcategories='<%= JSON.stringify(category.subCategories) %>'>
                             <%= category.name %></option>
                           <% }) %>
                         </select>
                       </div>
                       <div class="col-sm-12 mb-3">
-                        <label class="form-label">Sub-category</label>
+                        <label class="form-label">Sub-category (optional)</label>
                         <select class="form-select" id="book_subcategory" name="subcategory">
                           <option value="">Select Subcategory</option>
                         </select>

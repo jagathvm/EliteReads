@@ -43,10 +43,10 @@
               <img class="img-md img-avatar" src="/admin/imgs/theme/image-profile.png" alt="User pic" />
             </div>
             <div class="card-body">
-              <h5 class="card-title mt-50"><%= user.email %></h5>
+              <h5 class="card-title mt-50"><%= user.username %></h5>
               <div class="card-text text-muted">
-                <p class="m-0">User ID: <%= user._id %></p>
-                <a href="/admin/user-profile/<%= user._id %>" class="btn btn-sm btn-brand rounded font-sm mt-15">View details</a>
+                <p class="m-0">Phone: <%= user.phone %></p>
+                <a href="/admin/user-profile/<%= user.username %>" class="btn btn-sm btn-brand rounded font-sm mt-15">View details</a>
               </div>
             </div>
           </div>

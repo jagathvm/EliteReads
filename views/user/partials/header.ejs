@@ -63,7 +63,29 @@
               <li><i class="fi-rs-world"></i>English</li>
               <li>
                 <i class="fi-rs-user"></i>
+                <% if (user) { %>
+                <div class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <%= user.username %>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <% if (user.role.name === 'ADMIN') { %>
+                    <li>
+                      <a class="dropdown-item" href="/admin/dashboard">
+                        Dashboard
+                      </a>
+                    </li>
+                    <% } %>
+                    <li>
+                      <a class="dropdown-item" href="/api/auth/logout">
+                        Sign Out
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+                <% } else { %>
                 <a href="/api/auth/login">Log In </a>
+                <% } %>
               </li>
             </ul>
           </div>
@@ -161,6 +183,7 @@
         <div class="main-menu main-menu-padding-1 main-menu-lh-2 d-flex d-lg-block">
           <nav>
             <ul class="d-flex justify-items-center">
+              <% if (categories) { %>
               <% categories.forEach((category, index) => { %>
               <% if (index < 8) { %>
               <li>
@@ -168,6 +191,7 @@
               </li>
               <% } %>
               <% }) %>
+              <% } %>
             </ul>
           </nav>
         </div>

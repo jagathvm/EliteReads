@@ -1,6 +1,5 @@
 <!-- Quick view -->
 <%- include('partials/quick-view-modal') %>
-
 <!-- Preloader Start -->
 <%- include('partials/preloader-start') %>
 
@@ -222,6 +221,7 @@
       <div class="tab-content wow fadeIn animated" id="myTabContent">
         <div class="tab-pane fade show active" id="tab-one" role="tabpanel" aria-labelledby="tab-one">
           <div class="row product-grid-4">
+            <% if (books) { %>
             <% books.forEach((book, index) => { %>
             <% if (index < 8) { %>
             <div class="col-lg-3 col-md-4 col-12 col-sm-6">
@@ -257,6 +257,11 @@
             </div>
             <% } %>
             <% }) %>
+            <% } else { %>
+            <div class="col-12 text-center">
+              No Books Found
+            </div>
+            <% } %>
           </div>
         </div>
       </div>
@@ -271,6 +276,7 @@
       <div class="carausel-6-columns-cover position-relative">
         <div class="slider-arrow slider-arrow-2 carausel-6-columns-arrow" id="carausel-6-columns-2-arrows"></div>
         <div class="carausel-6-columns carausel-arrow-center" id="carausel-6-columns-2">
+          <% if (books) { %>
           <% books.forEach((book, index) => { %>
           <% if (index < 10) { %>
           <div class="product-cart-wrap small hover-up">
@@ -301,6 +307,11 @@
           </div>
           <% } %>
           <% }) %>
+          <% } else { %>
+          <div class="col-12 text-center">
+            New Arrivals not Found
+          </div>
+          <% } %>
         </div>
       </div>
     </div>

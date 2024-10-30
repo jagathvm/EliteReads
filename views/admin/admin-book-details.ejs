@@ -46,8 +46,8 @@
           <p class="card-text "><strong class="text-dark">Language:</strong> <%= book.language %></p>
           <p class="card-text "><strong class="text-dark">Pages:</strong> <%= book.pages %></p>
           <p class="card-text "><strong class="text-dark">Weight:</strong> <%= book.weight %> grams</p>
-          <p class="card-text "><strong class="text-dark">Category:</strong> <%= book.category %></p>
-          <p class="card-text "><strong class="text-dark">Subcategory:</strong> <%= book.subcategory %></p>
+          <p class="card-text "><strong class="text-dark">Category:</strong> <%= book.category.name %></p>
+          <p class="card-text "><strong class="text-dark">Subcategory:</strong> <%= book.subcategory.name %></p>
           <p class="card-text "><strong class="text-dark">Featured:</strong> <%= book.featured === true ? 'Yes' : 'No' %></p>
 
           <!-- Edit Button -->
@@ -69,110 +69,141 @@
 <div class="modal fade" id="editBookModal" tabindex="-1" aria-labelledby="editBookModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editBookModalLabel">Edit Book Details</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-header d-flex justify-content-between align-items-start">
+        <div>
+          <h5 class="modal-title" id="editBookModalLabel">Edit Book Details</h5>
+        </div>
+        <div>
+          <button type="submit" id="saveBookButton" class="btn btn-primary">Save Changes</button>
+        </div>
       </div>
       <div class="modal-body">
-        <form id="editBookForm" data-book-slugWithIsbn="<%= book.slugWithIsbn %>" enctype="multipart/form-data">
-          <div class="mb-3">
-            <label for="editCoverImage" class="form-label">Cover Image</label>
-            <input type="file" class="form-control" id="editCoverImage" name="cover_image" multiple>
-            <div id="coverImagePreviews" class="mt-2 d-flex flex-wrap">
-              <% if (book.coverImageUrls && book.coverImageUrls.length > 0) { %>
-              <% book.coverImageUrls.forEach((coverImageUrl, index) => { %>
-              <div class="position-relative me-2 mb-2 preview-container">
-                <img src="<%= coverImageUrl %>" alt="<%= book.title %> Cover Image" class="img-fluid preview-image" style="height: 100px; object-fit: cover;">
-                <button type="button" class="btn btn-link text-danger text-decoration-none p-0 remove-preview-image" data-index="<%= index %>">
-                  &times;
-                </button>
+        <form id="editBookForm" data-book-bookSlug="<%= book.bookSlug %>" enctype="multipart/form-data">
+          <div class="row">
+            <!-- Title and Author on the left side -->
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="editTitle" class="form-label">Title</label>
+                <input type="text" class="form-control" id="editTitle" name="title" value="<%= book.title %>">
               </div>
-              <% }) %>
-              <% } else { %>
-              <p>No cover images available.</p>
-              <% } %>
+              <div class="mb-3">
+                <label for="editAuthor" class="form-label">Author</label>
+                <input type="text" class="form-control" id="editAuthor" name="author" value="<%= book.author %>">
+              </div>
             </div>
-            <div id="newImagePreviews" class="mt-2 d-flex flex-wrap"></div>
+
+            <!-- Cover Image on the right side -->
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="editCoverImage" class="form-label">Cover Image</label>
+                <div id="coverImagePreviews" class="mt-2 d-flex flex-wrap">
+                  <% if (book.coverImageUrls && book.coverImageUrls.length > 0) { %>
+                  <% book.coverImageUrls.forEach((coverImageUrl, index) => { %>
+                  <div class="position-relative me-2 mb-2 preview-container">
+                    <img src="<%= coverImageUrl %>" alt="<%= book.title %> Cover Image" class="img-fluid preview-image" style="height: 100px; object-fit: cover;">
+                    <button type="button" class="btn btn-link text-danger text-decoration-none p-0 remove-preview-image" data-index="<%= index %>">
+                      &times;
+                    </button>
+                  </div>
+                  <% }) %>
+                  <% } else { %>
+                  <p>No cover images available.</p>
+                  <% } %>
+                </div>
+                <input type="file" class="form-control" id="editCoverImage" name="cover_image" multiple hidden>
+                <div id="newImagePreviews" class="mt-2 d-flex flex-wrap"></div>
+              </div>
+            </div>
+
+            <!-- Hidden input for storing removedImageUrls -->
+            <input type="hidden" id="removedImageUrls" name="removedImageUrls">
           </div>
-          <div class="mb-3">
-            <label for="editTitle" class="form-label">Title</label>
-            <input type="text" class="form-control" id="editTitle" name="title" value="<%= book.title %>">
-          </div>
-          <div class="mb-3">
-            <label for="editAuthor" class="form-label">Author</label>
-            <input type="text" class="form-control" id="editAuthor" name="author" value="<%= book.author %>">
-          </div>
+
           <div class="mb-3">
             <label for="editDescription" class="form-label">Description</label>
-            <textarea class="form-control" id="editDescription" name="description" rows="4"><%= book.description %></textarea>
+            <textarea class="form-control" id="editDescription" name="description" rows="2"><%= book.description %></textarea>
           </div>
-          <div class="mb-3">
-            <label for="editPrice" class="form-label">Price</label>
-            <input type="number" class="form-control" id="editPrice" name="price" value="<%= book.price %>">
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="editLanguage" class="form-label">Language</label>
+              <input type="text" class="form-control" id="editLanguage" name="language" value="<%= book.language %>">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="editFeatured" class="form-label">Featured</label>
+              <select class="form-select" id="editFeatured" name="featured">
+                <option selected hidden><%= book.featured ? 'Yes' : 'No' %></option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+              </select>
+            </div>
           </div>
-          <div class="mb-3">
-            <label for="editISBN" class="form-label">ISBN</label>
-            <input type="text" class="form-control" id="editISBN" name="isbn" value="<%= book.isbn %>">
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="editPrice" class="form-label">Price</label>
+              <input type="number" class="form-control" id="editPrice" name="price" value="<%= book.price %>">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="editISBN" class="form-label">ISBN</label>
+              <input type="text" class="form-control" id="editISBN" name="isbn" value="<%= book.isbn %>">
+            </div>
           </div>
-          <div class="mb-3">
-            <label for="editPublisher" class="form-label">Publisher</label>
-            <input type="text" class="form-control" id="editPublisher" name="publisher" value="<%= book.publisher %>">
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="editPublisher" class="form-label">Publisher</label>
+              <input type="text" class="form-control" id="editPublisher" name="publisher" value="<%= book.publisher %>">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="editYear" class="form-label">Year</label>
+              <input type="text" class="form-control" id="editYear" name="year" value="<%= book.year %>">
+            </div>
           </div>
-          <div class="mb-3">
-            <label for="editYear" class="form-label">Year</label>
-            <input type="text" class="form-control" id="editYear" name="year" value="<%= book.year %>">
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="editPages" class="form-label">Pages</label>
+              <input type="text" class="form-control" id="editPages" name="pages" value="<%= book.pages %>">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="editWeight" class="form-label">Weight</label>
+              <input type="text" class="form-control" id="editWeight" name="weight" value="<%= book.weight %>">
+            </div>
           </div>
-          <div class="mb-3">
-            <label for="editLanguage" class="form-label">Language</label>
-            <input type="text" class="form-control" id="editLanguage" name="language" value="<%= book.language %>">
-          </div>
-          <div class="mb-3">
-            <label for="editPages" class="form-label">Pages</label>
-            <input type="text" class="form-control" id="editPages" name="pages" value="<%= book.pages %>">
-          </div>
-          <div class="mb-3">
-            <label for="editWeight" class="form-label">Weight</label>
-            <input type="text" class="form-control" id="editWeight" name="weight" value="<%= book.weight %>">
-          </div>
-          <div class="mb-3">
-            <label for="editCategory" class="form-label">Category</label>
-            <select class="form-select" id="editCategory" name="category">
-              <% const selectedCategory = categories.find(category => category.name === book.category); %>
-              <% if (selectedCategory) { %>
-              <option selected value="<%= selectedCategory.name %>" data-subcategories="<%= JSON.stringify(selectedCategory.subCategories) %>" hidden>
-                <%= selectedCategory.name %>
-              </option>
-              <% } %>
-              <% categories.forEach(category => { %>
-              <option value="<%= category.name %>" data-subcategories="<%= JSON.stringify(category.subCategories) %>">
-                <%= category.name %>
-              </option>
-              <% }) %>
-            </select>
-          </div>
-          <div class="mb-3">
-            <label for="editSubcategory" class="form-label">Subcategory</label>
-            <select class="form-select" id="editSubcategory" name="subcategory">
-              <option selected value="<%= book.subcategory %>"><%= book.subcategory %></option>
-            </select>
-          </div>
-          <div class="mb-3">
-            <label for="editFeatured" class="form-label">Featured</label>
-            <select class="form-select" id="editFeatured" name="featured">
-              <option selected hidden><%= book.featured ? 'Yes' : 'No' %></option>
-              <option value="<%= true %>">Yes</option>
-              <option value="<%= false %>">No</option>
-            </select>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="editCategory" class="form-label">Category</label>
+              <select class="form-select" id="editCategory" name="category">
+                <option selected value="<%= book.category._id %>" data-subcategories="<%= JSON.stringify(book.category.subCategories) %>" hidden>
+                  <%= book.category.name %>
+                </option>
+                <option disabled>Select Category</option>
+                <% categories.forEach(category => { %>
+                <option value="<%= category._id %>" data-subcategories="<%= JSON.stringify(category.subCategories) %>">
+                  <%= category.name %>
+                </option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="editSubcategory" class="form-label">Subcategory</label>
+              <select class="form-select" id="editSubcategory" name="subcategory">
+                <option selected value="<%= book.subcategory ? book.subcategory._id : '' %>" hidden><%= book.subcategory ? book.subcategory.name : '' %></option>
+                <% const parentCategory = categories.find(category => category._id.toString() === book.category._id.toString()) %>
+                <% parentCategory.subCategories.forEach(subCategory => { %>
+                <option value="<%= subCategory._id %>"><%= subCategory.name %></option>
+                <% }) %>
+              </select>
+            </div>
           </div>
         </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" id="saveBookButton" class="btn btn-primary">Save Changes</button>
       </div>
     </div>
   </div>
 </div>
+
 
 <!-- Delete Book Confirmation Modal -->
 <div class="modal fade" id="deleteBookModal" tabindex="-1" aria-labelledby="deleteBookModalLabel" aria-hidden="true">
@@ -187,7 +218,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger" id="confirmDeleteButton" data-book-slugWithIsbn="<%= book.slugWithIsbn %>">Delete</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteButton" data-book-bookSlug="<%= book.bookSlug %>">Delete</button>
       </div>
     </div>
   </div>
@@ -195,7 +226,7 @@
 
 <script type="module" src="/admin/js/validators/admin-edit-book-validator.js"></script>
 
-<script type="module" src="/admin/js/utils/admin-edit-book-submit.js"></script>
+<script type="module" src="/admin/js/utils/admin-edit-book.js"></script>
 
 <script type="module" src="/admin/js/utils/admin-delete-book-submit.js"></script>
 

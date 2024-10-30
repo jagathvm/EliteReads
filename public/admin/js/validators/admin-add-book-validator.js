@@ -166,8 +166,9 @@ addBookValidator
   // Subcategory (ensure selection)
   .addField("#book_subcategory", [
     {
-      rule: "required",
-      errorMessage: "Subcategory is required",
+      rule: "minLength",
+      value: 1,
+      errorMessage: "Subcategory selection is invalid",
     },
   ])
 

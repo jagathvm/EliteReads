@@ -8,10 +8,13 @@
   <div class="card card-user shadow-sm">
     <div class="row g-0">
       <!-- Details -->
+      <% if (category) { %>
       <div class="col-md-8">
         <div class="card-body">
           <!-- Category Name -->
-          <h3 class="card-title text-primary mb-4 text-start"><%= category.name %></h3>
+          <h3 class="card-title text-primary mb-4 text-start">
+            <%= category.name %>
+          </h3>
           <!-- Category Details -->
           <div class="mb-3">
             <p class="mb-1 text-secondary text-start">
@@ -19,48 +22,43 @@
               <span class="text-dark"><%= category.description %></span>
             </p>
           </div>
-
           <div class="mb-3">
             <p class="mb-1 text-secondary text-start">
               <strong>Slug: </strong>
               <span class="text-dark">/<%= category.slug %></span>
             </p>
           </div>
-
           <div class="mb-3">
             <p class="mb-1 text-secondary text-start">
               <strong>Parent Category: </strong>
-              <span class="text-dark"><%= category.parent_category ? category.parent_category : 'None' %></span>
+              <% if (category.parentCategory) { %>
+              <a href='<%=
+              category.parentCategory
+              ? `/admin/categories/${category.parentCategory.slug}`
+              : '#'
+              %>' class="px-2 py-1 pop-out-btn d-inline-block">
+                <span class=" text-dark"><%= category.parentCategory.name %></span>
+              </a>
+              <% } else { %>
+              <span class="text-dark">None</span>
+              <% } %>
             </p>
           </div>
-
-          <!-- Subcategories -->
-          <% if (subCategories && subCategories.length > 0) { %>
-          <div class="mb-3">
-            <p class="mb-1 text-secondary text-start"><strong>Subcategories:</strong></p>
-            <div class="row">
-              <% subCategories.forEach((subCategory) => { %>
-              <div class="col-md-3 mb-3">
-                <a href="/admin/categories/<%= category.slug %>/<%= subCategory.slug %>">
-                  <div class="card shadow-sm border-0">
-                    <div class="card-body text-center p-2 bg-light">
-                      <h6 class="card-title text-primary fw-bold mb-0"><%= subCategory.name %></h6>
-                    </div>
-                  </div>
-                </a>
-              </div>
-              <% }) %>
-            </div>
-          </div>
-          <% } else { %>
+          <!-- Subcategories Section -->
           <div class="mb-3">
             <p class="mb-1 text-secondary text-start">
               <strong>Subcategories:</strong>
+              <% if (category?.subCategories?.length > 0) { %>
+              <% category.subCategories.forEach(subCategory => { %>
+              <a href="<%=`/admin/categories/${subCategory.slug}`%>" class="px-2 py-1 pop-out-btn d-inline-block me-1">
+                <span class="text-dark"><%= subCategory.name %></span>
+              </a>
+              <% }) %>
+              <% } else { %>
               <span class="text-dark">None</span>
+              <% } %>
             </p>
           </div>
-          <% } %>
-
           <!-- Action Buttons -->
           <div class="d-flex justify-content-start mt-4">
             <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editCategoryModal">
@@ -72,6 +70,7 @@
           </div>
         </div>
       </div>
+      <% } %>
     </div>
   </div>
 </section>
@@ -101,13 +100,11 @@
           </div>
           <div class="mb-4">
             <label for="edit_category_parent" class="form-label">Parent Category</label>
-            <select class="form-select" id="edit_category_parent" name="parent_category">
-              <option value="<%= category.parent_category ? category.parent_category : '' %>" selected hidden><%= category.parent_category ? category.parent_category : 'None' %></option>
+            <select class="form-select" id="edit_category_parent" name="parentCategory">
+              <option value="<%= category.parentCategory ? category.parentCategory._id : "" %>" selected hidden><%= category.parentCategory ? category.parentCategory.name : 'None' %></option>
               <option value="">None</option>
-              <% categories.forEach(categoryList => { %>
-              <option value="<%= categoryList.name %>" <%= categoryList.parent_category === categoryList.slug ? 'selected' : '' %>>
-                <%= categoryList.name %>
-              </option>
+              <% categories.forEach(category => { %>
+              <option value="<%= category._id %>"><%= category.name %></option>
               <% }) %>
             </select>
           </div>

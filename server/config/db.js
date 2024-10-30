@@ -24,17 +24,8 @@ const getCollection = async (collectionName) => {
   return db.collection(collectionName);
 };
 
-const getAdminCollection = async () => await getCollection("admin");
 const getBooksCollection = async () => await getCollection("books");
 const getCategoriesCollection = async () => await getCollection("categories");
-const getSubcategoriesCollection = async () =>
-  await getCollection("subcategories");
 const getUserCollection = async () => await getCollection("user");
 
-export {
-  getAdminCollection,
-  getBooksCollection,
-  getCategoriesCollection,
-  getSubcategoriesCollection,
-  getUserCollection,
-};
+export { getBooksCollection, getCategoriesCollection, getUserCollection };

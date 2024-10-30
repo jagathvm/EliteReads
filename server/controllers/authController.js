@@ -4,12 +4,15 @@ import {
   hashPassword,
   verifyPassword,
 } from "../services/authServices.js";
+import { formatDate } from "../utils/utils.js";
 import { sendOTP, verifyOTP } from "../services/otpServices.js";
 import { sendResponse, renderResponse } from "../utils/responseHandler.js";
-import { addUser, getAdmin, getUser } from "../services/dbServices.js";
-
-const getAdminLogin = (req, res) =>
-  renderResponse(res, 200, "admin/admin-login", { req });
+import {
+  getUsers,
+  getUser,
+  addUser,
+  updateUser,
+} from "../services/userServices.js";
 
 const getUserLogin = (req, res) =>
   renderResponse(res, 200, "user/user-login", { req });
@@ -20,58 +23,39 @@ const getUserLoginVerification = (req, res) =>
 const getUserSignup = (req, res) =>
   renderResponse(res, 200, "user/user-signup", { req });
 
-const postAdminLogin = async (req, res) => {
-  try {
-    const { email, password } = req.validData;
-    const { found: adminFound, value: admin } = await getAdmin({ email });
-
-    // Send error response if admin is not found
-    if (!adminFound)
-      return sendResponse(res, 404, "Invalid Admin Name / Password", false);
-
-    const passwordsMatch = await verifyPassword(password, admin.password);
-
-    // Send error response if password is not matched
-    if (!passwordsMatch)
-      return sendResponse(res, 400, "Invalid Admin Name / Password", false);
-
-    setCookie(res, "accessToken", generateAccessToken({ id: admin._id }));
-
-    return sendResponse(res, 200, "Admin Logged In.", true);
-  } catch (error) {
-    console.log(error);
-    return sendResponse(
-      res,
-      500,
-      "An unexpected error occurred. Please try again later.",
-      false
-    );
-  }
-};
-
 const postUserSignup = async (req, res) => {
   try {
-    const { email, phone, password } = req.validData;
+    const { username, email, phone, password } = req.validData;
     const { found: userExists } = await getUser({
-      $or: [{ email }, { phone }],
+      $or: [{ username }, { email }, { phone }],
     });
 
     if (userExists)
       return sendResponse(
         res,
         409,
-        "A user with this email or phone number already exists.",
+        "A user with this username, email or phone number already exists.",
         false
       );
 
     const hashedPassword = await hashPassword(password);
-
     const { acknowledged, insertedId } = await addUser({
+      username,
       email,
       phone,
       password: hashedPassword,
+      role: {
+        id: 1,
+        name: "USER",
+      },
+      accountStatus: {
+        isVerified: false,
+        createdAt: formatDate(new Date()),
+        lastLogin: null,
+        isBlocked: false,
+        status: "ACTIVE",
+      },
     });
-
     if (!acknowledged)
       return sendResponse(res, 400, "User registration failed.", false);
 
@@ -79,7 +63,7 @@ const postUserSignup = async (req, res) => {
 
     return sendResponse(res, 201, "User registration successful", true);
   } catch (error) {
-    console.error(error);
+    console.error(`signup error: ${error}`);
     return sendResponse(
       res,
       500,
@@ -145,6 +129,14 @@ const postVerifyOtp = async (req, res) => {
     } = await getUser({ phone: req.cookies.phone });
     if (!userFound) return sendResponse(res, 404, userNotFound, false);
 
+    const { modifiedCount } = await updateUser(
+      { _id: user._id },
+      { $set: { "accountStatus.lastLogin": formatDate(new Date()) } }
+    );
+
+    if (!modifiedCount)
+      return sendResponse(res, 500, "Failed to login.", false);
+
     setCookie(res, "accessToken", generateAccessToken({ userId: user._id }));
     res.clearCookie("phone");
 
@@ -156,12 +148,10 @@ const postVerifyOtp = async (req, res) => {
 };
 
 export {
-  getAdminLogin,
   getUserLogin,
   getUserLoginVerification,
   getUserSignup,
-  postAdminLogin,
-  postUserSignup,
   postUserLogin,
   postVerifyOtp,
+  postUserSignup,
 };

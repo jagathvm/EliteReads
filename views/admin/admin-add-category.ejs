@@ -36,14 +36,16 @@
           <div class="col-lg-6">
             <!-- Parent Category Section -->
             <div class="mb-4">
-              <label for="parent_category" class="form-label">Select Parent Category (optional)</label>
-              <select class="form-select" id="parent_category" name="parent_category" required>
+              <label for="parentCategory" class="form-label">Select Parent Category (optional)</label>
+              <select class="form-select" id="parentCategory" name="parentCategory" required>
                 <option value="">None</option>
+                <% if (categories) { %>
                 <% categories.forEach(category => { %>
-                <% if (!category.parent_category || category.parent_category === '') { %>
-                <option value="<%= category.name %>"><%= category.name %></option>
+                <% if (!category.parentCategory || category.parentCategory === '') { %>
+                <option value="<%= category._id %>"><%= category.name %></option>
                 <% } %>
                 <% }) %>
+                <% } %>
               </select>
             </div>
           </div>

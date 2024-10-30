@@ -1,11 +1,21 @@
 import cloudinary from "../config/cloudinary.js";
 
-const uploadToCloudinary = async (file, folderName) => {
+const uploadToCloudinary = async (file, folder) => {
   try {
     const result = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         {
-          folder: folderName,
+          folder,
+          transformation: [
+            {
+              aspect_ratio: "1.0",
+              width: 500,
+              height: 800,
+              crop: "fill",
+              gravity: "auto",
+              quality: "auto",
+            },
+          ],
         },
         (error, result) => {
           if (result) {

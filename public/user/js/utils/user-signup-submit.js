@@ -17,7 +17,6 @@ postUserSignUpForm.addEventListener("submit", async (e) => {
       showToast(response.message, true);
       setTimeout(() => {
         window.location.href = "/";
-        // 2 seconds delay
       }, 2000);
     } else {
       showToast(response.message || response.error, false);

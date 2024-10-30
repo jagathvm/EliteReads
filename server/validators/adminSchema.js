@@ -1,19 +1,5 @@
 import Joi from "joi";
 
-const adminLogInSchema = Joi.object({
-  email: Joi.string().email().required().messages({
-    "string.email": "Invalid email address",
-    "string.empty": "Email is required",
-    "any.required": "Email is required.",
-  }),
-  password: Joi.string().required().min(8).max(16).messages({
-    "string.empty": "Password is required",
-    "string.min": "Password must be at least 8 characters long",
-    "string.max": "Password must not exceed 16 characters",
-    "any.required": "Password is required.",
-  }),
-});
-
 const bookSchema = Joi.object({
   // Book Title
   title: Joi.string().required().messages({
@@ -94,22 +80,31 @@ const bookSchema = Joi.object({
     "any.required": "Weight is required",
   }),
 
-  // Featured (Optional but checked if exists)
+  // Featured (Optional)
   featured: Joi.optional().messages({
     "any.only": "Please select the featured option if necessary",
   }),
 
-  // Category
+  // Category (Dropdown)
   category: Joi.string().required().messages({
     "string.empty": "Category is required",
-    "any.required": "Category is required",
+    "any.required": "Category selection is required",
   }),
 
-  // Subcategory
-  subcategory: Joi.string().required().messages({
-    "string.empty": "Subcategory is required",
-    "any.required": "Subcategory is required",
+  // Subcategory (Dropdown, Optional)
+  subcategory: Joi.string().allow("").optional().messages({
+    "string.empty": "Subcategory is required if a selection is made",
   }),
+
+  removedImageUrls: Joi.alternatives()
+    .try(
+      Joi.array().items(Joi.string().uri()).optional(),
+      Joi.string().allow("").optional()
+    )
+    .messages({
+      "array.base": "Removed image URLs must be an array or an empty string",
+      "string.uri": "Each removed image URL must be a valid URL",
+    }),
 });
 
 const categorySchema = Joi.object({
@@ -134,33 +129,9 @@ const categorySchema = Joi.object({
         "Slug can only contain lowercase letters, numbers, and dashes.",
       "any.required": "Slug is required.",
     }),
-});
-
-const subCategorySchema = Joi.object({
-  name: Joi.string().trim().min(3).max(100).required().messages({
-    "string.empty": "Subcategory Name is required.",
-    "string.min": "Subcategory Name must be at least 3 characters long.",
-    "string.max": "Subcategory Name cannot exceed 100 characters.",
-    "any.required": "Subcategory Name is required.",
-  }),
-  description: Joi.string().trim().min(10).max(500).required().messages({
-    "string.empty": "Description is required.",
-    "string.min": "Description must be at least 10 characters long.",
-    "string.max": "Description cannot exceed 500 characters.",
-    "any.required": "Description is required.",
-  }),
-  slug: Joi.string()
-    .pattern(/^[a-z0-9-]+$/)
-    .required()
-    .messages({
-      "string.empty": "Slug is required.",
-      "string.pattern.base":
-        "Slug can only contain lowercase letters, numbers, and dashes.",
-      "any.required": "Slug is required.",
-    }),
-  parent_category: Joi.string().allow("").messages({
-    "string.base": "Parent Category must be a valid string.",
+  parentCategory: Joi.string().allow(null, "").optional().messages({
+    "string.base": "Parent Category must be a string.",
   }),
 });
 
-export { adminLogInSchema, bookSchema, categorySchema, subCategorySchema };
+export { bookSchema, categorySchema };

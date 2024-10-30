@@ -1,6 +1,14 @@
 import Joi from "joi";
 
 const userSignUpSchema = Joi.object({
+  username: Joi.string()
+    .pattern(/^[a-z0-9_]+$/)
+    .required()
+    .messages({
+      "string.pattern.base":
+        "Username can contain only lowercase letters, numbers, and underscores",
+      "string.empty": "Username is required",
+    }),
   email: Joi.string().email().required().messages({
     "string.email": "Invalid email address",
     "string.empty": "Email is required",

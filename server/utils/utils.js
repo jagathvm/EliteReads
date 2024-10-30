@@ -1,5 +1,4 @@
 import { ObjectId } from "mongodb";
-import { getSubcategories } from "../services/dbServices.js";
 
 const capitalisation = (data) => {
   return data
@@ -8,28 +7,7 @@ const capitalisation = (data) => {
     .join("-");
 };
 
-const attachSubCategoriesToCategories = async (categories) => {
-  for (let category of categories) {
-    if (category.subCategories && category.subCategories.length > 0) {
-      const subCategoryIds = category.subCategories.map(
-        (id) => new ObjectId(id)
-      );
-
-      const { value: subCategories } = await getSubcategories({
-        _id: { $in: subCategoryIds },
-      });
-
-      // Attach subcategory details to each category
-      category.subCategories = subCategories;
-    } else {
-      // Handle case where there are no subcategories
-      category.subCategories = [];
-    }
-  }
-};
-
-const slugWithIsbn = (book) => {
-  const { title, isbn } = book;
+const slugWithIsbn = (title, isbn) => {
   const slug = title
     .trim()
     .toLowerCase()
@@ -46,9 +24,16 @@ const slugWithIsbn = (book) => {
 
 const getCheckboxValue = (checkbox) => checkbox === "on";
 
-export {
-  attachSubCategoriesToCategories,
-  capitalisation,
-  getCheckboxValue,
-  slugWithIsbn,
-};
+const formatDate = (date) =>
+  new Date(date).toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
+
+export { capitalisation, getCheckboxValue, slugWithIsbn, formatDate };

@@ -1,5 +1,5 @@
 // Initialize JustValidate for the edit category form
-const editCategoryValidator = new JustValidate("#editCategoryForm", {
+export const editCategoryValidator = new JustValidate("#editCategoryForm", {
   errorFieldCssClass: "error-field",
   errorLabelCssClass: "error-label",
 });

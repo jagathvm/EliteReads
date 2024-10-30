@@ -11,11 +11,9 @@ formOtp.addEventListener("submit", async (e) => {
   try {
     const apiClient = new HttpRequest("/api/auth");
     const response = await apiClient.post("/loginVerification", formData);
-    console.log(response);
 
     if (response.success) {
       showToast(response.message, true, "center");
-
       setTimeout(() => {
         window.location.href = "/";
       }, 2000);

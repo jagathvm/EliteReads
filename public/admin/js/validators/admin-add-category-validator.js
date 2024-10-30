@@ -2,6 +2,7 @@ export const addCategoryValidator = new JustValidate("#addCategoryForm", {
   errorFieldCssClass: "error-field",
   errorLabelCssClass: "error-label",
   successFieldCssClass: "success-field",
+  focusInvalidField: true,
 });
 
 addCategoryValidator
@@ -20,6 +21,11 @@ addCategoryValidator
       rule: "maxLength",
       value: 100,
       errorMessage: "Category name must be less than 100 characters",
+    },
+    {
+      rule: "customRegexp",
+      value: /^[^\s]+(\s+[^\s]+)*$/, // No trailing spaces
+      errorMessage: "Category name should not start or end with a space",
     },
   ])
   // Category Description
@@ -63,7 +69,7 @@ addCategoryValidator
     },
   ])
   // Parent Category
-  .addField("#parent_category", [
+  .addField("#parentCategory", [
     {
       rule: "custom",
       validator: (value) => {

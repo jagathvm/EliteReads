@@ -9,9 +9,8 @@ const subcategorySelect = document.getElementById("book_subcategory");
 
 saveBookButton.addEventListener("click", async (e) => {
   const isValid = await addBookValidator.revalidate();
-  if (!isValid) {
+  if (!isValid)
     return showToast("Kindly fill in all fields to continue.", false);
-  }
 
   const formData = new FormData(addBookForm);
   try {
@@ -47,10 +46,15 @@ categorySelect.addEventListener("change", function () {
   if (subcategories && subcategories.length > 0) {
     subcategories.forEach((subcategory) => {
       const option = document.createElement("option");
-      option.id = `book_${subcategory.name}`;
-      option.value = subcategory.name;
+      option.value = subcategory._id;
       option.textContent = subcategory.name;
       subcategorySelect.appendChild(option);
     });
+  } else {
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "None";
+    option.disabled = true;
+    subcategorySelect.appendChild(option);
   }
 });
