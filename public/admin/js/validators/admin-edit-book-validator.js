@@ -3,15 +3,6 @@ export const editBookDetailsValidator = new JustValidate("#editBookForm", {
   errorLabelCssClass: "error-label",
 });
 
-export const editBookImageValidator = new JustValidate(
-  "#updateCoverImageForm",
-  {
-    errorFieldCssClass: "error-field",
-    errorLabelCssClass: "error-label",
-    successFieldCssClass: "success-field",
-  }
-);
-
 editBookDetailsValidator
   // Book Title
   .addField("#editTitle", [
@@ -179,18 +170,38 @@ editBookDetailsValidator
     },
   ]);
 
-editBookImageValidator
-  // File Input (Book Cover Image)
-  .addField("#updateCoverImage", [
+export const editBookImageValidator = new JustValidate(
+  "#updateCoverImageForm",
+  {
+    errorFieldCssClass: "error-field",
+    errorLabelCssClass: "error-label",
+    successFieldCssClass: "success-field",
+  }
+);
+
+// Constants
+const MAX_IMAGES_ALLOWED = 6;
+
+// Track the initial number of existing images
+let existingImagesCount =
+  coverImagePreviews.querySelectorAll(".preview-container").length;
+let newImagesCount = 0;
+let imageRemoved = false;
+
+// Update the file input validation rule based on remaining slots
+function updateFileInputValidation() {
+  const remainingSlots = MAX_IMAGES_ALLOWED - existingImagesCount;
+  editBookImageValidator.addField("#updateCoverImage", [
     {
       rule: "minFilesCount",
-      value: 1,
-      errorMessage: "Upload atleast one image.",
+      // Require at least 1 new image if no existing images,
+      value: existingImagesCount === 0 ? 1 : 0,
+      errorMessage: "Upload at least one image.",
     },
     {
       rule: "maxFilesCount",
-      value: 6,
-      errorMessage: "Uploading more than 6 images is not allowed.",
+      value: remainingSlots,
+      errorMessage: `You can only upload up to ${remainingSlots} new image(s).`,
     },
     {
       rule: "files",
@@ -204,34 +215,34 @@ editBookImageValidator
       errorMessage:
         "Please upload a valid image (JPEG/JPG/PNG, size 10KB - 2MB)",
     },
-  ])
-
-  // Add the removedImageUrls field
-  .addField("#removedImageUrls", [
-    {
-      validator: (value) => {
-        if (value === "") {
-          // Allow empty string
-          return true;
-        }
-        try {
-          // Check if the value is a valid JSON array of URLs
-          const urls = JSON.parse(value);
-          return (
-            Array.isArray(urls) &&
-            urls.every((url) => /^https?:\/\/[^\s]+$/.test(url))
-          );
-        } catch (e) {
-          return false; // Invalid JSON
-        }
-      },
-      errorMessage:
-        "Removed image URLs must be an empty string or a valid JSON array of URLs",
-    },
   ]);
+}
+
+// Initialize validation on load
+updateFileInputValidation();
+
+// Update image counters and validation when a new image is added
+updateCoverImage.addEventListener("change", function (event) {
+  const selectedFiles = Array.from(event.target.files);
+  newImagesCount = selectedFiles.length;
+
+  // Update validation rules based on the new image count
+  updateFileInputValidation();
+});
+
+// Adjust counters and validation when an image is removed
+coverImagePreviews.addEventListener("click", (e) => {
+  if (e.target.classList.contains("remove-preview-image")) {
+    const imageContainer = e.target.closest(".preview-container");
+    imageContainer.remove();
+
+    // Update the count of existing images
+    existingImagesCount--;
+    updateFileInputValidation();
+  }
+});
 
 // Attach event listeners
-
 document
   .querySelectorAll(
     "#editBookForm textarea, #editBookForm select, #updateCoverImageForm input"

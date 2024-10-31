@@ -9,10 +9,9 @@ const uploadToCloudinary = async (file, folder) => {
           transformation: [
             {
               aspect_ratio: "1.0",
-              width: 500,
-              height: 800,
+              width: 250,
+              height: 400,
               crop: "fill",
-              gravity: "auto",
               quality: "auto",
             },
           ],

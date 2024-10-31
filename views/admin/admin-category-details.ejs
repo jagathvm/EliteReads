@@ -1,8 +1,17 @@
 <section class="content-main">
-  <div class="content-header mb-4">
+  <div class="content-header">
     <a href="/admin/categories" class="text-decoration-none text-muted">
       <i class="material-icons md-arrow_back"></i> Go back
     </a>
+    <!-- Action Buttons -->
+    <div>
+      <button type="button" class="btn btn-secondary btn-md rounded" data-bs-toggle="modal" data-bs-target="#editCategoryModal">
+        Edit Category Details
+      </button>
+      <button type="button" class="btn btn-danger btn-md rounded" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal">
+        Delete Category
+      </button>
+    </div>
   </div>
 
   <div class="card card-user shadow-sm">
@@ -58,15 +67,6 @@
               <span class="text-dark">None</span>
               <% } %>
             </p>
-          </div>
-          <!-- Action Buttons -->
-          <div class="d-flex justify-content-start mt-4">
-            <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editCategoryModal">
-              Edit Category Details
-            </button>
-            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal">
-              Delete Category
-            </button>
           </div>
         </div>
       </div>

@@ -668,9 +668,9 @@ b {
   font-size: 14px;
   font-weight: 500;
   padding: 10px 40px;
-  color: #ffffff;
   border: none;
-  background-color: #088178;
+  color: #fff;
+  background-color: #0d6efd;
   border-radius: 4px;
 }
 .btn.btn-primary i {
@@ -685,33 +685,67 @@ b {
   font-size: 14px;
   font-weight: 500;
   padding: 10px 40px;
+  border: none;
   color: #fff;
   background-color: #6c757d;
-  border: none;
   -webkit-box-shadow: none;
   box-shadow: none;
+}
+.btn.btn-secondary:hover {
+  background-color: #5c636a;
 }
 .btn.btn-secondary.print {
   padding: 7px 15px;
 }
+.btn.btn-success {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 40px;
+  border: none;
+  color: #fff;
+  background-color: #198754;
+  border-radius: 4px;
+}
+.btn.btn-success:hover {
+  background-color: #157347;
+}
+.btn.btn-danger {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 40px;
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+}
+.btn.btn-danger i {
+  color: #fff !important;
+  margin-right: 5px;
+  margin-top: -4px;
+}
+.btn.btn-danger:hover {
+  background-color: #c82333;
+}
+.btn.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  border-radius: 0.25rem;
+}
+.btn.btn-sm:hover {
+  color: #fff;
+}
 .btn.btn-md {
   padding: 0.5rem 0.95rem;
-  font-weight: 500;
-  background-color: #088178;
-  color: #ffffff;
+  font-size: 1rem;
+  border-radius: 0.5rem;
 }
 .btn.btn-md:hover {
-  background-color: #046963;
+  color: #fff;
 }
 .btn.btn-xs {
-  background-color: #088178;
-  color: #ffffff;
-  border: none;
-  font-size: 11px;
-  font-weight: 400;
-  border-radius: 4px;
-  display: inline-block;
-  padding: 6px 19px;
+  padding: rem(6px) rem(10px);
+  font-size: rem(10px);
+  border-radius: rem(4px);
 }
 .btn.btn-xs i {
   font-size: 11px;
@@ -1007,7 +1041,7 @@ textarea.form-control {
   -webkit-box-shadow: none;
   box-shadow: none;
   border: 1px solid #eee;
-  border-radius: 10px;
+  border-radius: 5px;
   -webkit-transition-duration: 0.3s;
   transition-duration: 0.3s;
   overflow: hidden;
@@ -3103,7 +3137,7 @@ body.offcanvas-active {
   -webkit-box-pack: justify;
   -ms-flex-pack: justify;
   justify-content: space-between;
-  margin-bottom: 30px;
+  margin-bottom: 1rem;
 }
 .content-header .content-title {
   margin-bottom: 0;

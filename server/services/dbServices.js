@@ -91,7 +91,10 @@ const updateDocument = async (query, operation, getCollection) => {
     const collection = await getCollection();
     const result = await collection.updateOne(query, operation);
     return result;
+    // console.log("Update Result: ");
+    // console.log(result);
   } catch (error) {
+    console.error(`Error updating document: ${error.message}`);
     throw new Error(`Error updating document: ${error.message}`);
   }
 };

@@ -457,8 +457,110 @@ const editAdminBook = async (req, res) => {
 };
 
 const editAdminBookImage = async (req, res) => {
-  console.log(req.body);
-  console.log(req.files);
+  const { bookSlug } = req.params;
+  const { removedImageUrls } = req.body;
+  const coverImages = req.files;
+
+  try {
+    if (!removedImageUrls && coverImages.length > 0) {
+      const uploadedCoverImageUrls = await uploadImagesToCloudinary(
+        coverImages,
+        "books"
+      );
+
+      const { modifiedCount } = await updateBook(
+        { bookSlug },
+        {
+          $push: {
+            coverImageUrls: {
+              $each: uploadedCoverImageUrls,
+            },
+          },
+        }
+      );
+
+      if (!modifiedCount)
+        return sendResponse(res, 400, "Failed to update cover image.", false);
+
+      return sendResponse(res, 200, "Cover image updated.", true);
+    }
+
+    const urlsToRemove = JSON.parse(removedImageUrls);
+
+    if (removedImageUrls && coverImages.length === 0) {
+      // Delete images from Cloudinary
+      await deleteImagesFromCloudinary(JSON.parse(removedImageUrls), "books");
+
+      // Update the book in the database
+      const { modifiedCount } = await updateBook(
+        { bookSlug },
+        {
+          $pull: { coverImageUrls: { $in: urlsToRemove } },
+        }
+      );
+
+      if (!modifiedCount)
+        return sendResponse(
+          res,
+          400,
+          "Failed to update book cover image.",
+          false
+        );
+
+      return sendResponse(res, 200, "Cover image updated.", true);
+    }
+
+    if (removedImageUrls && coverImages.length > 0) {
+      // Delete images from Cloudinary
+      await deleteImagesFromCloudinary(JSON.parse(removedImageUrls), "books");
+
+      const { modifiedCount: modifiedCountPull } = await updateBook(
+        { bookSlug },
+        {
+          $pull: { coverImageUrls: { $in: urlsToRemove } },
+        }
+      );
+      if (!modifiedCountPull)
+        return sendResponse(
+          res,
+          400,
+          "Failed to update book cover image.",
+          false
+        );
+
+      // Upload newly uploaded images to Cloudinary
+      const uploadedCoverImageUrls = await uploadImagesToCloudinary(
+        coverImages,
+        "books"
+      );
+
+      const { modifiedCount: modifiedCountPush } = await updateBook(
+        { bookSlug },
+        {
+          $push: { coverImageUrls: { $each: uploadedCoverImageUrls } },
+        }
+      );
+      if (!modifiedCountPush) {
+        return sendResponse(
+          res,
+          400,
+          "Failed to update book cover image.",
+          false
+        );
+      }
+
+      return sendResponse(res, 200, "Cover image updated.", true);
+    }
+  } catch (error) {
+    console.error(`An unexpected error occurred. ${error}`);
+    // Send error response
+    return sendResponse(
+      res,
+      500,
+      "An error occurred while updating the cover image.",
+      false
+    );
+  }
 };
 
 const deleteAdminBook = async (req, res) => {

@@ -11,6 +11,7 @@ const uploadImagesToCloudinary = async (images, folder) => {
     );
     return cloudinaryResults.map((result) => result.secure_url);
   } catch (error) {
+    console.log(`Failed to upload images: ${error.message}`);
     throw new Error(`Failed to upload images: ${error.message}`);
   }
 };

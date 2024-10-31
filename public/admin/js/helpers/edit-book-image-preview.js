@@ -1,4 +1,5 @@
-document.addEventListener("DOMContentLoaded", function () {
+import { editBookImageValidator } from "../validators/admin-edit-book-validator.js";
+document.addEventListener("DOMContentLoaded", async function () {
   const updateCoverImage = document.getElementById("updateCoverImage");
   const coverImagePreviews = document.getElementById("coverImagePreviews");
   const newImagePreviews = document.getElementById("newImagePreviews");
@@ -8,7 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const accumulatedFiles = new DataTransfer();
 
   // Handle existing images
-  coverImagePreviews.addEventListener("click", function (event) {
+  coverImagePreviews.addEventListener("click", async function (event) {
     if (event.target.classList.contains("remove-preview-image")) {
       const imgElement = event.target.previousElementSibling;
       const imageUrl = imgElement.src;
@@ -16,8 +17,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
       removedImageUrls.push(imageUrl);
       removedImageUrlsInput.value = JSON.stringify(removedImageUrls);
+      // removedImageUrlsInput.value = removedImageUrls;
 
       event.target.parentElement.remove();
+      saveButtonEnable();
+      await editBookImageValidator.revalidate();
       updateCoverImage.focus();
     }
   });
@@ -42,7 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const img = document.createElement("img");
         img.src = e.target.result;
         img.classList.add("img-fluid", "preview-image");
-        img.style.height = "200px";
+        img.style.height = "150px";
         img.style.objectFit = "contain";
 
         const removeBtn = document.createElement("button");
@@ -58,18 +62,21 @@ document.addEventListener("DOMContentLoaded", function () {
         removeBtn.innerHTML = "&times;";
         removeBtn.title = "Remove this image";
 
-        removeBtn.addEventListener("click", function () {
+        removeBtn.addEventListener("click", async function () {
           const indexToRemove = Array.from(accumulatedFiles.files).findIndex(
             (f) => f === file
           );
           accumulatedFiles.items.remove(indexToRemove); // Remove file from accumulatedFiles
           colDiv.remove(); // Remove the preview
           updateCoverImage.files = accumulatedFiles.files; // Update input files
+
+          await editBookImageValidator.revalidate();
         });
 
         colDiv.appendChild(img);
         colDiv.appendChild(removeBtn);
         newImagePreviews.appendChild(colDiv);
+        saveButtonEnable();
       };
 
       reader.readAsDataURL(file);
@@ -79,3 +86,7 @@ document.addEventListener("DOMContentLoaded", function () {
     updateCoverImage.files = accumulatedFiles.files;
   });
 });
+
+function saveButtonEnable() {
+  saveCoverImageButton.disabled = false;
+}
