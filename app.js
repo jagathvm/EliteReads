@@ -11,7 +11,6 @@ import { setLayout } from "./server/middlewares/setLayout.js";
 // Import Routes
 import authRouter from "./server/routes/auth.js";
 import adminRouter from "./server/routes/admin.js";
-// import indexRouter from "./server/routes/index.js";
 import userRouter from "./server/routes/user.js";
 
 const app = express();
@@ -48,7 +47,7 @@ app.use("/api/auth", authRouter);
 app.use("/admin", adminRouter);
 
 /**
- * Use the user router for handling /user endpoints.
+ * Use the user router for handling / endpoints.
  */
 app.use("/", userRouter);
 

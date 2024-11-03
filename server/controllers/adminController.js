@@ -1,10 +1,11 @@
 import { ObjectId } from "mongodb";
-import { capitalisation, slugWithIsbn } from "../utils/utils.js";
+import { capitalisation } from "../utils/utils.js";
+import { slugWithIsbn } from "../helpers/userHelper.js";
 import { sendResponse, renderResponse } from "../utils/responseHandler.js";
 import {
-  deleteImagesFromCloudinary,
-  uploadImagesToCloudinary,
-} from "../utils/cloudinaryHandler.js";
+  deleteFromCloudinary,
+  uploadToCloudinary,
+} from "../helpers/cloudinaryHelper.js";
 import {
   getAggregatedCategories,
   getCategories,
@@ -120,14 +121,6 @@ const getAdminBookDetails = async (req, res) => {
       },
     ];
 
-    const {
-      found: bookFound,
-      errorMessage: bookNotFound,
-      value: [book],
-    } = await getAggregatedBooks(bookPipeline);
-
-    if (!bookFound) return sendResponse(res, 404, bookNotFound, false);
-
     const categoriesPipeline = [
       {
         $match: {
@@ -145,13 +138,11 @@ const getAdminBookDetails = async (req, res) => {
     ];
 
     const {
-      found: categoriesFound,
-      errorMessage: categoriesNotFound,
-      value: categories,
-    } = await getAggregatedCategories(categoriesPipeline);
+      value: [book],
+    } = await getAggregatedBooks(bookPipeline);
 
-    if (!categoriesFound)
-      return sendResponse(res, 404, categoriesNotFound, false);
+    const { value: categories } =
+      await getAggregatedCategories(categoriesPipeline);
 
     return renderResponse(res, 200, "admin/admin-book-details", {
       req,
@@ -165,13 +156,11 @@ const getAdminBookDetails = async (req, res) => {
   }
 };
 
-const getAdminOrders = (req, res) => {
-  return renderResponse(res, 200, "admin/admin-orders-list", { req });
-};
+const getAdminOrders = (req, res) =>
+  renderResponse(res, 200, "admin/admin-orders-list", { req });
 
-const getAdminOrderDetails = (req, res) => {
-  return renderResponse(res, 200, "admin/admin-order-details", { req });
-};
+const getAdminOrderDetails = (req, res) =>
+  renderResponse(res, 200, "admin/admin-order-details", { req });
 
 const getAdminAddCategory = async (req, res) => {
   try {
@@ -190,7 +179,7 @@ const getAdminAddCategory = async (req, res) => {
 
 const getAdminCategories = async (req, res) => {
   try {
-    const pipeline = [
+    const categoriesPipeline = [
       {
         $match: {
           parentCategory: "",
@@ -205,7 +194,8 @@ const getAdminCategories = async (req, res) => {
         },
       },
     ];
-    const { value: categories } = await getAggregatedCategories(pipeline);
+    const { value: categories } =
+      await getAggregatedCategories(categoriesPipeline);
 
     return renderResponse(res, 200, "admin/admin-categories", {
       req,
@@ -219,8 +209,9 @@ const getAdminCategories = async (req, res) => {
 
 const getAdminCategoryDetails = async (req, res) => {
   const { categorySlug: slug } = req.params;
+
   try {
-    const pipeline = [
+    const categoryPipeline = [
       {
         $match: { slug },
       },
@@ -251,7 +242,7 @@ const getAdminCategoryDetails = async (req, res) => {
     const {
       found: categoryFound,
       value: [category],
-    } = await getAggregatedCategories(pipeline);
+    } = await getAggregatedCategories(categoryPipeline);
     if (!categoryFound) return renderResponse(res, 404, "admin/404", { req });
 
     const { value: categories } = await getCategories();
@@ -267,33 +258,27 @@ const getAdminCategoryDetails = async (req, res) => {
   }
 };
 
-const getAdminSellers = (req, res) => {
-  return renderResponse(res, 200, "admin/admin-sellers-cards", { req });
-};
+const getAdminSellers = (req, res) =>
+  renderResponse(res, 200, "admin/admin-sellers-cards", { req });
 
-const getAdminSellerProfile = (req, res) => {
-  return renderResponse(res, 200, "admin/admin-seller-profile", {
+const getAdminSellerProfile = (req, res) =>
+  renderResponse(res, 200, "admin/admin-seller-profile", {
     req,
   });
-};
 
-const getAdminTransactions = (req, res) => {
-  return renderResponse(res, 200, "admin/admin-transactions", { req });
-};
+const getAdminTransactions = (req, res) =>
+  renderResponse(res, 200, "admin/admin-transactions", { req });
 
-const getAdminReviews = (req, res) => {
-  return renderResponse(res, 200, "admin/admin-reviews", { req });
-};
+const getAdminReviews = (req, res) =>
+  renderResponse(res, 200, "admin/admin-reviews", { req });
 
-const getAdminReviewDetails = (req, res) => {
-  return renderResponse(res, 200, "admin/admin-review-details", {
+const getAdminReviewDetails = (req, res) =>
+  renderResponse(res, 200, "admin/admin-review-details", {
     req,
   });
-};
 
-const getAdminSettings = (req, res) => {
-  return renderResponse(res, 200, "admin/admin-settings", { req });
-};
+const getAdminSettings = (req, res) =>
+  renderResponse(res, 200, "admin/admin-settings", { req });
 
 const getAdminUsers = async (req, res) => {
   const { found: usersFound, value: users } = await getUsers();
@@ -317,15 +302,13 @@ const getAdminUserProfile = async (req, res) => {
   });
 };
 
-const getAdminAuthors = (req, res) => {
-  return renderResponse(res, 200, "admin/admin-authors", { req });
-};
+const getAdminAuthors = (req, res) =>
+  renderResponse(res, 200, "admin/admin-authors", { req });
 
-const getAdminAuthorProfile = (req, res) => {
-  return renderResponse(res, 200, "admin/admin-author-profile", {
+const getAdminAuthorProfile = (req, res) =>
+  renderResponse(res, 200, "admin/admin-author-profile", {
     req,
   });
-};
 
 const postAdminAddBook = async (req, res) => {
   const isFeatured = req.validData.featured === "on";
@@ -341,7 +324,7 @@ const postAdminAddBook = async (req, res) => {
     if (!coverImages || coverImages.length === 0)
       return sendResponse(res, 400, "No cover images uploaded", false);
 
-    const coverImageUrls = await uploadImagesToCloudinary(coverImages, "books");
+    const coverImageUrls = await uploadToCloudinary(coverImages, "books");
     const bookSlug = slugWithIsbn(title, isbn);
 
     const newBook = {
@@ -463,7 +446,7 @@ const editAdminBookImage = async (req, res) => {
 
   try {
     if (!removedImageUrls && coverImages.length > 0) {
-      const uploadedCoverImageUrls = await uploadImagesToCloudinary(
+      const uploadedCoverImageUrls = await uploadToCloudinary(
         coverImages,
         "books"
       );
@@ -489,7 +472,7 @@ const editAdminBookImage = async (req, res) => {
 
     if (removedImageUrls && coverImages.length === 0) {
       // Delete images from Cloudinary
-      await deleteImagesFromCloudinary(JSON.parse(removedImageUrls), "books");
+      await deleteFromCloudinary(JSON.parse(removedImageUrls), "books");
 
       // Update the book in the database
       const { modifiedCount } = await updateBook(
@@ -512,7 +495,7 @@ const editAdminBookImage = async (req, res) => {
 
     if (removedImageUrls && coverImages.length > 0) {
       // Delete images from Cloudinary
-      await deleteImagesFromCloudinary(JSON.parse(removedImageUrls), "books");
+      await deleteFromCloudinary(JSON.parse(removedImageUrls), "books");
 
       const { modifiedCount: modifiedCountPull } = await updateBook(
         { bookSlug },
@@ -529,7 +512,7 @@ const editAdminBookImage = async (req, res) => {
         );
 
       // Upload newly uploaded images to Cloudinary
-      const uploadedCoverImageUrls = await uploadImagesToCloudinary(
+      const uploadedCoverImageUrls = await uploadToCloudinary(
         coverImages,
         "books"
       );
@@ -574,7 +557,7 @@ const deleteAdminBook = async (req, res) => {
 
     // Delete associated images from Cloudinary
     if (book.coverImageUrls?.length > 0)
-      await deleteImagesFromCloudinary(book.coverImageUrls, "books");
+      await deleteFromCloudinary(book.coverImageUrls, "books");
 
     // Remove the book from the database
     const { deletedCount } = await removeBook({ bookSlug });

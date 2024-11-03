@@ -228,7 +228,7 @@
               <div class="product-cart-wrap mb-30">
                 <div class="product-img-action-wrap">
                   <div class="product-img product-img-zoom">
-                    <a href="/book-details/<%= book.slugWithIsbn %>">
+                    <a href="/book-details/<%= book.bookSlug %>">
                       <img class="default-img" src="<%= book.coverImageUrls[0]  %>" alt="<%= book.title %>" />
                       <img class="hover-img" src="<%= book.coverImageUrls[1] ? book.coverImageUrls[1] : book.coverImageUrls[0] %>" alt="<%= book.title %>" />
                     </a>
@@ -239,10 +239,10 @@
                 </div>
                 <div class="product-content-wrap">
                   <div class="product-category">
-                    <a href="shop-grid-right.html"><%= book.category %></a>
+                    <a href='/book-store/categories/<%= book.category.slug %>'><%= book.category.name %></a>
                   </div>
                   <h2>
-                    <a href="shop-product-right.html"><%= book.title %></a>
+                    <a href="/book-details/<%= book.bookSlug %>"><%= book.title %></a>
                   </h2>
                   <div class="product-price">
                     <span>₹ <%= book.price %> </span>
@@ -282,7 +282,7 @@
           <div class="product-cart-wrap small hover-up">
             <div class="product-img-action-wrap">
               <div class="product-img product-img-zoom">
-                <a href="/book-details/<%= book.slugWithIsbn %>">
+                <a href="/book-details/<%= book.bookSlug %>">
                   <img class="default-img" src="<%= book.coverImageUrls[0] %>" alt="" />
                   <img class="hover-img" src="<%= book.coverImageUrls[1] ? book.coverImageUrls[1] : book.coverImageUrls[0] %>" alt="" />
                 </a>
@@ -297,11 +297,11 @@
               </h2>
               <div class="product-price">
                 <span>₹ <%= book.price %> </span>
-                <!-- <span class="old-price">₹ <%= book.price %> </span> -->
+                <span class="old-price">₹ <%= book.price %> </span>
               </div>
               <div class="product-action-1">
-                <a aria-label="Add To Wishlist" class="action-btn small hover-up" href="shop-wishlist.html" tabindex="0"><i class="fi-rs-heart"></i></a>
-                <a aria-label="Compare" class="action-btn small hover-up" href="shop-compare.html" tabindex="0"><i class="fi-rs-shuffle"></i></a>
+                <a aria-label="Add To Wishlist" class="action-btn small hover-up" href="/readlist" tabindex="0"><i class="fi-rs-heart"></i></a>
+                <a aria-label="Compare" class="action-btn small hover-up" href="/cart" tabindex="0"><i class="fi-rs-shuffle"></i></a>
               </div>
             </div>
           </div>

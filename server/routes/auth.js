@@ -1,14 +1,18 @@
 import { Router } from "express";
 import upload from "../middlewares/upload.js";
 import validateData from "../middlewares/validateData.js";
-import { userSignUpSchema, userLogInSchema } from "../validators/userSchema.js";
+import {
+  userSignUpSchema,
+  userLogInSchema,
+  userOtpVerificationSchema,
+} from "../validators/userSchema.js";
 import {
   getUserLogin,
   getUserLoginVerification,
   getUserSignup,
-  postUserSignup,
   postUserLogin,
   postVerifyOtp,
+  postUserSignup,
 } from "../controllers/authController.js";
 
 const router = Router();
@@ -23,7 +27,12 @@ router.post(
   validateData(userLogInSchema),
   postUserLogin
 );
-router.post("/loginVerification", upload.none(), postVerifyOtp);
+router.post(
+  "/loginVerification",
+  upload.none(),
+  validateData(userOtpVerificationSchema),
+  postVerifyOtp
+);
 router.post(
   "/signup",
   upload.none(),

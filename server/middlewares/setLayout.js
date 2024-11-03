@@ -1,4 +1,4 @@
-export const setLayout = (req, res, next) => {
+const setLayout = (req, res, next) => {
   const url = req.originalUrl;
 
   // Ignore .css.map, .js.map, and other static asset requests
@@ -13,10 +13,7 @@ export const setLayout = (req, res, next) => {
       : "user/layout/layout-user";
 
   req.app.set("layout", layout);
-
-  // // Log the current route and layout
-  // console.log(`Current route: ${url}`);
-  // console.log(`Layout set to: ${layout}`);
-
   next();
 };
+
+export { setLayout };

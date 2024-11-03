@@ -6,7 +6,7 @@ import {
   addDocument,
   updateDocument,
   removeDocument,
-} from "./dbServices.js";
+} from "../helpers/dbHelper.js";
 
 // Category-specific functions
 const getAggregatedCategories = async (pipeline) =>

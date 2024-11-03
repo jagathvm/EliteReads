@@ -1,11 +1,10 @@
 import { sendResponse } from "../utils/responseHandler.js";
-import { getCheckboxValue } from "../utils/utils.js";
 
 const validateData = (schema) => {
   return async (req, res, next) => {
     try {
       if (req.body.checkbox) {
-        req.body.checkbox = getCheckboxValue(req.body.checkbox);
+        req.body.checkbox = req.body.checkbox === "on";
       }
 
       const { error: validationError, value: validData } = schema.validate(

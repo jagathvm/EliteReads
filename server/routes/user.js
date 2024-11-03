@@ -12,7 +12,7 @@ router.get("/", userController.getUserHome);
 router.get("/about", userController.getUserAbout);
 router.get("/contact", userController.getUserContact);
 router.get("/privacy-policy", userController.getUserPrivacyPolicy);
-router.get("/book-details/:slugWithIsbn", userController.getUserBook);
+router.get("/book-details/:bookSlug", userController.getUserBook);
 router.get("/book-store", userController.getUserStore);
 router.get("/terms-conditions", userController.getUserTermsConditions);
 

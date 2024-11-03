@@ -4,7 +4,7 @@ import {
   getDocument,
   addDocument,
   updateDocument,
-} from "./dbServices.js";
+} from "../helpers/dbHelper.js";
 
 // User-specific functions
 const getUsers = async (query) =>

@@ -1,135 +1,188 @@
-import { ObjectId } from "mongodb";
-import { getBooks, getBook } from "../services/booksServices.js";
-import { getCategories } from "../services/categoriesServices.js";
-import { getUser } from "../services/userServices.js";
-import { renderResponse } from "../utils/responseHandler.js";
+import { fetchUserData } from "../helpers/userHelper.js";
+import { fetchBookData, fetchBooksData } from "../helpers/bookHelper.js";
+import { fetchCategoriesData } from "../helpers/categoryHelper.js";
+import { renderResponse, sendResponse } from "../utils/responseHandler.js";
+import { render } from "ejs";
 
 const getUserHome = async (req, res) => {
   try {
-    const { value: categories } = await getCategories();
-    const { value: books } = await getBooks();
-
-    let user = null;
-    if (req.user) {
-      const { value: userData } = await getUser({
-        _id: new ObjectId(req.user.userId),
-      });
-      user = userData;
-    }
+    const user = await fetchUserData(req);
+    const books = await fetchBooksData();
+    const categories = await fetchCategoriesData();
 
     return renderResponse(res, 200, "user/user-home", {
       req,
       user,
-      categories,
       books,
+      categories,
     });
   } catch (error) {
     console.error(`An unexpected error occurred. ${error}`);
-    return res.status(500).json({
-      success: false,
-      message: `Internal Server Error. ${error.message}`,
-    });
+    return sendResponse(
+      res,
+      500,
+      `Internal Server Error. ${error.message}`,
+      false
+    );
   }
 };
 
-const getUserAbout = (req, res) => {
-  res.status(200).render("user/user-about", { req });
+const getUserAbout = async (req, res) => {
+  try {
+    const user = await fetchUserData(req);
+    return renderResponse(res, 200, "user/user-about", { req, user });
+  } catch (error) {
+    console.log(`An unexpected error occurred. ${error}`);
+    return sendResponse(
+      res,
+      500,
+      `Internal Server Error. ${error.message}`,
+      false
+    );
+  }
 };
 
-const getUserContact = (req, res) => {
-  res.status(200).render("user/user-contact", { req });
+const getUserContact = async (req, res) => {
+  try {
+    const user = await fetchUserData(req);
+    return renderResponse(res, 200, "user/user-contact", { req, user });
+  } catch (error) {
+    console.log(`An unexpected error occurred. ${error}`);
+    return sendResponse(
+      res,
+      500,
+      `Internal Server Error. ${error.message}`,
+      false
+    );
+  }
 };
 
 const getUserStore = async (req, res) => {
   try {
-    const {
-      found: categoriesFound,
-      errorMessage: categoriesNotFound,
-      value: categories,
-    } = await getCategories();
+    const user = await fetchUserData(req);
+    const books = await fetchBooksData();
+    const categories = await fetchCategoriesData();
 
-    if (!categoriesFound)
-      return sendResponse(res, 400, categoriesNotFound, false);
-
-    const {
-      found: booksFound,
-      errorMessage: booksNotFound,
-      value: books,
-    } = await getBooks();
-
-    if (!booksFound) return sendResponse(res, 404, booksNotFound, false);
-
-    return res
-      .status(200)
-      .render("user/user-store", { req, categories, books });
+    return renderResponse(res, 200, "user/user-store", {
+      req,
+      user,
+      books,
+      categories,
+    });
   } catch (error) {
     console.error(`An unexpected error occurred. ${error}`);
-    return res.status(500).json({
-      sucess: false,
-      message: `Internal Server Error. ${error.message}`,
-    });
+    return sendResponse(
+      res,
+      500,
+      `Internal Server Error. ${error.message}`,
+      false
+    );
   }
 };
 
-const getUserPrivacyPolicy = (req, res) => {
-  res.status(200).render("user/user-privacy-policy", { req });
+const getUserPrivacyPolicy = async (req, res) => {
+  try {
+    const user = await fetchUserData(req);
+    return renderResponse(res, 200, "user/user-privacy-policy", { req, user });
+  } catch (error) {
+    console.log(`An unexpected error occurred. ${error}`);
+    return sendResponse(
+      res,
+      500,
+      `Internal Server Error. ${error.message}`,
+      false
+    );
+  }
 };
 
-const getUserCart = (req, res) => {
-  res.status(200).render("user/user-cart", { req });
+const getUserCart = async (req, res) => {
+  try {
+    const user = await fetchUserData(req);
+    return renderResponse(res, 200, "user/user-cart", { req, user });
+  } catch (error) {
+    console.log(`An unexpected error occurred. ${error}`);
+    return sendResponse(
+      res,
+      500,
+      `Internal Server Error. ${error.message}`,
+      false
+    );
+  }
 };
 
-const getUserReadlist = (req, res) => {
-  res.status(200).render("user/user-readlist", { req });
+const getUserReadlist = async (req, res) => {
+  try {
+    const user = await fetchUserData(req);
+    return renderResponse(res, 200, "user/user-readlist", { req, user });
+  } catch (error) {
+    console.log(`An unexpected error occurred. ${error}`);
+    return sendResponse(
+      res,
+      500,
+      `Internal Server Error. ${error.message}`,
+      false
+    );
+  }
 };
 
-const getUserProfile = (req, res) => {
-  res.status(200).render("user/user-profile", { req });
+const getUserProfile = async (req, res) => {
+  try {
+    const user = await fetchUserData(req);
+    return renderResponse(res, 200, "user/user-profile", { req, user });
+  } catch (error) {
+    console.log(`An unexpected error occurred. ${error}`);
+    return sendResponse(
+      res,
+      500,
+      `Internal Server Error. ${error.message}`,
+      false
+    );
+  }
 };
 
 const getUserBook = async (req, res) => {
-  const { slugWithIsbn } = req.params;
+  const { bookSlug } = req.params;
 
   try {
-    const {
-      found: categoriesFound,
-      errorMessage: categoriesNotFound,
-      value: categories,
-    } = await getCategories();
+    const user = await fetchUserData(req);
+    const book = await fetchBookData(bookSlug);
+    const books = await fetchBooksData();
+    const categories = await fetchCategoriesData();
 
-    if (!categoriesFound)
-      return sendResponse(res, 400, categoriesNotFound, false);
-
-    const {
-      found: booksFound,
-      errorMessage: booksNotFound,
-      value: books,
-    } = await getBooks();
-
-    if (!booksFound) return sendResponse(res, 404, booksNotFound, false);
-
-    const {
-      found: bookFound,
-      errorMessage: bookNotFound,
-      value: book,
-    } = await getBook({ slugWithIsbn });
-
-    if (!bookFound) return sendResponse(res, 404, bookNotFound, false);
-
-    return res
-      .status(200)
-      .render("user/user-product", { req, categories, books, book });
+    return renderResponse(res, 200, "user/user-product", {
+      req,
+      user,
+      book,
+      books,
+      categories,
+    });
   } catch (error) {
     console.error(`An unexpected error occurred. ${error}`);
-    return res.status(500).json({
-      sucess: false,
-      message: `Internal Server Error. ${error.message}`,
-    });
+    return sendResponse(
+      res,
+      500,
+      `Internal Server Error. ${error.message}`,
+      false
+    );
   }
 };
 
-const getUserTermsConditions = (req, res) => {
-  res.status(200).render("user/user-terms-conditions", { req });
+const getUserTermsConditions = async (req, res) => {
+  try {
+    const user = await fetchUserData(req);
+    return renderResponse(res, 200, "user/user-terms-conditions", {
+      req,
+      user,
+    });
+  } catch (error) {
+    console.log(`An unexpected error occurred. ${error}`);
+    return sendResponse(
+      res,
+      500,
+      `Internal Server Error. ${error.message}`,
+      false
+    );
+  }
 };
 
 export {

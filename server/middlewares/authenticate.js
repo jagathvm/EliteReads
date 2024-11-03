@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import { verifyAccessToken } from "../helpers/authHelper.js";
 import { renderResponse } from "../utils/responseHandler.js";
 
 const authenticateToken = (req, res, next) => {
@@ -13,26 +13,21 @@ const authenticateToken = (req, res, next) => {
     });
   }
 
-  // Verify the access token
-  jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-    if (err) {
-      // Set user layout for 403
-      req.app.set("layout", "auth/layout/layout-auth");
-
-      return renderResponse(res, 403, "user/user-login-redirect", {
-        req,
-        errorMessage: "Session Timed Out",
-      });
-    }
-
-    // Attach the user information to the request
-    req.user = user;
-    // Proceed to the next middleware or route handler
+  try {
+    // Verify the access token
+    req.user = verifyAccessToken(accessToken);
     next();
-  });
+  } catch (error) {
+    // Set user layout for 403
+    req.app.set("layout", "auth/layout/layout-auth");
+    return renderResponse(res, 403, "user/user-login-redirect", {
+      req,
+      errorMessage: "Session Timed Out",
+    });
+  }
 };
 
-const checkUserLoggedIn = (req, res, next) => {
+const checkUserLoggedIn = async (req, res, next) => {
   const { accessToken } = req.cookies;
 
   if (!accessToken) {
@@ -41,19 +36,13 @@ const checkUserLoggedIn = (req, res, next) => {
     return next();
   }
 
-  // Verify the access token
-  jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-    if (err) {
-      // Invalid token, set user to null
-      req.user = null;
-    } else {
-      // Valid token, set req.user to the decoded user info
-      req.user = user;
-    }
-
-    // Proceed to the next middleware or route handler
-    next();
-  });
+  try {
+    // Verify the access token
+    req.user = await verifyAccessToken(accessToken);
+  } catch (error) {
+    req.user = null;
+  }
+  next();
 };
 
 export { authenticateToken, checkUserLoggedIn };

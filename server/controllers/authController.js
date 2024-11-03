@@ -3,16 +3,12 @@ import {
   setCookie,
   hashPassword,
   verifyPassword,
-} from "../services/authServices.js";
+  sendOTP,
+  verifyOTP,
+} from "../helpers/authHelper.js";
 import { formatDate } from "../utils/utils.js";
-import { sendOTP, verifyOTP } from "../services/otpServices.js";
 import { sendResponse, renderResponse } from "../utils/responseHandler.js";
-import {
-  getUsers,
-  getUser,
-  addUser,
-  updateUser,
-} from "../services/userServices.js";
+import { getUser, addUser, updateUser } from "../services/userServices.js";
 
 const getUserLogin = (req, res) =>
   renderResponse(res, 200, "user/user-login", { req });
@@ -24,8 +20,9 @@ const getUserSignup = (req, res) =>
   renderResponse(res, 200, "user/user-signup", { req });
 
 const postUserSignup = async (req, res) => {
+  const { username, email, phone, password } = req.validData;
+
   try {
-    const { username, email, phone, password } = req.validData;
     const { found: userExists } = await getUser({
       $or: [{ username }, { email }, { phone }],
     });
@@ -39,7 +36,7 @@ const postUserSignup = async (req, res) => {
       );
 
     const hashedPassword = await hashPassword(password);
-    const { acknowledged, insertedId } = await addUser({
+    const userData = {
       username,
       email,
       phone,
@@ -55,7 +52,9 @@ const postUserSignup = async (req, res) => {
         isBlocked: false,
         status: "ACTIVE",
       },
-    });
+    };
+
+    const { acknowledged, insertedId } = await addUser(userData);
     if (!acknowledged)
       return sendResponse(res, 400, "User registration failed.", false);
 
@@ -74,18 +73,32 @@ const postUserSignup = async (req, res) => {
 };
 
 const postUserLogin = async (req, res) => {
-  try {
-    const { emailOrPhone, password } = req.validData;
+  const { usernameEmailPhone, password } = req.validData;
 
+  try {
     const { found: userFound, value: user } = await getUser({
-      $or: [{ email: emailOrPhone }, { phone: emailOrPhone }],
+      $or: [
+        { username: usernameEmailPhone },
+        { email: usernameEmailPhone },
+        { phone: usernameEmailPhone },
+      ],
     });
     if (!userFound)
-      return sendResponse(res, 404, "Invalid Username / Password", false);
+      return sendResponse(
+        res,
+        404,
+        "Invalid Username, Email or Password",
+        false
+      );
 
     const passwordsMatch = await verifyPassword(password, user.password);
     if (!passwordsMatch)
-      return sendResponse(res, 400, "Invalid Username / Password", false);
+      return sendResponse(
+        res,
+        400,
+        "Invalid Username, Email or Password",
+        false
+      );
 
     const otpResponse = await sendOTP(user.phone);
     if (!otpResponse || otpResponse.status !== "pending") {
@@ -98,7 +111,6 @@ const postUserLogin = async (req, res) => {
     }
 
     setCookie(res, "phone", user.phone, 10 * 60 * 1000);
-
     return sendResponse(res, 200, "OTP sent to your phone.", true);
   } catch (error) {
     console.error(error);

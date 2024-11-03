@@ -1,11 +1,14 @@
 import HttpRequest from "../../../helpers/http-request.js";
+import { userLoginValidator } from "../validators/user-login-validator.js";
 import { showToast, errorMessage } from "../../../helpers/toast.js";
 
 const formOtp = document.getElementById("formOtp");
 const otpErrorMessage = document.getElementById("otpErrorMessage");
 
 formOtp.addEventListener("submit", async (e) => {
-  e.preventDefault();
+  const isValid = await userLoginValidator.revalidate();
+  if (!isValid) return e.preventDefault();
+
   const formData = new FormData(formOtp);
 
   try {

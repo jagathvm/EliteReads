@@ -7,9 +7,8 @@ const saveCategoryButton = document.getElementById("saveCategoryButton");
 
 saveCategoryButton.addEventListener("click", async (e) => {
   const isValid = await addCategoryValidator.revalidate();
-  if (!isValid) {
+  if (!isValid)
     return showToast("Kindly fill in all fields to continue.", false);
-  }
 
   const formData = new FormData(addCategoryForm);
   try {

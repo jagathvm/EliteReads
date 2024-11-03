@@ -49,20 +49,27 @@ const userSignUpSchema = Joi.object({
 });
 
 const userLogInSchema = Joi.object({
-  emailOrPhone: Joi.string()
+  usernameEmailPhone: Joi.string()
     .required()
     .custom((value, helpers) => {
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       const phonePattern = /^[6-9]\d{9}$/;
+      const usernamePattern = /^[a-z0-9_]{3,20}$/;
 
-      if (!emailPattern.test(value) && !phonePattern.test(value)) {
-        return helpers.message("Enter a valid email or phone number");
+      if (emailPattern.test(value)) {
+        return value; // valid email
+      } else if (phonePattern.test(value)) {
+        return value; // valid phone number
+      } else if (usernamePattern.test(value)) {
+        return value; // valid username
       }
 
-      return value;
+      return helpers.message("Enter a valid username, email, or phone number");
     })
     .messages({
-      "string.empty": "Email or Phone is required",
+      "string.empty": "Username, Email, or Phone is required",
+      "string.pattern.base":
+        "Username must be 3-20 characters, using only lowercase letters, numbers, and underscores",
     }),
   password: Joi.string().required().min(8).max(16).messages({
     "string.empty": "Password is required",
@@ -75,4 +82,16 @@ const userLogInSchema = Joi.object({
     .default(false),
 });
 
-export { userSignUpSchema, userLogInSchema };
+const userOtpVerificationSchema = Joi.object({
+  otp: Joi.string()
+    .length(6)
+    .pattern(/^[0-9]+$/)
+    .required()
+    .messages({
+      "string.empty": "OTP is required",
+      "string.length": "OTP must be exactly 6 digits",
+      "string.pattern.base": "OTP must contain only digits",
+    }),
+});
+
+export { userSignUpSchema, userLogInSchema, userOtpVerificationSchema };

@@ -6,7 +6,7 @@ import {
   addDocument,
   updateDocument,
   removeDocument,
-} from "./dbServices.js";
+} from "../helpers/dbHelper.js";
 
 // Book-specific functions
 const getAggregatedBooks = async (pipeline) =>

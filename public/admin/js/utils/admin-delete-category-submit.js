@@ -5,6 +5,7 @@ const deleteCategoryButton = document.getElementById("deleteCategoryButton");
 
 deleteCategoryButton.addEventListener("click", async (e) => {
   const slug = deleteCategoryButton.getAttribute("data-category-slug");
+
   try {
     const apiClient = new HttpRequest("/admin/categories");
     const response = await apiClient.delete(`/${slug}`);

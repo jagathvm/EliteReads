@@ -3,8 +3,10 @@
     <div class="container">
       <div class="breadcrumb">
         <a href="/" rel="nofollow">Home</a>
-        <span></span> <%= book.category %>
-        <span></span> <%= book.subcategory %>
+        <span></span> <%= book.category.name %>
+        <% if (book.subcategory) { %>
+        <span></span> <%= book.subcategory.name %>
+        <% } %>
         <span></span> <%= book.title %>
       </div>
     </div>
@@ -15,13 +17,13 @@
         <div class="col-lg-9">
           <div class="product-detail accordion-detail">
             <div class="row mb-50">
-              <div class="col-md-6 col-sm-12 col-xs-12">
+              <div class="col-md-4 col-sm-12 col-xs-12">
                 <div class="detail-gallery">
-                  <span class="zoom-icon"><i class="fi-rs-search"></i></span>
                   <!-- MAIN SLIDES -->
-                  <div class="product-image-slider">
+                  <span class="zoom-icon"><i class="fi-rs-search"></i></span>
+                  <div class="product-image-slider" style="height: auto; width: 200px;">
                     <% book.coverImageUrls.forEach(url => { %>
-                    <figure class="border-radius-10">
+                    <figure class="border-radius-10" style="height: auto; width: 200px;">
                       <img src="<%= url %>" alt="product image">
                     </figure>
                     <% }) %>
@@ -46,7 +48,7 @@
                   </ul>
                 </div>
               </div>
-              <div class="col-md-6 col-sm-12 col-xs-12">
+              <div class="col-md-8 col-sm-12 col-xs-12">
                 <div class="detail-info">
                   <h2 class="title-detail"><%= book.title %></h2>
                   <div class="pro-details-brand mt-2">
@@ -237,7 +239,7 @@
                     <div class="product-cart-wrap small hover-up">
                       <div class="product-img-action-wrap">
                         <div class="product-img product-img-zoom">
-                          <a href="/book-details/<%= book.slugWithIsbn %>" tabindex="0">
+                          <a href="/book-details/<%= book.bookSlug %>" tabindex="0">
                             <img class="default-img" src="<%= book.coverImageUrls[0] %>" alt="">
                             <img class="hover-img" src="<%= book.coverImageUrls[1] ? book.coverImageUrls[1] : book.coverImageUrls[0] %>" alt="">
                           </a>
@@ -247,7 +249,7 @@
                         </div>
                       </div>
                       <div class="product-content-wrap">
-                        <h2><a href="/book-details/<%= book.slugWithIsbn %>" tabindex="0"><%= book.title %></a></h2>
+                        <h2><a href="/book-details/<%= book.bookSlug %>" tabindex="0"><%= book.title %></a></h2>
                         <div class="rating-result" title="90%">
                           <span>
                           </span>
@@ -288,7 +290,7 @@
                 <img src="<%= book.coverImageUrls[0] %>" alt="<%= book.title %>">
               </div>
               <div class="content pt-10">
-                <h5><a href="/book-details/<%= book.slugWithIsbn %>"><%= book.title %></a></h5>
+                <h5><a href="/book-details/<%= book.bookSlug %>"><%= book.title %></a></h5>
                 <p class="author mb-0 mt-5 text-dark"><%= book.author %></p>
                 <p class="price mb-0 mt-5">₹ <%= book.price %></p>
                 <!-- <div class="product-rate">
