@@ -82,16 +82,16 @@ EliteReads/
 
 - **Admin Panel**: Manage categories, subcategories, and book listings, including image uploads.
 - **User Features**: Register, log in (with OTP), browse books, and add to cart.
-- **Authentication**: Secure login with OTP, along with refresh tokens and role-based access control.
+- **Authentication**: Secure login with OTP, along with role-based access control.
 
 ## Technologies Used
 
-- **Backend**: Node.js, Express, MongoDB, Mongoose
+- **Backend**: Node.js, Express, MongoDB
 - **Frontend**: HTML, CSS, JavaScript, EJS
 - **Authentication**: JSON Web Tokens (JWT)
 - **Image Management**: Cloudinary
-- **Session Management**: Redis
-- **Validation**: JustValidate (frontend validation library)
+- **Validation**: JustValidate (frontend validation library), Joi (backend validation library)
+- **Session Management**: Redis (coming soon)
 
 ## Future Improvements
 
