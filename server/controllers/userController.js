@@ -2,7 +2,6 @@ import { fetchUserData } from "../helpers/userHelper.js";
 import { fetchBookData, fetchBooksData } from "../helpers/bookHelper.js";
 import { fetchCategoriesData } from "../helpers/categoryHelper.js";
 import { renderResponse, sendResponse } from "../utils/responseHandler.js";
-import { render } from "ejs";
 
 const getUserHome = async (req, res) => {
   try {

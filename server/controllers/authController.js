@@ -58,7 +58,7 @@ const postUserSignup = async (req, res) => {
     if (!acknowledged)
       return sendResponse(res, 400, "User registration failed.", false);
 
-    setCookie(res, "accessToken", generateAccessToken({ id: insertedId }));
+    setCookie(res, "accessToken", generateAccessToken({ userId: insertedId }));
 
     return sendResponse(res, 201, "User registration successful", true);
   } catch (error) {
