@@ -23,11 +23,12 @@
               <div class="sort-by-cover">
                 <div class="sort-by-product-wrap">
                   <div class="sort-by">
-                    <span><i class="fi-rs-apps-sort"></i>Sort
-                      by:</span>
+                    <span><i class="fi-rs-apps-sort"></i>
+                      Sort by:
+                    </span>
                   </div>
                   <div class="sort-by-dropdown-wrap">
-                    <span>
+                    <span id="selected-sort-option">
                       Featured
                       <i class="fi-rs-angle-small-down"></i></span>
                   </div>
@@ -35,16 +36,16 @@
                 <div class="sort-by-dropdown">
                   <ul>
                     <li>
-                      <a class="active" href="#">Featured</a>
+                      <a href="/book-store?sort=featured" data-sort-name="Featured">Featured</a>
                     </li>
                     <li>
-                      <a href="#">Price: Low to High</a>
+                      <a href="/book-store?sort=priceAsc" data-sort-name="Price: Low to High">Price: Low to High</a>
                     </li>
                     <li>
-                      <a href="#">Price: High to Low</a>
+                      <a href="/book-store?sort=priceDesc" data-sort-name="Price: High to Low">Price: High to Low</a>
                     </li>
-                    <li><a href="#">Release Date</a></li>
-                    <li><a href="#">Avg. Rating</a></li>
+                    <li><a href="/book-store?sort=releaseDate" data-sort-name="Release Date">Release Date</a></li>
+                    <li><a href="/book-store?sort=rating" data-sort-name="Rating">Rating</a></li>
                   </ul>
                 </div>
               </div>
@@ -120,7 +121,7 @@
           ">
           <!-- Filter By Price -->
           <!-- Product sidebar Widget -->
-          <div class="theiaStickySidebar" style="
+          <!-- <div class="theiaStickySidebar" style="
               padding-top: 0px;
               padding-bottom: 1px;
               position: static;
@@ -173,9 +174,68 @@
               <a href="shop-grid-right.html" class="btn btn-sm btn-default"><i class="fi-rs-filter mr-5"></i>
                 Filter</a>
             </div>
+          </div> -->
+
+          <div class="sidebar-widget filter-options mb-30">
+            <div class="widget-header position-relative mb-20 pb-10">
+              <h5 class="widget-title mb-10">Filter with Options</h5>
+              <div class="bt-1 border-color-1"></div>
+            </div>
+            <!-- Filter by Price -->
+            <div class="price-filter mb-20">
+              <label for="price-filter">Price:</label>
+              <select id="price-filter" class="form-control" name="price">
+                <option value="">Select Price Range</option>
+                <option value="under-100">Under 100</option>
+                <option value="100-200">100 - 200</option>
+                <option value="200-500">200 - 500</option>
+                <option value="500-1000">500 - 1000</option>
+                <option value="over-1000">Over 1000</option>
+              </select>
+            </div>
+            <!-- Filter by Language -->
+            <div class="language-filter mb-20">
+              <label for="language-filter">Language:</label>
+              <select id="language-filter" class="form-control" name="language">
+                <option value="">Select Language</option>
+                <option value="en">English</option>
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+                <option value="de">German</option>
+                <option value="it">Italian</option>
+              </select>
+            </div>
+            <!-- Filter by Authors -->
+            <div class="authors-filter mb-20">
+              <label for="author-filter">Authors:</label>
+              <select id="author-filter" class="form-control" name="authors">
+                <option value="">Select Author</option>
+                <option value="author1">J.K. Rowling</option>
+                <option value="author2">George R.R. Martin</option>
+                <option value="author3">J.R.R. Tolkien</option>
+                <option value="author4">Agatha Christie</option>
+                <option value="author5">Mark Twain</option>
+              </select>
+            </div>
+            <!-- Filter by Publishers -->
+            <div class="publishers-filter mb-20">
+              <label for="publisher-filter">Publishers:</label>
+              <select id="publisher-filter" class="form-control" name="publishers">
+                <option value="">Select Publisher</option>
+                <option value="publisher1">Penguin Random House</option>
+                <option value="publisher2">HarperCollins</option>
+                <option value="publisher3">Simon & Schuster</option>
+                <option value="publisher4">Hachette Book Group</option>
+                <option value="publisher5">Macmillan Publishers</option>
+              </select>
+            </div>
+            <a href="#" class="btn btn-sm btn-default" id="filter-button"><i class="fi-rs-filter mr-5"></i> Filter</a>
           </div>
+
         </div>
       </div>
     </div>
   </section>
 </main>
+
+<script type="module" src="/user/js/utils/user-store.js"></script>

@@ -1,73 +1,56 @@
 <section class="content-main">
+  <!-- Header section with title and add button -->
   <div class="content-header d-flex justify-content-between align-items-center mb-4">
     <div>
       <h2 class="content-title card-title">Authors</h2>
       <p>Manage book authors and their published works</p>
     </div>
     <div>
-      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAuthorModal">
-        <i class="text-muted material-icons md-post_add"></i> Add New Author
+      <button type="button" class="btn btn-secondary btn-md rounded" data-bs-toggle="modal" data-bs-target="#addAuthorModal">
+        Add Author
       </button>
     </div>
   </div>
 
-  <div class="card mb-4">
-    <header class="card-header">
-      <div class="row gx-3 align-items-center">
-        <div class="col-lg-4 mb-lg-0 mb-3">
-          <input type="text" placeholder="Search authors..." class="form-control" />
-        </div>
-        <div class="col-lg-2 col-6">
-          <div class="custom_select">
-            <select class="form-select select-nice">
-              <option selected>Genres</option>
-              <option>Fiction</option>
-              <option>Non-Fiction</option>
-              <option>Science Fiction</option>
-              <option>Biography</option>
-              <option>Fantasy</option>
-              <option>Historical</option>
-            </select>
-          </div>
-        </div>
-        <div class="col-lg-2 col-6">
-          <input type="date" class="form-control" />
-        </div>
+  <header class="card card-body mb-4">
+    <div class="row gx-3">
+      <div class="col-lg-4 col-md-6 me-auto">
+        <input type="text" placeholder="Search authors..." class="form-control">
       </div>
-    </header>
+      <div class="col-lg-2 col-6 col-md-3">
+        <select class="form-select">
+          <option selected>Sort by</option>
+          <option>Name Ascending</option>
+          <option>Name Descending</option>
+          <option>Recently Added</option>
+        </select>
+      </div>
+    </div>
+  </header>
 
+  <!-- Author cards section -->
+  <div class="card mb-4">
     <div class="card-body">
       <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
+        <!-- Author card 1 -->
         <div class="col">
-          <div class="card card-user text-center">
+          <div class="card text-center author-card">
             <div class="card-header bg-transparent border-0">
-              <img src="/admin/imgs/theme/image-profile.png" alt="Author Photo" class="img-fluid rounded-circle mb-3" style="width: 100px; height: 100px;">
+              <img src="/admin/imgs/theme/image-profile.png" alt="Author Photo" class="img-fluid rounded-circle" style="width: 100px; height: 100px;">
             </div>
             <div class="card-body">
-              <h5 class="card-title mt-2">J.K. Rowling</h5>
-              <p class="card-text text-muted mb-2">7 books</p>
+              <h5 class="card-title">J.K. Rowling</h5>
+              <p class="card-text text-muted">7 books</p>
               <a href="/admin/author-profile" class="btn btn-sm btn-brand rounded font-sm">View details</a>
             </div>
           </div>
         </div>
-        <div class="col">
-          <div class="card card-user text-center">
-            <div class="card-header bg-transparent border-0">
-              <img src="/admin/imgs/theme/image-profile.png" alt="Author Photo" class="img-fluid rounded-circle mb-3" style="width: 100px; height: 100px;">
-            </div>
-            <div class="card-body">
-              <h5 class="card-title mt-2">George R.R. Martin</h5>
-              <p class="card-text text-muted mb-2">5 books</p>
-              <a href="#" class="btn btn-sm btn-brand rounded font-sm">View details</a>
-            </div>
-          </div>
-        </div>
-        <!-- Repeat for other authors... -->
+
       </div>
     </div>
   </div>
 
-  <!-- Modal -->
+  <!-- Modal for adding a new author -->
   <div class="modal fade" id="addAuthorModal" tabindex="-1" aria-labelledby="addAuthorModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -78,21 +61,21 @@
         <div class="modal-body">
           <form id="authorForm">
             <div class="mb-3">
-              <label for="authorName" class="form-label">Author Name</label>
-              <input type="text" class="form-control" id="authorName" name="authorName" placeholder="Enter author name" required>
+              <label for="name" class="form-label">Author Name</label>
+              <input type="text" class="form-control" id="name" name="name" placeholder="Enter author name" required>
             </div>
             <div class="mb-3">
-              <label for="authorDescription" class="form-label">Description</label>
-              <textarea class="form-control" id="authorDescription" name="authorDescription" rows="3" placeholder="Enter author description" required></textarea>
+              <label for="description" class="form-label">Description</label>
+              <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter author description" required></textarea>
             </div>
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" id="saveAuthor">Save Author</button>
+          <button type="button" class="btn btn-success btn-md rounded" id="saveAuthor">
+            Save Author
+          </button>
         </div>
       </div>
     </div>
   </div>
-
 </section>

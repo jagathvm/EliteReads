@@ -5,7 +5,7 @@
     </a>
     <h2 class="content-title card-title">Add New Category</h2>
     <div>
-      <button class="btn btn-md rounded font-sm hover-up" id="saveCategoryButton">
+      <button class="btn btn-success btn-md rounded font-sm hover-up" id="saveCategoryButton">
         Save Category
       </button>
     </div>
@@ -18,22 +18,17 @@
     <div class="card-body">
       <form id="addCategoryForm">
         <div class="row">
-          <div class="col-lg-6">
+          <div class="col-lg-12">
             <!-- Category Details Section -->
             <div class="mb-4">
               <label for="category_name" class="form-label">Name</label>
               <input type="text" placeholder="Category Name" class="form-control" id="category_name" name="name" />
             </div>
+            <!-- Category Details Section -->
             <div class="mb-4">
               <label for="category_description" class="form-label">Description</label>
-              <textarea placeholder="Description" class="form-control" rows="4" id="category_description" name="description"></textarea>
+              <input type="text" placeholder="Description" class="form-control" id="category_description" name="description" />
             </div>
-            <div class="mb-4">
-              <label for="category_slug" class="form-label">Slug</label>
-              <input type="text" placeholder="Slug" class="form-control" id="category_slug" name="slug" />
-            </div>
-          </div>
-          <div class="col-lg-6">
             <!-- Parent Category Section -->
             <div class="mb-4">
               <label for="parentCategory" class="form-label">Select Parent Category (optional)</label>

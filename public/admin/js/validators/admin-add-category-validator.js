@@ -45,29 +45,6 @@ addCategoryValidator
       errorMessage: "Description must be less than 500 characters",
     },
   ])
-  // Category Slug
-  .addField("#category_slug", [
-    {
-      rule: "required",
-      errorMessage: "Slug is required",
-    },
-    {
-      rule: "customRegexp",
-      value: /^[a-z0-9-]+$/, // Ensures only lowercase letters, numbers, and dashes
-      errorMessage:
-        "Slug must be in lowercase and contain only letters, numbers, and dashes",
-    },
-    {
-      rule: "minLength",
-      value: 3, // Optional: minimum slug length
-      errorMessage: "Slug must be at least 3 characters long",
-    },
-    {
-      rule: "maxLength",
-      value: 100, // Optional: maximum slug length
-      errorMessage: "Slug must be less than 100 characters",
-    },
-  ])
   // Parent Category
   .addField("#parentCategory", [
     {

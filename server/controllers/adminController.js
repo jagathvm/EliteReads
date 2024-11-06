@@ -1,27 +1,27 @@
 import { ObjectId } from "mongodb";
 import { capitalisation } from "../utils/utils.js";
-import { slugWithIsbn } from "../helpers/userHelper.js";
+import { createSlug, fetchUserData } from "../helpers/userHelper.js";
 import { sendResponse, renderResponse } from "../utils/responseHandler.js";
 import {
   deleteFromCloudinary,
   uploadToCloudinary,
 } from "../helpers/cloudinaryHelper.js";
 import {
-  getAggregatedCategories,
-  getCategories,
-  getCategory,
   addCategory,
   updateCategory,
   removeCategory,
 } from "../services/categoriesServices.js";
 import {
-  getAggregatedBooks,
-  getBooks,
   getBook,
   addBook,
   updateBook,
   removeBook,
 } from "../services/booksServices.js";
+import {
+  fetchCategoriesData,
+  fetchCategoryData,
+} from "../helpers/categoriesHelper.js";
+import { fetchBooksData, fetchBookData } from "../helpers/booksHelper.js";
 
 const getAdminDashboard = (req, res) => {
   req.app.set("layout", "admin/layout/layout-admin");
@@ -30,8 +30,8 @@ const getAdminDashboard = (req, res) => {
 
 const getAdminBooks = async (req, res) => {
   try {
-    const { value: books } = await getBooks();
-    const { value: categories } = await getCategories();
+    const books = await fetchBooksData();
+    const categories = await fetchCategoriesData();
 
     return renderResponse(res, 200, "admin/admin-books", {
       req,
@@ -46,30 +46,7 @@ const getAdminBooks = async (req, res) => {
 
 const getAdminAddBook = async (req, res) => {
   try {
-    const pipeline = [
-      {
-        $match: {
-          parentCategory: "",
-        },
-      },
-      {
-        $lookup: {
-          from: "categories",
-          localField: "_id",
-          foreignField: "parentCategory",
-          as: "subCategories",
-        },
-      },
-    ];
-
-    const {
-      found: categoriesFound,
-      errorMessage: categoriesNotFound,
-      value: categories,
-    } = await getAggregatedCategories(pipeline);
-
-    if (!categoriesFound)
-      return sendResponse(res, 404, categoriesNotFound, false);
+    const categories = await fetchCategoriesData();
 
     return renderResponse(res, 200, "admin/admin-add-book", {
       req,
@@ -85,64 +62,8 @@ const getAdminBookDetails = async (req, res) => {
   const { bookSlug } = req.params;
 
   try {
-    const bookPipeline = [
-      {
-        $match: {
-          bookSlug,
-        },
-      },
-      {
-        $lookup: {
-          from: "categories",
-          localField: "category",
-          foreignField: "_id",
-          as: "category",
-        },
-      },
-      {
-        $unwind: {
-          path: "$category",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: "categories",
-          localField: "subcategory",
-          foreignField: "_id",
-          as: "subcategory",
-        },
-      },
-      {
-        $unwind: {
-          path: "$subcategory",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-    ];
-
-    const categoriesPipeline = [
-      {
-        $match: {
-          parentCategory: "",
-        },
-      },
-      {
-        $lookup: {
-          from: "categories",
-          localField: "_id",
-          foreignField: "parentCategory",
-          as: "subCategories",
-        },
-      },
-    ];
-
-    const {
-      value: [book],
-    } = await getAggregatedBooks(bookPipeline);
-
-    const { value: categories } =
-      await getAggregatedCategories(categoriesPipeline);
+    const book = await fetchBookData(bookSlug);
+    const categories = await fetchCategoriesData({ parentCategory: "" });
 
     return renderResponse(res, 200, "admin/admin-book-details", {
       req,
@@ -164,7 +85,7 @@ const getAdminOrderDetails = (req, res) =>
 
 const getAdminAddCategory = async (req, res) => {
   try {
-    const { value: categories } = await getCategories();
+    const categories = await fetchCategoriesData();
 
     return renderResponse(res, 200, "admin/admin-add-category", {
       req,
@@ -179,23 +100,7 @@ const getAdminAddCategory = async (req, res) => {
 
 const getAdminCategories = async (req, res) => {
   try {
-    const categoriesPipeline = [
-      {
-        $match: {
-          parentCategory: "",
-        },
-      },
-      {
-        $lookup: {
-          from: "categories",
-          localField: "_id",
-          foreignField: "parentCategory",
-          as: "subCategories",
-        },
-      },
-    ];
-    const { value: categories } =
-      await getAggregatedCategories(categoriesPipeline);
+    const categories = await fetchCategoriesData();
 
     return renderResponse(res, 200, "admin/admin-categories", {
       req,
@@ -211,41 +116,8 @@ const getAdminCategoryDetails = async (req, res) => {
   const { categorySlug: slug } = req.params;
 
   try {
-    const categoryPipeline = [
-      {
-        $match: { slug },
-      },
-      {
-        $lookup: {
-          from: "categories",
-          localField: "parentCategory",
-          foreignField: "_id",
-          as: "parentCategory",
-        },
-      },
-      {
-        $unwind: {
-          path: "$parentCategory",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: "categories",
-          localField: "_id",
-          foreignField: "parentCategory",
-          as: "subCategories",
-        },
-      },
-    ];
-
-    const {
-      found: categoryFound,
-      value: [category],
-    } = await getAggregatedCategories(categoryPipeline);
-    if (!categoryFound) return renderResponse(res, 404, "admin/404", { req });
-
-    const { value: categories } = await getCategories();
+    const category = await fetchCategoryData(slug);
+    const categories = await fetchCategoriesData();
 
     return renderResponse(res, 200, "admin/admin-category-details", {
       req,
@@ -262,9 +134,7 @@ const getAdminSellers = (req, res) =>
   renderResponse(res, 200, "admin/admin-sellers-cards", { req });
 
 const getAdminSellerProfile = (req, res) =>
-  renderResponse(res, 200, "admin/admin-seller-profile", {
-    req,
-  });
+  renderResponse(res, 200, "admin/admin-seller-profile", { req });
 
 const getAdminTransactions = (req, res) =>
   renderResponse(res, 200, "admin/admin-transactions", { req });
@@ -273,42 +143,46 @@ const getAdminReviews = (req, res) =>
   renderResponse(res, 200, "admin/admin-reviews", { req });
 
 const getAdminReviewDetails = (req, res) =>
-  renderResponse(res, 200, "admin/admin-review-details", {
-    req,
-  });
+  renderResponse(res, 200, "admin/admin-review-details", { req });
 
 const getAdminSettings = (req, res) =>
   renderResponse(res, 200, "admin/admin-settings", { req });
 
 const getAdminUsers = async (req, res) => {
-  const { found: usersFound, value: users } = await getUsers();
-  if (!usersFound) return renderResponse(res, 404, "admin/404", { req });
+  try {
+    const users = await fetchUsersData();
 
-  return renderResponse(res, 200, "admin/admin-users-cards", {
-    req,
-    users,
-  });
+    return renderResponse(res, 200, "admin/admin-users-cards", {
+      req,
+      users,
+    });
+  } catch (error) {
+    console.error(`An unexpected error occurred. ${error}`);
+    return sendResponse(res, 500, "An unexpected error occurred.", false);
+  }
 };
 
 const getAdminUserProfile = async (req, res) => {
   const { username } = req.params;
 
-  const { found: userFound, value: user } = await getUser({ username });
-  if (!userFound) return renderResponse(res, 404, "admin/404", { req });
-
-  return renderResponse(res, 200, "admin/admin-user-profile", {
-    req,
-    user,
-  });
+  try {
+    const user = await fetchUserData(username);
+    return renderResponse(res, 200, "admin/admin-user-profile", {
+      req,
+      user,
+    });
+  } catch (error) {
+    console.error(`An unexpected error occurred. ${error}`);
+    return sendResponse(res, 500, "An unexpected error occurred.", false);
+  }
 };
 
-const getAdminAuthors = (req, res) =>
-  renderResponse(res, 200, "admin/admin-authors", { req });
+// // Admin authors
+// const getAdminAuthors = (req, res) =>
+//   renderResponse(res, 200, "admin/admin-authors", { req });
 
-const getAdminAuthorProfile = (req, res) =>
-  renderResponse(res, 200, "admin/admin-author-profile", {
-    req,
-  });
+// const getAdminAuthorProfile = (req, res) =>
+//   renderResponse(res, 200, "admin/admin-author-profile", { req });
 
 const postAdminAddBook = async (req, res) => {
   const isFeatured = req.validData.featured === "on";
@@ -316,16 +190,29 @@ const postAdminAddBook = async (req, res) => {
   const coverImages = req.files;
 
   try {
-    const { found: bookFound } = await getBook({
-      $or: [{ title }, { isbn }],
-    });
-    if (bookFound) return sendResponse(res, 400, "Book already exists", false);
+    const bookFoundWithSameTitle = await getBook({ title });
+    if (bookFoundWithSameTitle.found)
+      return sendResponse(
+        res,
+        400,
+        "Book with same title already exists",
+        false
+      );
+
+    const bookFoundWithSameISBN = await getBook({ isbn });
+    if (bookFoundWithSameISBN.found)
+      return sendResponse(
+        res,
+        400,
+        "Book with same ISBN already exists",
+        false
+      );
 
     if (!coverImages || coverImages.length === 0)
       return sendResponse(res, 400, "No cover images uploaded", false);
 
     const coverImageUrls = await uploadToCloudinary(coverImages, "books");
-    const bookSlug = slugWithIsbn(title, isbn);
+    const bookSlug = `${createSlug(title)}-${isbn}`;
 
     const newBook = {
       title,
@@ -380,15 +267,10 @@ const editAdminBook = async (req, res) => {
   };
 
   try {
-    const {
-      found: bookFound,
-      errorMessage: bookNotFound,
-      value: book,
-    } = await getBook({ bookSlug });
-    if (!bookFound) return sendResponse(res, 404, bookNotFound, false);
+    const { value: book } = await getBook({ bookSlug });
 
     if (book.title !== title || book.isbn !== isbn) {
-      updatedBookData.bookSlug = slugWithIsbn(title, isbn);
+      updatedBookData.bookSlug = `${createSlug(title)}-${isbn}`;
 
       // Check if the new slug already exists to avoid conflicts
       const { found: bookExists } = await getBook({
@@ -580,11 +462,11 @@ const deleteAdminBook = async (req, res) => {
 };
 
 const postAdminAddCategory = async (req, res) => {
+  const { name, description, parentCategory } = req.validData;
+  const slug = createSlug(name);
   try {
-    const { name, slug, description, parentCategory } = req.validData;
-
-    // Check if a category with the same name or slug already exists
-    const { found: categoryFound } = await getCategory({
+    // Check if a category with the same name exists
+    const { found: categoryFound } = await fetchCategoriesData({
       $or: [{ name }, { slug }],
     });
 
@@ -593,17 +475,18 @@ const postAdminAddCategory = async (req, res) => {
       return sendResponse(
         res,
         400,
-        "Category already exists with the same name or slug.",
+        "Category already exists with the same name.",
         false
       );
 
     // Handle category addition
-    const { acknowledged } = await addCategory({
+    const categoryData = {
       name,
       description,
       slug,
       parentCategory: parentCategory ? new ObjectId(parentCategory) : "",
-    });
+    };
+    const { acknowledged } = await addCategory(categoryData);
 
     // Send error response if category was not added
     if (!acknowledged)
@@ -624,23 +507,18 @@ const postAdminAddCategory = async (req, res) => {
 
 const editAdminCategory = async (req, res) => {
   const { categorySlug } = req.params;
-  const { name, description, slug, parentCategory } = req.validData;
+  const { name, description, parentCategory } = req.validData;
 
   try {
-    const {
-      found: categoryFound,
-      value: category,
-      errorMessage: categoryNotFound,
-    } = await getCategory({ slug: categorySlug });
+    const category = await fetchCategoriesData({
+      slug: categorySlug,
+    });
 
-    // If category is not found, return a 404 status
-    if (!categoryFound) return sendResponse(res, 404, categoryNotFound, false);
-
+    const slug = createSlug(name);
     // Check if any data has changed when the front-end validation fails
     const isUnchanged =
       category.name === name &&
       category.description === description &&
-      category.slug === slug &&
       category.parentCategory === parentCategory;
 
     // If no changes were made, return a 400 status
@@ -652,17 +530,17 @@ const editAdminCategory = async (req, res) => {
         false
       );
 
+    const categoryData = {
+      name,
+      description,
+      slug,
+      parentCategory: parentCategory ? new ObjectId(parentCategory) : "",
+    };
+
     // Update the category in the database
     const { acknowledged } = await updateCategory(
       { slug: categorySlug },
-      {
-        $set: {
-          name,
-          description,
-          slug,
-          parentCategory: new ObjectId(parentCategory),
-        },
-      }
+      { $set: categoryData }
     );
 
     // If update was not acknowledged, return a 400 status
@@ -670,7 +548,7 @@ const editAdminCategory = async (req, res) => {
       return sendResponse(res, 400, "Error updating category.", false);
 
     // Success: return a 200 status with a success message
-    return sendResponse(res, 200, "Category updated.", true);
+    return sendResponse(res, 200, "Category updated.", true, slug);
   } catch (error) {
     console.error(`An unexpected error occurred: ${error}`);
     return sendResponse(res, 500, "An unexpected error occurred", false);
@@ -682,14 +560,7 @@ const deleteAdminCategory = async (req, res) => {
 
   try {
     // Find the category by slug
-    const {
-      found: categoryFound,
-      value: category,
-      errorMessage: categoryNotFound,
-    } = await getCategory({ slug });
-
-    // Return error if category is not found
-    if (!categoryFound) return sendResponse(res, 404, categoryNotFound, false);
+    const category = await fetchCategoriesData({ slug });
 
     // Prevent deletion if subcategories exist
     if (category.subCategories?.length > 0)
@@ -743,8 +614,8 @@ export {
   getAdminSettings,
   getAdminUsers,
   getAdminUserProfile,
-  getAdminAuthors,
-  getAdminAuthorProfile,
+  // getAdminAuthors,
+  // getAdminAuthorProfile,
   postAdminAddBook,
   editAdminBook,
   editAdminBookImage,

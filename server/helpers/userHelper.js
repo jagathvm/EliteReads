@@ -1,8 +1,29 @@
 import { ObjectId } from "mongodb";
-import { getUser } from "../services/userServices.js";
+import { getUsers, getUser } from "../services/userServices.js";
 
 // User-specific functions
-const fetchUserData = async (req) => {
+
+const fetchUsersData = async () => {
+  try {
+    const { value: users } = await getUsers();
+    return users;
+  } catch (error) {
+    console.error(`Error fetching users: ${error}`);
+    return null;
+  }
+};
+
+const fetchUserData = async (username) => {
+  try {
+    const { value: user } = await getUser({ username });
+    return user;
+  } catch (error) {
+    console.error(`Error fetching user: ${error}`);
+    return null;
+  }
+};
+
+const fetchUserDataFromReq = async (req) => {
   if (req.user) {
     const { value: user } = await getUser({
       _id: new ObjectId(req.user.userId),
@@ -12,18 +33,18 @@ const fetchUserData = async (req) => {
   return null;
 };
 
-const slugWithIsbn = (title, isbn) => {
-  const slug = title
-    .trim()
-    .toLowerCase()
-    // Remove apostrophes specifically without replacing them with a dash
-    .replace(/'/g, "")
-    // Replace other non-alphanumeric characters with dashes
-    .replace(/[^a-z0-9]+/g, "-")
-    // Remove leading or trailing dashes
-    .replace(/^-|-$/g, "");
-
-  return `${slug}-${isbn}`;
+const createSlug = (title) => {
+  return (
+    title
+      .trim()
+      .toLowerCase()
+      // Remove apostrophes specifically without replacing them with a dash
+      .replace(/'/g, "")
+      // Replace other non-alphanumeric characters with dashes
+      .replace(/[^a-z0-9]+/g, "-")
+      // Remove leading or trailing dashes
+      .replace(/^-|-$/g, "")
+  );
 };
 
-export { fetchUserData, slugWithIsbn };
+export { fetchUsersData, fetchUserData, fetchUserDataFromReq, createSlug };

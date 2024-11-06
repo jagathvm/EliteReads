@@ -120,15 +120,6 @@ const categorySchema = Joi.object({
     "string.max": "Description cannot exceed 500 characters.",
     "any.required": "Description is required.",
   }),
-  slug: Joi.string()
-    .pattern(/^[a-z0-9-]+$/)
-    .required()
-    .messages({
-      "string.empty": "Slug is required.",
-      "string.pattern.base":
-        "Slug can only contain lowercase letters, numbers, and dashes.",
-      "any.required": "Slug is required.",
-    }),
   parentCategory: Joi.string().allow(null, "").optional().messages({
     "string.base": "Parent Category must be a string.",
   }),

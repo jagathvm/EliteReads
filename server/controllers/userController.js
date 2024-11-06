@@ -1,11 +1,11 @@
-import { fetchUserData } from "../helpers/userHelper.js";
-import { fetchBookData, fetchBooksData } from "../helpers/bookHelper.js";
-import { fetchCategoriesData } from "../helpers/categoryHelper.js";
+import { fetchUserDataFromReq } from "../helpers/userHelper.js";
+import { fetchBookData, fetchBooksData } from "../helpers/booksHelper.js";
+import { fetchCategoriesData } from "../helpers/categoriesHelper.js";
 import { renderResponse, sendResponse } from "../utils/responseHandler.js";
 
 const getUserHome = async (req, res) => {
   try {
-    const user = await fetchUserData(req);
+    const user = await fetchUserDataFromReq(req);
     const books = await fetchBooksData();
     const categories = await fetchCategoriesData();
 
@@ -28,7 +28,7 @@ const getUserHome = async (req, res) => {
 
 const getUserAbout = async (req, res) => {
   try {
-    const user = await fetchUserData(req);
+    const user = await fetchUserDataFromReq(req);
     return renderResponse(res, 200, "user/user-about", { req, user });
   } catch (error) {
     console.log(`An unexpected error occurred. ${error}`);
@@ -43,7 +43,7 @@ const getUserAbout = async (req, res) => {
 
 const getUserContact = async (req, res) => {
   try {
-    const user = await fetchUserData(req);
+    const user = await fetchUserDataFromReq(req);
     return renderResponse(res, 200, "user/user-contact", { req, user });
   } catch (error) {
     console.log(`An unexpected error occurred. ${error}`);
@@ -58,7 +58,7 @@ const getUserContact = async (req, res) => {
 
 const getUserStore = async (req, res) => {
   try {
-    const user = await fetchUserData(req);
+    const user = await fetchUserDataFromReq(req);
     const books = await fetchBooksData();
     const categories = await fetchCategoriesData();
 
@@ -81,7 +81,7 @@ const getUserStore = async (req, res) => {
 
 const getUserPrivacyPolicy = async (req, res) => {
   try {
-    const user = await fetchUserData(req);
+    const user = await fetchUserDataFromReq(req);
     return renderResponse(res, 200, "user/user-privacy-policy", { req, user });
   } catch (error) {
     console.log(`An unexpected error occurred. ${error}`);
@@ -96,7 +96,7 @@ const getUserPrivacyPolicy = async (req, res) => {
 
 const getUserCart = async (req, res) => {
   try {
-    const user = await fetchUserData(req);
+    const user = await fetchUserDataFromReq(req);
     return renderResponse(res, 200, "user/user-cart", { req, user });
   } catch (error) {
     console.log(`An unexpected error occurred. ${error}`);
@@ -111,7 +111,7 @@ const getUserCart = async (req, res) => {
 
 const getUserReadlist = async (req, res) => {
   try {
-    const user = await fetchUserData(req);
+    const user = await fetchUserDataFromReq(req);
     return renderResponse(res, 200, "user/user-readlist", { req, user });
   } catch (error) {
     console.log(`An unexpected error occurred. ${error}`);
@@ -126,7 +126,7 @@ const getUserReadlist = async (req, res) => {
 
 const getUserProfile = async (req, res) => {
   try {
-    const user = await fetchUserData(req);
+    const user = await fetchUserDataFromReq(req);
     return renderResponse(res, 200, "user/user-profile", { req, user });
   } catch (error) {
     console.log(`An unexpected error occurred. ${error}`);
@@ -143,7 +143,7 @@ const getUserBook = async (req, res) => {
   const { bookSlug } = req.params;
 
   try {
-    const user = await fetchUserData(req);
+    const user = await fetchUserDataFromReq(req);
     const book = await fetchBookData(bookSlug);
     const books = await fetchBooksData();
     const categories = await fetchCategoriesData();
@@ -168,7 +168,7 @@ const getUserBook = async (req, res) => {
 
 const getUserTermsConditions = async (req, res) => {
   try {
-    const user = await fetchUserData(req);
+    const user = await fetchUserDataFromReq(req);
     return renderResponse(res, 200, "user/user-terms-conditions", {
       req,
       user,

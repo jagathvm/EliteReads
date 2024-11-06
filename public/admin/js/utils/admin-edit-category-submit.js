@@ -6,7 +6,6 @@ import { editCategoryValidator } from "../validators/admin-edit-category-validat
 const originalData = {
   name: document.getElementById("edit_category_name").value,
   description: document.getElementById("edit_category_description").value,
-  slug: document.getElementById("edit_category_slug").value,
   parentCategory: document.getElementById("edit_category_parent").value,
 };
 
@@ -18,7 +17,6 @@ saveCategoryButton.addEventListener("click", async (e) => {
   const currentData = {
     name: document.getElementById("edit_category_name").value,
     description: document.getElementById("edit_category_description").value,
-    slug: document.getElementById("edit_category_slug").value,
     parentCategory: document.getElementById("edit_category_parent").value,
   };
 
@@ -42,7 +40,11 @@ saveCategoryButton.addEventListener("click", async (e) => {
     if (response.success) {
       showToast(response.message, true);
       setTimeout(() => {
-        window.location.href = `/admin/categories`;
+        if (response.data) {
+          window.location.href = `/admin/categories/${response.data}`;
+        } else {
+          window.location.href = `/admin/categories`;
+        }
       }, 2000);
     } else {
       showToast(response.message || response.error, false);

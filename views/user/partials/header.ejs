@@ -185,7 +185,7 @@
             <ul class="d-flex justify-items-center">
               <% if (categories) { %>
               <% categories.forEach((category, index) => { %>
-              <% if (category.subCategories?.length > 0 && index < 8) { %>
+              <% if (index < 8) { %>
               <li>
                 <a href="/book-store/categories/<%= category.slug %>"><%= category.name %></a>
               </li>

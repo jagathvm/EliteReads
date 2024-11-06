@@ -12,8 +12,6 @@ router.get("/dashboard", adminController.getAdminDashboard);
 router.get("/books/add-book", adminController.getAdminAddBook);
 router.get("/books", adminController.getAdminBooks);
 router.get("/books/:bookSlug", adminController.getAdminBookDetails);
-router.get("/authors", adminController.getAdminAuthors);
-router.get("/author-profile", adminController.getAdminAuthorProfile);
 router.get("/categories/add-category", adminController.getAdminAddCategory);
 router.get("/categories", adminController.getAdminCategories);
 router.get(
