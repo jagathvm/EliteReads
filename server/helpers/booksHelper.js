@@ -31,7 +31,7 @@ const booksPipeline = [
   },
 ];
 
-const fetchBooksData = async (categorySlug) => {
+const fetchBooksData = async (categorySlug, sort) => {
   try {
     if (categorySlug) {
       booksPipeline.push({
@@ -41,11 +41,51 @@ const fetchBooksData = async (categorySlug) => {
       });
     }
 
-    // console.log(`booksPipeline: `);
-    // console.log(booksPipeline);
+    if (sort === "featured") {
+      booksPipeline.push({
+        $match: {
+          featured: true,
+        },
+      });
+    }
+
+    if (sort === "priceAsc") {
+      booksPipeline.push({
+        $sort: {
+          price: 1,
+        },
+      });
+    } else if (sort === "priceDesc") {
+      booksPipeline.push({
+        $sort: {
+          price: -1,
+        },
+      });
+    }
+
+    if (sort === "releaseDate") {
+      booksPipeline.push({
+        $sort: {
+          year: 1,
+        },
+      });
+    }
+
     const { value: books } = await getAggregatedBooks(booksPipeline);
 
     if (categorySlug) {
+      booksPipeline.pop();
+    }
+
+    if (sort === "featured") {
+      booksPipeline.pop();
+    }
+
+    if (sort === "priceAsc" || sort === "priceDesc") {
+      booksPipeline.pop();
+    }
+
+    if (sort === "releaseDate") {
       booksPipeline.pop();
     }
 

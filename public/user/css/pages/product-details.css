@@ -5,8 +5,8 @@
 
 .detail-gallery .zoom-icon {
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 6px;
+  right: 40px;
   z-index: 2;
 }
 
@@ -23,7 +23,7 @@
   border-bottom: 5px solid #333;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
-  content: '';
+  content: "";
   height: 0;
   left: 50%;
   margin-left: -5px;
@@ -62,7 +62,7 @@
 }
 
 .product-rate {
-  background-image: url('/user/imgs/theme/rating-stars.png');
+  background-image: url("/user/imgs/theme/rating-stars.png");
   background-position: 0 -12px;
   background-repeat: repeat-x;
   height: 12px;
@@ -74,7 +74,7 @@
 .product-rating {
   height: 12px;
   background-repeat: repeat-x;
-  background-image: url('/user/imgs/theme/rating-stars.png');
+  background-image: url("/user/imgs/theme/rating-stars.png");
   background-position: 0 0;
 }
 
@@ -129,7 +129,7 @@
 }
 
 .color-filter.list-filter li.active a::before {
-  content: '';
+  content: "";
   display: inline-block;
   font-style: normal;
   font-variant: normal;
@@ -323,7 +323,6 @@
 }
 
 .detail-gallery .slick-slider {
-  background-color: #000;
   margin-bottom: 30px;
   border-radius: 10px;
 }
@@ -400,7 +399,7 @@
   position: absolute;
   left: -14px;
   top: 9px;
-  content: '';
+  content: "";
   height: 6px;
   width: 6px;
   border-radius: 100%;
@@ -496,9 +495,7 @@
   margin-bottom: 20px;
 }
 
-.shop-product-fillter-header
-  .product-rate-cover
-  + .product-rate-cover {
+.shop-product-fillter-header .product-rate-cover + .product-rate-cover {
   margin-top: 15px;
 }
 
@@ -538,7 +535,7 @@
 }
 
 .custome-radio .form-check-label::before {
-  content: '';
+  content: "";
   border: 1px solid #908f8f;
   height: 16px;
   width: 16px;
@@ -548,8 +545,8 @@
   margin-right: 8px;
 }
 
-.custome-radio input[type='radio'] + .form-check-label::after {
-  content: '';
+.custome-radio input[type="radio"] + .form-check-label::after {
+  content: "";
   height: 10px;
   width: 10px;
   border-radius: 100%;
@@ -559,9 +556,7 @@
   opacity: 0;
 }
 
-.custome-radio
-  input[type='radio']:checked
-  + .form-check-label::after {
+.custome-radio input[type="radio"]:checked + .form-check-label::after {
   opacity: 1;
   background-color: #088178;
 }

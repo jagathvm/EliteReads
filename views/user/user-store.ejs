@@ -33,7 +33,6 @@
                   </div>
                   <div class="sort-by-dropdown-wrap">
                     <span id="selected-sort-option">
-                      Featured
                       <i class="fi-rs-angle-small-down"></i></span>
                   </div>
                 </div>
@@ -49,7 +48,7 @@
                       <a href="/book-store?sort=priceDesc" data-sort-name="Price: High to Low">Price: High to Low</a>
                     </li>
                     <li><a href="/book-store?sort=releaseDate" data-sort-name="Release Date">Release Date</a></li>
-                    <li><a href="/book-store?sort=rating" data-sort-name="Rating">Rating</a></li>
+                    <!-- <li><a href="/book-store?sort=rating" data-sort-name="Rating">Rating</a></li> -->
                   </ul>
                 </div>
               </div>
@@ -68,7 +67,9 @@
                     </a>
                   </div>
                   <div class="product-badges product-badges-position product-badges-mrg">
-                    <span class="hot">Hot</span>
+                    <% if (book.featured) { %>
+                    <span class="hot">Featured</span>
+                    <% } %>
                   </div>
                 </div>
                 <div class="product-content-wrap">

@@ -7,7 +7,7 @@
         <% if (book.subcategory) { %>
         <span></span> <%= book.subcategory.name %>
         <% } %>
-        <span></span> <%= book.title %>
+        <span></span> <strong> <%= book.title %> </strong>
       </div>
     </div>
   </div>
@@ -21,7 +21,7 @@
                 <div class="detail-gallery">
                   <!-- MAIN SLIDES -->
                   <span class="zoom-icon"><i class="fi-rs-search"></i></span>
-                  <div class="product-image-slider" style="height: auto; width: 200px;">
+                  <div class="product-image-slider" style="height: auto; width: 250px; overflow: hidden;">
                     <% book.coverImageUrls.forEach(url => { %>
                     <figure class="border-radius-10" style="height: auto; width: 200px;">
                       <img src="<%= url %>" alt="product image">
@@ -29,7 +29,7 @@
                     <% }) %>
                   </div>
                   <!-- THUMBNAILS -->
-                  <div class="slider-nav-thumbnails pl-15 pr-15">
+                  <div class="slider-nav-thumbnails pl-15 pr-15" style="width: 250px;">
                     <% book.coverImageUrls.forEach(url => { %>
                     <div>
                       <img src="<%= url %>" alt="product image">

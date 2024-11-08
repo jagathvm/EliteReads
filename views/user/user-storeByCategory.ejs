@@ -46,16 +46,16 @@
                 <div class="sort-by-dropdown">
                   <ul>
                     <li>
-                      <a href="/book-store?sort=featured" data-sort-name="Featured">Featured</a>
+                      <a href="/book-store/categories/<%= category.slug %>?sort=featured" data-sort-name="Featured">Featured</a>
                     </li>
                     <li>
-                      <a href="/book-store?sort=priceAsc" data-sort-name="Price: Low to High">Price: Low to High</a>
+                      <a href="/book-store/categories/<%= category.slug %>?sort=priceAsc" data-sort-name="Price: Low to High">Price: Low to High</a>
                     </li>
                     <li>
-                      <a href="/book-store?sort=priceDesc" data-sort-name="Price: High to Low">Price: High to Low</a>
+                      <a href="/book-store/categories/<%= category.slug %>?sort=priceDesc" data-sort-name="Price: High to Low">Price: High to Low</a>
                     </li>
-                    <li><a href="/book-store?sort=releaseDate" data-sort-name="Release Date">Release Date</a></li>
-                    <li><a href="/book-store?sort=rating" data-sort-name="Rating">Rating</a></li>
+                    <li><a href="/book-store/categories/<%= category.slug %>?sort=releaseDate" data-sort-name="Release Date">Release Date</a></li>
+                    <!-- <li><a href="/book-store/categories/<%= category.slug %>?sort=rating" data-sort-name="Rating">Rating</a></li> -->
                   </ul>
                 </div>
               </div>

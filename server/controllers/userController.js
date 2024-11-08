@@ -64,7 +64,7 @@ const getUserStore = async (req, res) => {
 
   try {
     const user = await fetchUserDataFromReq(req);
-    const books = await fetchBooksData();
+    const books = await fetchBooksData("", sort);
     const categories = await fetchCategoriesData();
 
     return renderResponse(res, 200, "user/user-store", {
@@ -86,10 +86,11 @@ const getUserStore = async (req, res) => {
 
 const getUserStoreByCategory = async (req, res) => {
   const { categorySlug } = req.params;
+  const { sort } = req.query;
 
   try {
     const user = await fetchUserDataFromReq(req);
-    const books = await fetchBooksData(categorySlug);
+    const books = await fetchBooksData(categorySlug, sort);
     const category = await fetchCategoryData(categorySlug);
     const categories = await fetchCategoriesData();
 
