@@ -1,7 +1,10 @@
 import { fetchUserDataFromReq } from "../helpers/userHelper.js";
 import { fetchBookData, fetchBooksData } from "../helpers/booksHelper.js";
-import { fetchCategoriesData } from "../helpers/categoriesHelper.js";
-import { renderResponse, sendResponse } from "../utils/responseHandler.js";
+import {
+  fetchCategoriesData,
+  fetchCategoryData,
+} from "../helpers/categoriesHelper.js";
+import { sendResponse, renderResponse } from "../helpers/responseHelper.js";
 
 const getUserHome = async (req, res) => {
   try {
@@ -57,6 +60,8 @@ const getUserContact = async (req, res) => {
 };
 
 const getUserStore = async (req, res) => {
+  const { sort } = req.query;
+
   try {
     const user = await fetchUserDataFromReq(req);
     const books = await fetchBooksData();
@@ -66,6 +71,33 @@ const getUserStore = async (req, res) => {
       req,
       user,
       books,
+      categories,
+    });
+  } catch (error) {
+    console.error(`An unexpected error occurred. ${error}`);
+    return sendResponse(
+      res,
+      500,
+      `Internal Server Error. ${error.message}`,
+      false
+    );
+  }
+};
+
+const getUserStoreByCategory = async (req, res) => {
+  const { categorySlug } = req.params;
+
+  try {
+    const user = await fetchUserDataFromReq(req);
+    const books = await fetchBooksData(categorySlug);
+    const category = await fetchCategoryData(categorySlug);
+    const categories = await fetchCategoriesData();
+
+    return renderResponse(res, 200, "user/user-storeByCategory", {
+      req,
+      user,
+      books,
+      category,
       categories,
     });
   } catch (error) {
@@ -189,6 +221,7 @@ export {
   getUserAbout,
   getUserContact,
   getUserStore,
+  getUserStoreByCategory,
   getUserPrivacyPolicy,
   getUserBook,
   getUserCart,

@@ -40,12 +40,7 @@ router.patch(
   upload.array("cover_image", 6),
   adminController.editAdminBookImage
 );
-router.patch(
-  "/books/:bookSlug",
-  upload.none(),
-  validateData(bookSchema),
-  adminController.editAdminBook
-);
+router.patch("/books/:bookSlug", upload.none(), adminController.editAdminBook);
 router.delete("/books/:bookSlug", adminController.deleteAdminBook);
 
 router.post(

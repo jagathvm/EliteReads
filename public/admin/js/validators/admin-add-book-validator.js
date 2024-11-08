@@ -4,6 +4,15 @@ export const addBookValidator = new JustValidate("#addBookForm", {
   successFieldCssClass: "success-field",
 });
 
+// Regular expression to enforce no spaces and only numbers for numeric fields
+const numberRegex = /^[0-9]+$/;
+
+// Regular expression to enforce the following:
+// - Starts with an uppercase letter
+// - Only one space between words
+// - No trailing spaces
+const capitalizedRegex = /^[A-Z][a-z]*(?: [A-Z][a-z]*)*$/;
+
 addBookValidator
   // Book Title
   .addField("#book_title", [
@@ -11,13 +20,39 @@ addBookValidator
       rule: "required",
       errorMessage: "Book title is required",
     },
+    {
+      rule: "customRegexp",
+      value: capitalizedRegex,
+      errorMessage:
+        "Title must start with a capital letter, only one space between words, and no trailing spaces",
+    },
   ])
 
-  // Author
-  .addField("#book_author", [
+  // First Name of Author
+  .addField("#author_firstName", [
     {
       rule: "required",
-      errorMessage: "Author is required",
+      errorMessage: "Author's first name is required",
+    },
+    {
+      rule: "customRegexp",
+      value: capitalizedRegex,
+      errorMessage:
+        "First name must start with a capital letter, only one space between words, and no trailing spaces",
+    },
+  ])
+
+  // Last Name of Author
+  .addField("#author_lastName", [
+    {
+      rule: "required",
+      errorMessage: "Author's last name is required",
+    },
+    {
+      rule: "customRegexp",
+      value: capitalizedRegex,
+      errorMessage:
+        "Last name must start with a capital letter, only one space between words, and no trailing spaces",
     },
   ])
 
@@ -54,9 +89,15 @@ addBookValidator
       value: 0.1,
       errorMessage: "Price must be greater than 0",
     },
+    {
+      rule: "customRegexp",
+      value: /^[0-9]+(\.[0-9]{1,2})?$/,
+      errorMessage:
+        "Price must be a valid positive number, with up to two decimal places, and no spaces",
+    },
   ])
 
-  // ISBN (exactly 10 digits)
+  // ISBN (exactly 13 digits)
   .addField("#book_isbn", [
     {
       rule: "required",
@@ -74,6 +115,12 @@ addBookValidator
     {
       rule: "required",
       errorMessage: "Publisher is required",
+    },
+    {
+      rule: "customRegexp",
+      value: capitalizedRegex,
+      errorMessage:
+        "Publisher name must start with a capital letter, only one space between words, and no trailing spaces",
     },
   ])
 
@@ -97,6 +144,11 @@ addBookValidator
       value: new Date().getFullYear(),
       errorMessage: "Year cannot be in the future",
     },
+    {
+      rule: "customRegexp",
+      value: numberRegex,
+      errorMessage: "Year must be a valid number with no spaces",
+    },
   ])
 
   // Language
@@ -109,6 +161,12 @@ addBookValidator
       rule: "minLength",
       value: 2,
       errorMessage: "Language must be at least 2 characters long",
+    },
+    {
+      rule: "customRegexp",
+      value: capitalizedRegex,
+      errorMessage:
+        "Language must start with a capital letter, only one space between words, and no trailing spaces",
     },
   ])
 
@@ -127,6 +185,11 @@ addBookValidator
       value: 1,
       errorMessage: "Pages must be greater than 0",
     },
+    {
+      rule: "customRegexp",
+      value: numberRegex,
+      errorMessage: "Pages must be a number with no spaces",
+    },
   ])
 
   // Weight
@@ -143,6 +206,11 @@ addBookValidator
       rule: "minNumber",
       value: 1,
       errorMessage: "Weight must be greater than 0",
+    },
+    {
+      rule: "customRegexp",
+      value: numberRegex,
+      errorMessage: "Weight must be a number with no spaces",
     },
   ])
 

@@ -15,11 +15,9 @@ const upload = async (file, folder) => {
           folder,
           transformation: [
             {
-              aspect_ratio: "1.0",
-              width: 250,
-              height: 400,
+              width: 500,
+              height: 800,
               crop: "fill",
-              quality: "auto",
             },
           ],
         },

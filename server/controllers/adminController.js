@@ -1,7 +1,5 @@
 import { ObjectId } from "mongodb";
-import { capitalisation } from "../utils/utils.js";
-import { createSlug, fetchUserData } from "../helpers/userHelper.js";
-import { sendResponse, renderResponse } from "../utils/responseHandler.js";
+import { sendResponse, renderResponse } from "../helpers/responseHelper.js";
 import {
   deleteFromCloudinary,
   uploadToCloudinary,
@@ -17,11 +15,17 @@ import {
   updateBook,
   removeBook,
 } from "../services/booksServices.js";
+import { fetchBooksData, fetchBookData } from "../helpers/booksHelper.js";
 import {
   fetchCategoriesData,
   fetchCategoryData,
 } from "../helpers/categoriesHelper.js";
-import { fetchBooksData, fetchBookData } from "../helpers/booksHelper.js";
+import {
+  createSlug,
+  fetchUserData,
+  capitalisation,
+  sentenceCase,
+} from "../helpers/userHelper.js";
 
 const getAdminDashboard = (req, res) => {
   req.app.set("layout", "admin/layout/layout-admin");
@@ -185,13 +189,16 @@ const getAdminUserProfile = async (req, res) => {
 //   renderResponse(res, 200, "admin/admin-author-profile", { req });
 
 const postAdminAddBook = async (req, res) => {
-  const isFeatured = req.validData.featured === "on";
-  const { title, isbn } = req.validData;
+  const {
+    title,
+    author: { firstName, lastName },
+    isbn,
+  } = req.validData;
   const coverImages = req.files;
 
   try {
-    const bookFoundWithSameTitle = await getBook({ title });
-    if (bookFoundWithSameTitle.found)
+    const bookFoundWithSameTitle = await fetchBookData({ title });
+    if (bookFoundWithSameTitle)
       return sendResponse(
         res,
         400,
@@ -199,8 +206,8 @@ const postAdminAddBook = async (req, res) => {
         false
       );
 
-    const bookFoundWithSameISBN = await getBook({ isbn });
-    if (bookFoundWithSameISBN.found)
+    const bookFoundWithSameISBN = await fetchBookData({ isbn });
+    if (bookFoundWithSameISBN)
       return sendResponse(
         res,
         400,
@@ -216,8 +223,8 @@ const postAdminAddBook = async (req, res) => {
 
     const newBook = {
       title,
-      author: req.validData.author,
-      description: req.validData.description,
+      author: `${firstName} ${lastName}`,
+      description: sentenceCase(req.validData.description),
       price: req.validData.price,
       isbn,
       publisher: req.validData.publisher,
@@ -225,7 +232,7 @@ const postAdminAddBook = async (req, res) => {
       language: req.validData.language,
       pages: req.validData.pages,
       weight: req.validData.weight,
-      featured: isFeatured,
+      featured: req.validData.featured === "on",
       coverImageUrls,
       bookSlug,
       category: new ObjectId(req.validData.category),
@@ -247,23 +254,21 @@ const postAdminAddBook = async (req, res) => {
 
 const editAdminBook = async (req, res) => {
   const { bookSlug } = req.params;
-  const { title, isbn } = req.validData;
+  const { title, isbn } = req.body;
   const updatedBookData = {
-    title,
-    author: req.validData.author,
-    language: req.validData.language,
-    featured: Boolean(req.validData.featured),
-    description: req.validData.description,
-    price: req.validData.price,
+    title: title,
+    author: req.body.author,
+    language: req.body.language,
+    featured: req.body.featured === "true" ? true : false,
+    description: sentenceCase(req.body.description),
+    price: req.body.price,
     isbn,
-    publisher: req.validData.publisher,
-    year: req.validData.year,
-    pages: req.validData.pages,
-    weight: req.validData.weight,
-    category: new ObjectId(req.validData.category),
-    subcategory: req.validData.subcategory
-      ? new ObjectId(req.validData.subcategory)
-      : "",
+    publisher: req.body.publisher,
+    year: req.body.year,
+    pages: req.body.pages,
+    weight: req.body.weight,
+    category: new ObjectId(req.body.category),
+    subcategory: req.body.subcategory ? new ObjectId(req.body.subcategory) : "",
   };
 
   try {
@@ -295,7 +300,13 @@ const editAdminBook = async (req, res) => {
       if (!acknowledged)
         return sendResponse(res, 400, "Failed to update book", false);
 
-      return sendResponse(res, 200, "Book updated successfully", true);
+      return sendResponse(
+        res,
+        200,
+        "Book updated successfully",
+        true,
+        updatedBookData.bookSlug
+      );
     }
 
     // Update the book in the database

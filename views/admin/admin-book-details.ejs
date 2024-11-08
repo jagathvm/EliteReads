@@ -24,8 +24,8 @@
   <div class="card card-user">
     <div class="row no-gutters">
       <!-- Left side: Image Carousel -->
-      <div class="col-md-4" style="height: 3rem; display: flex; align-items: flex-start; justify-content: center; position: relative;">
-        <div id="bookCoverCarousel" class="carousel slide" style="width: 100%; max-width: 400px; position: relative;">
+      <div class="col-md-2" style="display: flex; align-items: center; justify-content: center; position: relative;">
+        <div id="bookCoverCarousel" class="carousel slide" style="width: 100%; max-width: 300px; position: relative;">
           <div class="carousel-inner">
             <% if (book.coverImageUrls?.length > 0) { %>
             <% book.coverImageUrls.forEach((coverImageUrl, index) => { %>
@@ -49,7 +49,7 @@
       </div>
 
       <!-- Right side: Details -->
-      <div class="col-md-8">
+      <div class="col-md-10">
         <div class="card-body text-start">
           <!-- Added text-start for left alignment -->
           <h3 class="card-title mt-2"><%= book.title %></h3>

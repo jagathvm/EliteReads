@@ -7,11 +7,22 @@ const bookSchema = Joi.object({
     "any.required": "Book title is required.",
   }),
 
-  // Author
-  author: Joi.string().required().messages({
-    "string.empty": "Author is required",
-    "any.required": "Author is required.",
-  }),
+  // Author (Object with First and Last Name)
+  author: Joi.object({
+    firstName: Joi.string().required().messages({
+      "string.empty": "Author's first name is required",
+      "any.required": "Author's first name is required.",
+    }),
+    lastName: Joi.string().required().messages({
+      "string.empty": "Author's last name is required",
+      "any.required": "Author's last name is required.",
+    }),
+  })
+    .required()
+    .messages({
+      "object.base": "Author information is required",
+      "any.required": "Author information is required.",
+    }),
 
   // Description
   description: Joi.string().min(10).max(1000).required().messages({

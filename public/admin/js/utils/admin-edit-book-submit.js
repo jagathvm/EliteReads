@@ -66,6 +66,7 @@ saveBookButton.addEventListener("click", async (e) => {
     const response = await apiClient.patch(`/${bookSlug}`, formData);
     if (response.success) {
       const slug = response.data ? response.data : bookSlug;
+      console.log(slug);
       showToast(response.message, true);
       setTimeout(() => {
         window.location.href = `/admin/books/${slug}`;

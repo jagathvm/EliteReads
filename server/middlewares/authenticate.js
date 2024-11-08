@@ -1,5 +1,5 @@
 import { verifyAccessToken } from "../helpers/authHelper.js";
-import { renderResponse } from "../utils/responseHandler.js";
+import { renderResponse } from "../helpers/responseHelper.js";
 
 const authenticateToken = (req, res, next) => {
   const { accessToken } = req.cookies;

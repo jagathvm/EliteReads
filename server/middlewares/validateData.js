@@ -1,4 +1,4 @@
-import { sendResponse } from "../utils/responseHandler.js";
+import { sendResponse } from "../helpers/responseHelper.js";
 
 const validateData = (schema) => {
   return async (req, res, next) => {

@@ -6,15 +6,9 @@ import {
   sendOTP,
   verifyOTP,
 } from "../helpers/authHelper.js";
-import { formatDate } from "../utils/utils.js";
-import { sendResponse, renderResponse } from "../utils/responseHandler.js";
+import { formatDate } from "../helpers/userHelper.js";
+import { sendResponse, renderResponse } from "../helpers/responseHelper.js";
 import { getUser, addUser, updateUser } from "../services/userServices.js";
-
-const getUserLogin = (req, res) =>
-  renderResponse(res, 200, "user/user-login", { req });
-
-const getUserLoginVerification = (req, res) =>
-  renderResponse(res, 200, "user/user-login-verify", { req });
 
 const getUserSignup = (req, res) =>
   renderResponse(res, 200, "user/user-signup", { req });
@@ -72,6 +66,9 @@ const postUserSignup = async (req, res) => {
   }
 };
 
+const getUserLogin = (req, res) =>
+  renderResponse(res, 200, "user/user-login", { req });
+
 const postUserLogin = async (req, res) => {
   const { usernameEmailPhone, password } = req.validData;
 
@@ -122,6 +119,9 @@ const postUserLogin = async (req, res) => {
     );
   }
 };
+
+const getUserLoginVerification = (req, res) =>
+  renderResponse(res, 200, "user/user-login-verify", { req });
 
 const postVerifyOtp = async (req, res) => {
   try {

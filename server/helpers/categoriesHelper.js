@@ -33,6 +33,8 @@ const fetchCategoriesData = async () => {
       },
     });
 
+    // console.log(`categoriesPipeline: `);
+    // console.log(categoriesPipeline);
     const { value: categories } =
       await getAggregatedCategories(categoriesPipeline);
     categoriesPipeline.shift();
@@ -52,6 +54,8 @@ const fetchCategoryData = async (slug) => {
       },
     });
 
+    // console.log(`categoryPipeline: `);
+    // console.log(categoriesPipeline);
     const {
       value: [category],
     } = await getAggregatedCategories(categoriesPipeline);

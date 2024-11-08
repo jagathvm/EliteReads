@@ -1666,13 +1666,15 @@ a.itemside:hover .title {
 }
 [class*="card-product"] .img-wrap img {
   height: 100%;
-  max-width: 100%;
+  max-width: 200px;
   width: auto;
   display: inline-block;
   -o-object-fit: cover;
   object-fit: cover;
 }
 .card-product-grid {
+  width: 100%; /* Makes the card take up the full available width */
+  max-width: 200px; /* Set a maximum width for the card */
   margin-bottom: 20px;
 }
 .card-product-grid .info-wrap {
@@ -1681,6 +1683,8 @@ a.itemside:hover .title {
 .card-product-grid a.title {
   color: #6c757d;
   display: block;
+  /* overflow: hidden; */
+  text-overflow: ellipsis;
   text-decoration: none;
 }
 .card-product-grid a.title:hover {

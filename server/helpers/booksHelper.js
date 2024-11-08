@@ -31,9 +31,24 @@ const booksPipeline = [
   },
 ];
 
-const fetchBooksData = async () => {
+const fetchBooksData = async (categorySlug) => {
   try {
+    if (categorySlug) {
+      booksPipeline.push({
+        $match: {
+          "category.slug": categorySlug,
+        },
+      });
+    }
+
+    // console.log(`booksPipeline: `);
+    // console.log(booksPipeline);
     const { value: books } = await getAggregatedBooks(booksPipeline);
+
+    if (categorySlug) {
+      booksPipeline.pop();
+    }
+
     return books;
   } catch (error) {
     console.error(`Error fetching books: ${error}`);

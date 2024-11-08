@@ -27,8 +27,18 @@
                   <input type="text" placeholder="Type here" class="form-control" id="book_title" name="title">
                 </div>
                 <div class="mb-4">
-                  <label for="book_author" class="form-label">Author</label>
-                  <input type="text" placeholder="Type here" class="form-control" id="book_author" name="author">
+                  <!-- <label for="book_author" class="form-label">Author</label>
+                  <input type="text" placeholder="Type here" class="form-control" id="book_author" name="author"> -->
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <label for="author_firstName" class="form-label">Author First Name</label>
+                      <input type="text" placeholder="First Name" class="form-control" id="author_firstName" name="author[firstName]">
+                    </div>
+                    <div class="col-lg-6">
+                      <label for="author_lastName" class="form-label">Author Last Name</label>
+                      <input type="text" placeholder="Last Name" class="form-control" id="author_lastName" name="author[lastName]">
+                    </div>
+                  </div>
                 </div>
                 <div class="mb-4">
                   <label for="book_description" class="form-label">Book Description</label>
