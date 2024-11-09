@@ -15,7 +15,7 @@ const uploadToCloudinary = async (images, folder) => {
 
 // Delete images from Cloudinary
 const deleteFromCloudinary = async (imageUrls, folder) => {
-  await Promise.all(
+  const deletePromises = await Promise.all(
     imageUrls.map(async (url) => {
       const publicId = url.split("/").slice(-1)[0].split(".")[0];
       try {
@@ -27,6 +27,8 @@ const deleteFromCloudinary = async (imageUrls, folder) => {
       }
     })
   );
+
+  return deletePromises;
 };
 
 export { uploadToCloudinary, deleteFromCloudinary };

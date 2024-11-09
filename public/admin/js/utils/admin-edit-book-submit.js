@@ -60,10 +60,11 @@ saveBookButton.addEventListener("click", async (e) => {
 
   const bookSlug = editBookForm.getAttribute("data-book-bookSlug");
   const formData = new FormData(editBookForm);
+  const data = Object.fromEntries(formData);
 
   try {
     const apiClient = new HttpRequest("/admin/books");
-    const response = await apiClient.patch(`/${bookSlug}`, formData);
+    const response = await apiClient.patch(`/${bookSlug}`, data);
     if (response.success) {
       const slug = response.data ? response.data : bookSlug;
       console.log(slug);

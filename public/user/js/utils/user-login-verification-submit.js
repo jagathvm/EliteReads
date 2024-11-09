@@ -10,10 +10,11 @@ formOtp.addEventListener("submit", async (e) => {
   if (!isValid) return e.preventDefault();
 
   const formData = new FormData(formOtp);
+  const data = Object.fromEntries(formData);
 
   try {
     const apiClient = new HttpRequest("/api/auth");
-    const response = await apiClient.post("/loginVerification", formData);
+    const response = await apiClient.post("/loginVerification", data);
 
     if (response.success) {
       showToast(response.message, true, "center");

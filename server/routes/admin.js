@@ -40,18 +40,16 @@ router.patch(
   upload.array("cover_image", 6),
   adminController.editAdminBookImage
 );
-router.patch("/books/:bookSlug", upload.none(), adminController.editAdminBook);
+router.patch("/books/:bookSlug", adminController.editAdminBook);
 router.delete("/books/:bookSlug", adminController.deleteAdminBook);
 
 router.post(
   "/categories/add-category",
-  upload.none(),
   validateData(categorySchema),
   adminController.postAdminAddCategory
 );
 router.patch(
   "/categories/:categorySlug",
-  upload.none(),
   validateData(categorySchema),
   adminController.editAdminCategory
 );

@@ -8,10 +8,11 @@ postUserSignUpForm.addEventListener("submit", async (e) => {
   if (!isValid) return;
 
   const formData = new FormData(postUserSignUpForm);
+  const data = Object.fromEntries(formData);
 
   try {
     const apiClient = new HttpRequest("/api/auth");
-    const response = await apiClient.post("/signup", formData);
+    const response = await apiClient.post("/signup", data);
 
     if (response.success) {
       showToast(response.message, true);

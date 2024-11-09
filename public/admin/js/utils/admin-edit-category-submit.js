@@ -33,9 +33,11 @@ saveCategoryButton.addEventListener("click", async (e) => {
 
   const slug = saveCategoryButton.getAttribute("data-category-slug");
   const formData = new FormData(editCategoryForm);
+  const data = Object.fromEntries(formData);
+
   try {
     const apiClient = new HttpRequest("/admin/categories");
-    const response = await apiClient.patch(`/${slug}`, formData);
+    const response = await apiClient.patch(`/${slug}`, data);
 
     if (response.success) {
       showToast(response.message, true);

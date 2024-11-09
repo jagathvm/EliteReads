@@ -11,9 +11,11 @@ saveCategoryButton.addEventListener("click", async (e) => {
     return showToast("Kindly fill in all fields to continue.", false);
 
   const formData = new FormData(addCategoryForm);
+  const data = Object.fromEntries(formData);
+
   try {
     const apiClient = new HttpRequest("/admin/categories");
-    const response = await apiClient.post("/add-category", formData);
+    const response = await apiClient.post("/add-category", data);
 
     if (response.success) {
       showToast(response.message, true);

@@ -1,4 +1,4 @@
-import { verifyAccessToken } from "../helpers/authHelper.js";
+import { verifyAccessToken } from "../services/authServices.js";
 import { renderResponse } from "../helpers/responseHelper.js";
 
 const authenticateToken = (req, res, next) => {

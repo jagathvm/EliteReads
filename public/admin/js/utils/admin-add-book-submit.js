@@ -13,6 +13,7 @@ saveBookButton.addEventListener("click", async (e) => {
     return showToast("Kindly fill in all fields to continue.", false);
 
   const formData = new FormData(addBookForm);
+  console.log(formData);
   try {
     const apiClient = new HttpRequest("/admin/books");
     const response = await apiClient.post("/add-book", formData);

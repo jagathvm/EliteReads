@@ -15,17 +15,17 @@ import {
   updateBook,
   removeBook,
 } from "../services/booksServices.js";
-import { fetchBooksData, fetchBookData } from "../helpers/booksHelper.js";
+import { fetchBooksData, fetchBookData } from "../services/booksServices.js";
 import {
   fetchCategoriesData,
   fetchCategoryData,
-} from "../helpers/categoriesHelper.js";
+} from "../services/categoriesServices.js";
 import {
   createSlug,
-  fetchUserData,
   capitalisation,
   sentenceCase,
 } from "../helpers/userHelper.js";
+import { fetchUsersData, fetchUserData } from "../services/userServices.js";
 
 const getAdminDashboard = (req, res) => {
   req.app.set("layout", "admin/layout/layout-admin");
@@ -286,7 +286,7 @@ const editAdminBook = async (req, res) => {
         return sendResponse(
           res,
           400,
-          "A book with the same title and ISBN already exists.",
+          "A book with the same title or ISBN already exists.",
           false
         );
 

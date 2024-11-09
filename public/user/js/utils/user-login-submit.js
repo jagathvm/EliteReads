@@ -14,9 +14,10 @@ postUserLoginForm.addEventListener("submit", async (e) => {
 
   const formData = new FormData(postUserLoginForm);
   formData.checkbox = formData.checkbox === "on";
+  const data = Object.fromEntries(formData);
   try {
     const apiClient = new HttpRequest("/api/auth");
-    const response = await apiClient.post("/login", formData);
+    const response = await apiClient.post("/login", data);
 
     if (response.success) {
       showToast(response.message, true, "center");

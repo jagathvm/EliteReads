@@ -5,7 +5,7 @@ import {
   verifyPassword,
   sendOTP,
   verifyOTP,
-} from "../helpers/authHelper.js";
+} from "../services/authServices.js";
 import { formatDate } from "../helpers/userHelper.js";
 import { sendResponse, renderResponse } from "../helpers/responseHelper.js";
 import { getUser, addUser, updateUser } from "../services/userServices.js";

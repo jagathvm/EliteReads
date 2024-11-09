@@ -1,9 +1,9 @@
-import { fetchUserDataFromReq } from "../helpers/userHelper.js";
-import { fetchBookData, fetchBooksData } from "../helpers/booksHelper.js";
+import { fetchUserDataFromReq } from "../services/userServices.js";
+import { fetchBookData, fetchBooksData } from "../services/booksServices.js";
 import {
   fetchCategoriesData,
   fetchCategoryData,
-} from "../helpers/categoriesHelper.js";
+} from "../services/categoriesServices.js";
 import { sendResponse, renderResponse } from "../helpers/responseHelper.js";
 
 const getUserHome = async (req, res) => {

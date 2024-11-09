@@ -1,7 +1,7 @@
 import { sendResponse } from "../helpers/responseHelper.js";
 
 const validateData = (schema) => {
-  return async (req, res, next) => {
+  const validate = async (req, res, next) => {
     try {
       if (req.body.checkbox) {
         req.body.checkbox = req.body.checkbox === "on";
@@ -29,6 +29,7 @@ const validateData = (schema) => {
       return sendResponse(res, 500, "An unexpected error occurred.", false);
     }
   };
+  return validate;
 };
 
 export default validateData;
