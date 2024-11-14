@@ -25,6 +25,7 @@ EliteReads is a book-focused e-commerce platform designed to deliver a seamless 
 
 ## Project Structure
 
+```plaintext
 EliteReads
 ├───public/ # Contains static assets served to the client
 │ ├───scripts/ # JavaScript files for front-end interactions
@@ -50,6 +51,7 @@ EliteReads
 └───user/ # Views specific to user interface
 ├───layout/ # Layout template for user-facing pages
 └───partials/ # Reusable partials for user pages (e.g., header, footer)
+```
 
 ## Installation
 
