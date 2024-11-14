@@ -27,30 +27,30 @@ EliteReads is a book-focused e-commerce platform designed to deliver a seamless 
 
 ```plaintext
 EliteReads
-├───public/ # Contains static assets served to the client
-│ ├───scripts/ # JavaScript files for front-end interactions
-│ └───stylesheets/ # CSS files for styling
+├───public/           # Contains static assets served to the client
+│ ├───scripts/        # JavaScript files for front-end interactions
+│ └───stylesheets/    # CSS files for styling
 │
-├───server/ # Server-side application logic
-│ ├───config/ # Configuration files (database, environment, etc.)
-│ ├───controllers/ # Route controllers handling request logic
-│ ├───helpers/ # Helper functions for reusable code logic
-│ ├───middlewares/ # Middleware functions (e.g., authentication, error handling)
-│ ├───routes/ # API and page route definitions
-│ ├───services/ # Service layer for external API interactions
-│ ├───utils/ # Utility functions for shared utilities
-│ └───validators/ # Validation logic for request data
+├───server/           # Server-side application logic
+│ ├───config/         # Configuration files (database, environment, etc.)
+│ ├───controllers/    # Route controllers handling request logic
+│ ├───helpers/        # Helper functions for reusable code logic
+│ ├───middlewares/    # Middleware functions (e.g., authentication, error handling)
+│ ├───routes/         # API and page route definitions
+│ ├───services/       # Service layer for external API interactions
+│ ├───utils/          # Utility functions for shared utilities
+│ └───validators/     # Validation logic for request data
 │
-└───views/ # EJS templates for rendering dynamic HTML
-├───admin/ # Views specific to admin interface
-│ ├───layout/ # Layout templates for admin pages
-│ └───partials/ # Reusable partials for admin pages (e.g., header, sidebar)
-├───auth/ # Views for authentication pages (login, signup)
-│ ├───layout/ # Layout template for authentication pages
-│ └───partials/ # Partials for authentication pages (e.g., form elements)
-└───user/ # Views specific to user interface
-├───layout/ # Layout template for user-facing pages
-└───partials/ # Reusable partials for user pages (e.g., header, footer)
+└───views/            # EJS templates for rendering dynamic HTML
+├───admin/            # Views specific to admin interface
+│ ├───layout/         # Layout templates for admin pages
+│ └───partials/       # Reusable partials for admin pages (e.g., header, sidebar)
+├───auth/             # Views for authentication pages (login, signup)
+│ ├───layout/         # Layout template for authentication pages
+│ └───partials/       # Partials for authentication pages (e.g., form elements)
+└───user/             # Views specific to user interface
+├───layout/           # Layout template for user-facing pages
+└───partials/         # Reusable partials for user pages (e.g., header, footer)
 ```
 
 ## Installation
