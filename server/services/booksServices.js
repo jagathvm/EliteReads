@@ -1,36 +1,17 @@
 import { getBooksCollection } from "../config/db.js";
 import {
   getAggregatedDocuments,
+  getDocumentsCount,
   getDocuments,
   getDocument,
   addDocument,
   updateDocument,
   removeDocument,
 } from "../helpers/dbHelper.js";
+import { fetchCategoryIdsBySlug } from "./categoriesServices.js";
 
-// Book-specific functions
-const getAggregatedBooks = async (pipeline) =>
-  await getAggregatedDocuments(
-    pipeline,
-    getBooksCollection,
-    "Error retrieving books."
-  );
-
-const getBooks = async (query = {}) =>
-  await getDocuments(query, getBooksCollection, "Error retrieving books.");
-
-const getBook = async (query) =>
-  await getDocument(query, getBooksCollection, "Book not found.");
-
-const addBook = async (book) => await addDocument(book, getBooksCollection);
-
-const updateBook = async (query, operation) =>
-  await updateDocument(query, operation, getBooksCollection);
-
-const removeBook = async (query) =>
-  await removeDocument(query, getBooksCollection);
-
-const booksPipeline = [
+// Utility Constants
+const bookPipeline = [
   {
     $lookup: {
       from: "categories",
@@ -61,99 +42,319 @@ const booksPipeline = [
   },
 ];
 
-const fetchBooksData = async (categorySlug, sort) => {
+const booksPipeline = [
+  {
+    $project: {
+      author: 1,
+      title: 1,
+      price: 1,
+      language: 1,
+      publisher: 1,
+      coverImageUrls: 1,
+      category: 1,
+      subcategory: 1,
+      bookSlug: 1,
+    },
+  },
+];
+
+const priceRanges = {
+  "under-100": { price: { $lt: 100 } },
+  "100-200": { price: { $gte: 100, $lt: 200 } },
+  "200-500": { price: { $gte: 200, $lt: 500 } },
+  "500-1000": { price: { $gte: 500, $lt: 1000 } },
+  "over-1000": { price: { $gte: 1000 } },
+};
+
+const sortOptions = {
+  featured: { featured: -1 },
+  titleAsc: { title: 1 },
+  titleDesc: { title: -1 },
+  priceAsc: { price: 1 },
+  priceDesc: { price: -1 },
+  releaseDate: { year: 1 },
+};
+
+// Helper functions
+const parseCommaSeparatedValues = (value) => value.split(",").filter(Boolean);
+
+const sanitizeQuery = async (query) => {
+  const sanitizedQuery = {};
+
+  sanitizedQuery.sort = query.sort ? sortOptions[query.sort] : { title: 1 };
+  sanitizedQuery.page = parseInt(query.page) || 1;
+  sanitizedQuery.limit = parseInt(query.limit) || 9;
+
+  if (query.price) {
+    // Split comma-separated values
+    const prices = parseCommaSeparatedValues(query.price);
+
+    // Map selected price ranges to their corresponding filters
+    const filters = prices
+      // Map each range to its corresponding filter
+      .map((range) => priceRanges[range])
+      // Filter out empty filters;
+      .filter((filter) => filter);
+
+    // Add filters to the sanitized query
+    sanitizedQuery["$or"] = filters;
+  }
+
+  if (query.category) {
+    try {
+      const categorySlugs = parseCommaSeparatedValues(query.category);
+      sanitizedQuery.category = {
+        $in: await fetchCategoryIdsBySlug(categorySlugs),
+      };
+    } catch (error) {
+      console.error(`Error sanitizing category query: ${error.message}`);
+      throw error;
+    }
+  }
+
+  if (query.subcategory) {
+    try {
+      const categorySlugs = parseCommaSeparatedValues(query.subcategory);
+      sanitizedQuery.subcategory = {
+        $in: await fetchCategoryIdsBySlug(categorySlugs),
+      };
+    } catch (error) {
+      console.error(`Error sanitizing subcategory query: ${error.message}`);
+      throw error;
+    }
+  }
+
+  if (query.language) {
+    sanitizedQuery.language = {
+      $in: parseCommaSeparatedValues(query.language),
+    };
+  }
+
+  if (query.authors) {
+    sanitizedQuery.author = { $in: parseCommaSeparatedValues(query.authors) };
+  }
+
+  if (query.publisher) {
+    sanitizedQuery.publisher = {
+      $in: parseCommaSeparatedValues(query.publisher),
+    };
+  }
+
+  return sanitizedQuery;
+};
+
+// Core CRUD Operations
+const addBook = async (book) => {
   try {
-    if (categorySlug) {
-      booksPipeline.push({
-        $match: {
-          "category.slug": categorySlug,
-        },
-      });
-    }
+    const insertResult = await addDocument(book, getBooksCollection);
 
-    if (sort === "featured") {
-      booksPipeline.push({
-        $match: {
-          featured: true,
-        },
-      });
-    }
-
-    if (sort === "priceAsc") {
-      booksPipeline.push({
-        $sort: {
-          price: 1,
-        },
-      });
-    } else if (sort === "priceDesc") {
-      booksPipeline.push({
-        $sort: {
-          price: -1,
-        },
-      });
-    }
-
-    if (sort === "releaseDate") {
-      booksPipeline.push({
-        $sort: {
-          year: 1,
-        },
-      });
-    }
-
-    const { value: books } = await getAggregatedBooks(booksPipeline);
-
-    if (categorySlug) {
-      booksPipeline.pop();
-    }
-
-    if (sort === "featured") {
-      booksPipeline.pop();
-    }
-
-    if (sort === "priceAsc" || sort === "priceDesc") {
-      booksPipeline.pop();
-    }
-
-    if (sort === "releaseDate") {
-      booksPipeline.pop();
-    }
-
-    return books;
+    return insertResult;
   } catch (error) {
-    console.error(`Error fetching books: ${error}`);
-    return null;
+    console.error(`Error adding book: ${error}`);
+    throw error;
   }
 };
 
-const fetchBookData = async (bookSlug) => {
+const getBooks = async (query = {}) => {
   try {
-    booksPipeline.unshift({
-      $match: {
-        bookSlug,
-      },
-    });
+    const books = await getDocuments(
+      query,
+      getBooksCollection,
+      "Error retrieving books."
+    );
 
-    const {
-      value: [book],
-    } = await getAggregatedBooks(booksPipeline);
-    booksPipeline.shift();
+    return books;
+  } catch (error) {
+    console.error(`Error retrieving books: ${error}`);
+    throw error;
+  }
+};
+
+const getBook = async (query) => {
+  try {
+    const book = await getDocument(
+      query,
+      getBooksCollection,
+      "Book not found."
+    );
 
     return book;
   } catch (error) {
-    console.error(`Error fetching book: ${error}`);
-    return null;
+    console.error(`Error retrieving book: ${error}`);
+    throw error;
+  }
+};
+
+const updateBook = async (query, operation) => {
+  try {
+    const updateResult = await updateDocument(
+      query,
+      operation,
+      getBooksCollection
+    );
+
+    return updateResult;
+  } catch (error) {
+    console.error(`Error updating book: ${error}`);
+    throw error;
+  }
+};
+
+const removeBook = async (query) => {
+  try {
+    const deleteResult = await removeDocument(query, getBooksCollection);
+
+    return deleteResult;
+  } catch (error) {
+    console.error(`Error deleting book: ${error}`);
+    throw error;
+  }
+};
+
+// Data aggregation and fetching
+const getAggregatedBooks = async (pipeline) => {
+  try {
+    const books = await getAggregatedDocuments(
+      pipeline,
+      getBooksCollection,
+      "Error retrieving books."
+    );
+
+    return books;
+  } catch (error) {
+    console.error(`Error retrieving books: ${error}`);
+    throw error;
+  }
+};
+
+const fetchBooksData = async (categorySlug) => {
+  const pipeline = [...booksPipeline];
+
+  try {
+    if (categorySlug) {
+      try {
+        const categoryIds = await fetchCategoryIdsBySlug([categorySlug]);
+
+        if (categoryIds) {
+          const categoryQuery = { $match: { category: { $in: categoryIds } } };
+          pipeline.unshift(categoryQuery);
+        }
+      } catch (error) {
+        console.error(`Error fetching category: ${error.message}`);
+        throw error;
+      }
+    }
+
+    const { value: books } = await getAggregatedBooks(pipeline);
+    return books;
+  } catch (error) {
+    console.error(`Error fetching books: ${error.message}`);
+    throw error;
+  }
+};
+
+const fetchBooksDataByFiltersAndSort = async (
+  queryObject = null,
+  sortObject = null,
+  skipValue = null,
+  limit = null
+) => {
+  const pipeline = [];
+
+  if (queryObject) {
+    pipeline.push({ $match: queryObject });
+  }
+
+  if (sortObject) {
+    pipeline.push({ $sort: sortObject });
+  }
+
+  if (skipValue) {
+    pipeline.push({ $skip: skipValue });
+  }
+
+  if (limit) {
+    pipeline.push({ $limit: limit });
+  }
+
+  pipeline.push(...bookPipeline);
+
+  try {
+    const { value: books } = await getAggregatedBooks(pipeline);
+    return books;
+  } catch (error) {
+    console.error("Error in fetchBooksDataByFiltersAndSort: ", error.message);
+    console.debug("Query Object: ", queryObject);
+    console.debug("Sort Object: ", sortObject);
+    console.debug("Skip Value: ", skipValue);
+    console.debug("Limit: ", limit);
+
+    throw error;
+  }
+};
+
+const fetchBookData = async (field, value) => {
+  const pipeline = [{ $match: { [field]: value } }, ...bookPipeline];
+
+  try {
+    const {
+      value: [book],
+    } = await getAggregatedBooks(pipeline);
+
+    return book;
+  } catch (error) {
+    console.error(`Error fetching book by ${field}: ${error}`);
+    throw error;
+  }
+};
+
+const fetchBookDataBySlug = async (bookSlug) =>
+  await fetchBookData("bookSlug", bookSlug);
+const fetchBookDataByTitle = async (title) =>
+  await fetchBookData("title", title);
+const fetchBookDataByIsbn = async (isbn) => await fetchBookData("isbn", isbn);
+
+// Additional functionalities
+const fetchBooksCount = async (queryObject = {}) => {
+  try {
+    const booksCount = await getDocumentsCount(queryObject, getBooksCollection);
+
+    return booksCount;
+  } catch (error) {
+    console.error(
+      `Error fetching books count: ${error.message},
+      queryObject: ${queryObject}`
+    );
+    throw error;
+  }
+};
+
+const fetchUniqueValuesFromBooksData = (field, booksData) => {
+  try {
+    const uniqueValues = [
+      ...new Set(booksData.map((book) => book[field]).filter(Boolean)),
+    ];
+    return uniqueValues;
+  } catch (error) {
+    console.error(`Error fetching books unique values: ${error}`);
+    throw error;
   }
 };
 
 // Export functions
 export {
-  fetchBookData,
+  fetchBookDataBySlug,
+  fetchBookDataByTitle,
+  fetchBookDataByIsbn,
   fetchBooksData,
+  fetchBooksDataByFiltersAndSort,
+  fetchBooksCount,
+  fetchUniqueValuesFromBooksData,
   getAggregatedBooks,
   getBooks,
   getBook,
   addBook,
   updateBook,
   removeBook,
+  sanitizeQuery,
 };
