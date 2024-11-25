@@ -1,40 +1,175 @@
-// Update sort option text on click
-document.querySelectorAll(".sort-by-dropdown a").forEach((link) => {
-  link.addEventListener("click", function (event) {
-    event.preventDefault(); // Prevent default navigation for now
+document.addEventListener("DOMContentLoaded", function () {
+  const filterButton = document.getElementById("apply-filter");
+  const clearFiltersButton = document.getElementById("clear-filters");
+  const sortDropdown = document.querySelector(".sort-by-dropdown");
+  const sortLinks = document.querySelectorAll(".sort-by-dropdown ul li a");
+  const selectedSortOption = document.getElementById("selected-sort-option");
 
-    // Get the sorting name and URL from the clicked link
-    const sortName = this.getAttribute("data-sort-name");
-    const sortUrl = this.getAttribute("href");
+  // Helper to get current query parameters
+  const getQueryParams = () => new URLSearchParams(window.location.search);
 
-    // Update the displayed sort option text
-    document.getElementById("selected-sort-option").innerHTML = `
-      ${sortName} <i class="fi-rs-angle-small-down"></i>
-    `;
+  // ----------------------------------------
+  // Filter Functionality
+  // ----------------------------------------
 
-    // Navigate to the URL to apply the sort
-    window.location.href = sortUrl;
+  // Retain filter selections from URL
+  const queryParams = getQueryParams();
+
+  // Helper to retain checkbox states
+  function retainFilters(filterName) {
+    const selectedFilters = queryParams.get(filterName)?.split(",") || [];
+    selectedFilters.forEach((filterValue) => {
+      const checkbox = document.querySelector(
+        `input[name="${filterName}"][value="${filterValue}"]`
+      );
+      if (checkbox) checkbox.checked = true;
+    });
+  }
+
+  // Retain selections for all filter types
+  [
+    "category",
+    "subcategory",
+    "price",
+    "language",
+    "authors",
+    "publisher",
+  ].forEach(retainFilters);
+
+  // Handle filter button click
+  filterButton.addEventListener("click", () => {
+    const newQueryParams = new URLSearchParams();
+
+    // Helper to gather selected filters
+    function gatherFilters(filterName) {
+      const selectedFilters = Array.from(
+        document.querySelectorAll(`input[name="${filterName}"]:checked`)
+      ).map((checkbox) => checkbox.value);
+
+      if (selectedFilters.length > 0) {
+        newQueryParams.append(filterName, selectedFilters.join(","));
+      }
+    }
+
+    // Gather filters for all types
+    [
+      "category",
+      "subcategory",
+      "price",
+      "language",
+      "authors",
+      "publisher",
+    ].forEach(gatherFilters);
+
+    // Preserve existing sort and page parameters
+    const currentSort = queryParams.get("sort");
+    const currentPage = queryParams.get("page");
+
+    if (currentSort) {
+      newQueryParams.append("sort", currentSort);
+    }
+    if (currentPage) {
+      newQueryParams.append("page", currentPage);
+    }
+
+    // // Preserve existing sort parameter
+    // const currentSort = queryParams.get("sort");
+    // if (currentSort) {
+    //   newQueryParams.append("sort", currentSort);
+    // }
+
+    // // Reset the page number to 1
+    // newQueryParams.set("page", 1);
+
+    // Redirect to the new URL with query parameters
+    const baseUrl = window.location.origin + window.location.pathname;
+    window.location.href = `${baseUrl}?${newQueryParams.toString()}`;
   });
-});
 
-// Update the selected sort option based on URL parameter on page load
-window.addEventListener("DOMContentLoaded", () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const sortParam = urlParams.get("sort");
+  // ----------------------------------------
+  // Clear Filter Functionality
+  // ----------------------------------------
 
-  // Define mapping of URL params to display names
-  const sortOptions = {
-    featured: "Featured",
-    priceAsc: "Price: Low to High",
-    priceDesc: "Price: High to Low",
-    releaseDate: "Release Date",
-    rating: "Rating",
+  clearFiltersButton.addEventListener("click", () => {
+    const newQueryParams = new URLSearchParams();
+
+    // Retain only the sort parameter (clear filters and page number)
+    const currentSort = queryParams.get("sort");
+    if (currentSort) {
+      newQueryParams.append("sort", currentSort);
+    }
+
+    // Redirect to the new URL with only the sort parameter
+    const baseUrl = window.location.origin + window.location.pathname;
+    window.location.href = `${baseUrl}?${newQueryParams.toString()}`;
+  });
+
+  // ----------------------------------------
+  // Sort Functionality
+  // ----------------------------------------
+
+  // Function to handle sort option selection
+  const handleSortClick = (event) => {
+    // Prevent default navigation behavior
+    event.preventDefault();
+
+    // Get `data-sort-name` for display
+    const sortName = event.target.getAttribute("data-sort-name");
+    // Get `href` attribute and extract the query string after `?`
+    const sortQuery = event.target
+      .getAttribute("href")
+      .split("?")[1]
+      .replace("sort=", "");
+
+    // Retain existing query parameters, but replace or add the sort parameter
+    const newQueryParams = getQueryParams();
+    newQueryParams.set("sort", sortQuery);
+
+    // Update the URL in the browser
+    const baseUrl = window.location.origin + window.location.pathname;
+    window.history.pushState(
+      null,
+      "",
+      `${baseUrl}?${newQueryParams.toString()}`
+    );
+
+    selectedSortOption.innerHTML = `${sortName} <i class="fi-rs-angle-small-down"></i>`; // Update the dropdown text
+    sortDropdown.classList.remove("visible"); // Collapse the dropdown after selection
+    window.location.reload(); // Reload the page with the updated query parameters
   };
 
-  // If the sort parameter exists, update the display text accordingly
-  if (sortParam && sortOptions[sortParam]) {
-    document.getElementById("selected-sort-option").innerHTML = `
-      ${sortOptions[sortParam]} <i class="fi-rs-angle-small-down"></i>
-    `;
+  // Add click event listeners to all sort links
+  sortLinks.forEach((link) => {
+    link.addEventListener("click", handleSortClick);
+  });
+
+  // ----------------------------------------
+  // Retain Sort and Filters
+  // ----------------------------------------
+
+  const currentSort = queryParams.get("sort");
+  if (currentSort) {
+    // Find the corresponding link for the current sort value
+    const activeLink = Array.from(sortLinks).find((link) =>
+      link.getAttribute("href").includes(`sort=${currentSort}`)
+    );
+
+    if (activeLink) {
+      const sortName = activeLink.getAttribute("data-sort-name");
+      selectedSortOption.innerHTML = `${sortName} <i class="fi-rs-angle-small-down"></i>`;
+    }
   }
+
+  // Toggle dropdown visibility
+  const sortByCover = document.querySelector(".sort-by-cover");
+  sortByCover.addEventListener("click", () => {
+    sortDropdown.classList.toggle("visible");
+  });
+
+  // Close dropdown if clicked outside
+  document.addEventListener("click", (event) => {
+    if (!sortByCover.contains(event.target)) {
+      sortDropdown.classList.remove("visible");
+    }
+  });
 });
