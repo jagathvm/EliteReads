@@ -244,9 +244,11 @@
                             <img class="hover-img" src="<%= book.coverImageUrls[1] ? book.coverImageUrls[1] : book.coverImageUrls[0] %>" alt="">
                           </a>
                         </div>
+                        <% if (book.featured) { %>
                         <div class="product-badges product-badges-position product-badges-mrg">
-                          <span class="hot">Hot</span>
+                          <span class="hot">Featured</span>
                         </div>
+                        <% } %>
                       </div>
                       <div class="product-content-wrap">
                         <h2><a href="/book-details/<%= book.bookSlug %>" tabindex="0"><%= book.title %></a></h2>
@@ -273,7 +275,7 @@
             <h5 class="section-title style-1 mb-30 wow fadeIn animated">Categories</h5>
             <ul class="categories">
               <% categories.forEach((category) => { %>
-              <li><a href="/book-store/categories/<%= category.slug %>"><%= category.name %></a></li>
+              <li><a href="/book-store?category=<%= category.slug %>"><%= category.name %></a></li>
               <% }) %>
             </ul>
           </div>
