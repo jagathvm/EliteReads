@@ -1,5 +1,4 @@
 import { ObjectId } from "mongodb";
-import { sendResponse, renderResponse } from "../helpers/responseHelper.js";
 import {
   deleteFromCloudinary,
   uploadToCloudinary,
@@ -8,30 +7,46 @@ import {
   addCategory,
   updateCategory,
   removeCategory,
+  fetchCategoriesDataBySlug,
+  fetchCategoriesDataByName,
+  fetchCategoryDataBySlug,
+  fetchCategoriesData,
 } from "../services/categoriesServices.js";
 import {
   getBook,
   addBook,
   updateBook,
   removeBook,
+  fetchBookDataByTitle,
+  fetchBookDataByIsbn,
 } from "../services/booksServices.js";
-import { fetchBooksData, fetchBookData } from "../services/booksServices.js";
 import {
-  fetchCategoriesData,
-  fetchCategoryData,
-} from "../services/categoriesServices.js";
+  fetchBooksData,
+  fetchBookDataBySlug,
+} from "../services/booksServices.js";
 import {
   createSlug,
   capitalisation,
   sentenceCase,
 } from "../helpers/userHelper.js";
 import { fetchUsersData, fetchUserData } from "../services/userServices.js";
+import { sendResponse, renderResponse } from "../helpers/responseHelper.js";
 
+// ------------------ ADMIN CONTROLLERS ------------------ //
+
+// Render the Admin Dashboard page.
 const getAdminDashboard = (req, res) => {
   req.app.set("layout", "admin/layout/layout-admin");
   return renderResponse(res, 200, "admin/admin-dashboard", { req });
 };
 
+// Render the Admin Settings page.
+const getAdminSettings = (req, res) =>
+  renderResponse(res, 200, "admin/admin-settings", { req });
+
+// ----------------- ADMIN BOOKS ------------------ //
+
+// Fetch and display all books.
 const getAdminBooks = async (req, res) => {
   try {
     const books = await fetchBooksData();
@@ -48,6 +63,7 @@ const getAdminBooks = async (req, res) => {
   }
 };
 
+// Render the Admin Add Book form.
 const getAdminAddBook = async (req, res) => {
   try {
     const categories = await fetchCategoriesData();
@@ -62,12 +78,13 @@ const getAdminAddBook = async (req, res) => {
   }
 };
 
+// Render book details for a specific book.
 const getAdminBookDetails = async (req, res) => {
   const { bookSlug } = req.params;
 
   try {
-    const book = await fetchBookData(bookSlug);
-    const categories = await fetchCategoriesData({ parentCategory: "" });
+    const book = await fetchBookDataBySlug(bookSlug);
+    const categories = await fetchCategoriesData();
 
     return renderResponse(res, 200, "admin/admin-book-details", {
       req,
@@ -81,113 +98,7 @@ const getAdminBookDetails = async (req, res) => {
   }
 };
 
-const getAdminOrders = (req, res) =>
-  renderResponse(res, 200, "admin/admin-orders-list", { req });
-
-const getAdminOrderDetails = (req, res) =>
-  renderResponse(res, 200, "admin/admin-order-details", { req });
-
-const getAdminAddCategory = async (req, res) => {
-  try {
-    const categories = await fetchCategoriesData();
-
-    return renderResponse(res, 200, "admin/admin-add-category", {
-      req,
-      categories,
-      capitalisation,
-    });
-  } catch (error) {
-    console.error(`An unexpected error occurred. ${error}`);
-    return sendResponse(res, 500, "An unexpected error occurred.", false);
-  }
-};
-
-const getAdminCategories = async (req, res) => {
-  try {
-    const categories = await fetchCategoriesData();
-
-    return renderResponse(res, 200, "admin/admin-categories", {
-      req,
-      categories,
-    });
-  } catch (error) {
-    console.error(`An unexpected error occurred. ${error}`);
-    return sendResponse(res, 500, "An unexpected error occurred.", false);
-  }
-};
-
-const getAdminCategoryDetails = async (req, res) => {
-  const { categorySlug: slug } = req.params;
-
-  try {
-    const category = await fetchCategoryData(slug);
-    const categories = await fetchCategoriesData();
-
-    return renderResponse(res, 200, "admin/admin-category-details", {
-      req,
-      category,
-      categories,
-    });
-  } catch (error) {
-    console.error(`An unexpected error occurred. ${error}`);
-    return sendResponse(res, 500, error.message, false);
-  }
-};
-
-const getAdminSellers = (req, res) =>
-  renderResponse(res, 200, "admin/admin-sellers-cards", { req });
-
-const getAdminSellerProfile = (req, res) =>
-  renderResponse(res, 200, "admin/admin-seller-profile", { req });
-
-const getAdminTransactions = (req, res) =>
-  renderResponse(res, 200, "admin/admin-transactions", { req });
-
-const getAdminReviews = (req, res) =>
-  renderResponse(res, 200, "admin/admin-reviews", { req });
-
-const getAdminReviewDetails = (req, res) =>
-  renderResponse(res, 200, "admin/admin-review-details", { req });
-
-const getAdminSettings = (req, res) =>
-  renderResponse(res, 200, "admin/admin-settings", { req });
-
-const getAdminUsers = async (req, res) => {
-  try {
-    const users = await fetchUsersData();
-
-    return renderResponse(res, 200, "admin/admin-users-cards", {
-      req,
-      users,
-    });
-  } catch (error) {
-    console.error(`An unexpected error occurred. ${error}`);
-    return sendResponse(res, 500, "An unexpected error occurred.", false);
-  }
-};
-
-const getAdminUserProfile = async (req, res) => {
-  const { username } = req.params;
-
-  try {
-    const user = await fetchUserData(username);
-    return renderResponse(res, 200, "admin/admin-user-profile", {
-      req,
-      user,
-    });
-  } catch (error) {
-    console.error(`An unexpected error occurred. ${error}`);
-    return sendResponse(res, 500, "An unexpected error occurred.", false);
-  }
-};
-
-// // Admin authors
-// const getAdminAuthors = (req, res) =>
-//   renderResponse(res, 200, "admin/admin-authors", { req });
-
-// const getAdminAuthorProfile = (req, res) =>
-//   renderResponse(res, 200, "admin/admin-author-profile", { req });
-
+// Add a new book to the database.
 const postAdminAddBook = async (req, res) => {
   const {
     title,
@@ -197,7 +108,7 @@ const postAdminAddBook = async (req, res) => {
   const coverImages = req.files;
 
   try {
-    const bookFoundWithSameTitle = await fetchBookData({ title });
+    const bookFoundWithSameTitle = await fetchBookDataByTitle({ title });
     if (bookFoundWithSameTitle)
       return sendResponse(
         res,
@@ -206,7 +117,7 @@ const postAdminAddBook = async (req, res) => {
         false
       );
 
-    const bookFoundWithSameISBN = await fetchBookData({ isbn });
+    const bookFoundWithSameISBN = await fetchBookDataByIsbn({ isbn });
     if (bookFoundWithSameISBN)
       return sendResponse(
         res,
@@ -252,6 +163,7 @@ const postAdminAddBook = async (req, res) => {
   }
 };
 
+// Edit a book in the database.
 const editAdminBook = async (req, res) => {
   const { bookSlug } = req.params;
   const { title, isbn } = req.body;
@@ -332,6 +244,7 @@ const editAdminBook = async (req, res) => {
   }
 };
 
+// Edit a book's cover images in the database.
 const editAdminBookImage = async (req, res) => {
   const { bookSlug } = req.params;
   const { removedImageUrls } = req.body;
@@ -439,6 +352,7 @@ const editAdminBookImage = async (req, res) => {
   }
 };
 
+// Delete a book from the database
 const deleteAdminBook = async (req, res) => {
   const { bookSlug } = req.params;
   try {
@@ -472,21 +386,83 @@ const deleteAdminBook = async (req, res) => {
   }
 };
 
+// --------------------- ADMIN CATEGORIES --------------------- //
+
+// Fetch and display all categories.
+const getAdminCategories = async (req, res) => {
+  try {
+    const categories = await fetchCategoriesData();
+
+    return renderResponse(res, 200, "admin/admin-categories", {
+      req,
+      categories,
+    });
+  } catch (error) {
+    console.error(`An unexpected error occurred. ${error}`);
+    return sendResponse(res, 500, "An unexpected error occurred.", false);
+  }
+};
+
+// Render category details for a specific category.
+const getAdminCategoryDetails = async (req, res) => {
+  const { categorySlug: slug } = req.params;
+
+  try {
+    const category = await fetchCategoryDataBySlug(slug);
+    const categories = await fetchCategoriesData();
+
+    return renderResponse(res, 200, "admin/admin-category-details", {
+      req,
+      category,
+      categories,
+    });
+  } catch (error) {
+    console.error(`An unexpected error occurred. ${error}`);
+    return sendResponse(res, 500, error.message, false);
+  }
+};
+
+// Render the Admin Add Category form.
+const getAdminAddCategory = async (req, res) => {
+  try {
+    const categories = await fetchCategoriesData();
+
+    return renderResponse(res, 200, "admin/admin-add-category", {
+      req,
+      categories,
+      capitalisation,
+    });
+  } catch (error) {
+    console.error(`An unexpected error occurred. ${error}`);
+    return sendResponse(res, 500, "An unexpected error occurred.", false);
+  }
+};
+
+// Add a new category or subcategory.
 const postAdminAddCategory = async (req, res) => {
   const { name, description, parentCategory } = req.validData;
   const slug = createSlug(name);
   try {
     // Check if a category with the same name exists
-    const { found: categoryFound } = await fetchCategoriesData({
-      $or: [{ name }, { slug }],
-    });
+    const { found: catFoundByName } = await fetchCategoriesDataByName([name]);
+
+    // Check if a category with the same slug exists
+    const { found: catFoundBySlug } = await fetchCategoriesDataBySlug([slug]);
 
     // Send error response if category exists
-    if (categoryFound)
+    if (catFoundByName)
       return sendResponse(
         res,
         400,
         "Category already exists with the same name.",
+        false
+      );
+
+    if (catFoundBySlug)
+      return sendResponse(
+        res,
+        400,
+        "Category already exists with the same slug.",
         false
       );
 
@@ -516,16 +492,15 @@ const postAdminAddCategory = async (req, res) => {
   }
 };
 
+// Edit a category or subcategory.
 const editAdminCategory = async (req, res) => {
   const { categorySlug } = req.params;
   const { name, description, parentCategory } = req.validData;
 
   try {
-    const category = await fetchCategoriesData({
-      slug: categorySlug,
-    });
-
+    const category = await fetchCategoriesDataBySlug([categorySlug]);
     const slug = createSlug(name);
+
     // Check if any data has changed when the front-end validation fails
     const isUnchanged =
       category.name === name &&
@@ -566,12 +541,13 @@ const editAdminCategory = async (req, res) => {
   }
 };
 
+// Delete a category or subcategory.
 const deleteAdminCategory = async (req, res) => {
   const { categorySlug: slug } = req.params;
 
   try {
     // Find the category by slug
-    const category = await fetchCategoriesData({ slug });
+    const category = await fetchCategoriesDataBySlug([slug]);
 
     // Prevent deletion if subcategories exist
     if (category.subCategories?.length > 0)
@@ -607,31 +583,96 @@ const deleteAdminCategory = async (req, res) => {
   }
 };
 
+// --------------------- ADMIN USERS --------------------- //
+
+// Fetch and display all users.
+const getAdminUsers = async (req, res) => {
+  try {
+    const users = await fetchUsersData();
+
+    return renderResponse(res, 200, "admin/admin-users-cards", {
+      req,
+      users,
+    });
+  } catch (error) {
+    console.error(`An unexpected error occurred. ${error}`);
+    return sendResponse(res, 500, "An unexpected error occurred.", false);
+  }
+};
+
+// Fetch and display a user's profile.
+const getAdminUserProfile = async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    const user = await fetchUserData(username);
+    return renderResponse(res, 200, "admin/admin-user-profile", {
+      req,
+      user,
+    });
+  } catch (error) {
+    console.error(`An unexpected error occurred. ${error}`);
+    return sendResponse(res, 500, "An unexpected error occurred.", false);
+  }
+};
+
+// --------------------- ADMIN SELLERS --------------------- //
+
+// Fetch and display all sellers.
+const getAdminSellers = (req, res) =>
+  renderResponse(res, 200, "admin/admin-sellers-cards", { req });
+
+// Fetch and display a seller's profile.
+const getAdminSellerProfile = (req, res) =>
+  renderResponse(res, 200, "admin/admin-seller-profile", { req });
+
+// --------------------- ADMIN REVIEWS --------------------- //
+
+// Fetch and display all reviews.
+const getAdminReviews = (req, res) =>
+  renderResponse(res, 200, "admin/admin-reviews", { req });
+
+// Fetch and display a review's details.
+const getAdminReviewDetails = (req, res) =>
+  renderResponse(res, 200, "admin/admin-review-details", { req });
+
+// --------------------- ADMIN ORDERS --------------------- //
+
+// Fetch and display all orders.
+const getAdminOrders = (req, res) =>
+  renderResponse(res, 200, "admin/admin-orders-list", { req });
+
+// Render order details for a specific order.
+const getAdminOrderDetails = (req, res) =>
+  renderResponse(res, 200, "admin/admin-order-details", { req });
+
+// --------------------- ADMIN TRANSACTIONS --------------------- //
+const getAdminTransactions = (req, res) =>
+  renderResponse(res, 200, "admin/admin-transactions", { req });
+
 export {
   getAdminDashboard,
-  getAdminBooks,
-  getAdminAddBook,
-  getAdminBookDetails,
-  getAdminOrders,
-  getAdminOrderDetails,
-  getAdminAddCategory,
-  getAdminCategories,
-  getAdminCategoryDetails,
-  getAdminSellers,
-  getAdminSellerProfile,
-  getAdminTransactions,
-  getAdminReviews,
-  getAdminReviewDetails,
   getAdminSettings,
-  getAdminUsers,
-  getAdminUserProfile,
-  // getAdminAuthors,
-  // getAdminAuthorProfile,
+  getAdminBooks,
+  getAdminBookDetails,
   postAdminAddBook,
+  getAdminAddBook,
   editAdminBook,
   editAdminBookImage,
   deleteAdminBook,
+  getAdminCategories,
+  getAdminCategoryDetails,
   postAdminAddCategory,
+  getAdminAddCategory,
   editAdminCategory,
   deleteAdminCategory,
+  getAdminUsers,
+  getAdminUserProfile,
+  getAdminSellers,
+  getAdminSellerProfile,
+  getAdminReviews,
+  getAdminReviewDetails,
+  getAdminOrders,
+  getAdminOrderDetails,
+  getAdminTransactions,
 };
