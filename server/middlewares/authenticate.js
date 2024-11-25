@@ -1,7 +1,7 @@
 import { verifyAccessToken } from "../services/authServices.js";
 import { renderResponse } from "../helpers/responseHelper.js";
 
-const authenticateToken = (req, res, next) => {
+const authenticateToken = async (req, res, next) => {
   const { accessToken } = req.cookies;
 
   if (!accessToken) {
@@ -15,7 +15,7 @@ const authenticateToken = (req, res, next) => {
 
   try {
     // Verify the access token
-    req.user = verifyAccessToken(accessToken);
+    req.user = await verifyAccessToken(accessToken);
     next();
   } catch (error) {
     // Set user layout for 403
