@@ -1203,6 +1203,18 @@
   .mobile-menu
   li
   a
+  .active {
+  color: #088178;
+}
+
+.mobile-header-wrapper-style
+  .mobile-header-wrapper-inner
+  .mobile-header-content-area
+  .mobile-menu-wrap
+  nav
+  .mobile-menu
+  li
+  a
   i {
   margin-right: 5px;
 }
