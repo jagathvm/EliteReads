@@ -21,6 +21,17 @@ const getAggregatedDocuments = async (
   }
 };
 
+// Generic documents count
+const getDocumentsCount = async (query = {}, getCollection) => {
+  try {
+    const collection = await getCollection();
+    const count = await collection.countDocuments(query);
+    return count;
+  } catch (error) {
+    throw new Error(`Error retrieving documents count: ${error.message}`);
+  }
+};
+
 // Generic documents retrieval
 const getDocuments = async (
   query = {},
@@ -112,6 +123,7 @@ const removeDocument = async (query, getCollection) => {
 
 export {
   getAggregatedDocuments,
+  getDocumentsCount,
   getDocuments,
   getDocument,
   addDocument,
