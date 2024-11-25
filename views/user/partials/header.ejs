@@ -176,7 +176,7 @@
     <div class="container">
       <div class="header-wrap header-space-between position-relative">
         <div class="logo logo-width-1 d-block d-lg-none">
-          <a href="index.html"><img src="/user/imgs/theme/logo.svg" alt="logo"></a>
+          <a href="/"><img src="/user/imgs/theme/logo.svg" alt="logo"></a>
         </div>
         <div class="header-nav d-none d-lg-flex">
           <div class="main-categori-wrap d-none d-lg-block">
@@ -187,15 +187,24 @@
           <div class="main-menu main-menu-padding-1 main-menu-lh-2 d-none d-lg-block">
             <nav>
               <ul>
-                <% if (categories) { %>
-                <% categories.forEach((category, index) => { %>
-                <% if (index < 8) { %>
                 <li>
-                  <a href="/book-store/categories/<%= category.slug %>"><%= category.name %></a>
+                  <a class="<%= currentPath === '/' ? 'active' : '' %>" href="/">Home</a>
                 </li>
-                <% } %>
-                <% }) %>
-                <% } %>
+                <li>
+                  <a class="<%= currentPath === '/about' ? 'active' : '' %>" href="/about">About</a>
+                </li>
+                <li>
+                  <a class="<%= currentPath === '/purchase-guide' ? 'active' : '' %>" href="/purchase-guide">Purchase Guide</a>
+                </li>
+                <li>
+                  <a class="<%= currentPath === '/privacy-policy' ? 'active' : '' %>" href="/privacy-policy">Privacy Policy</a>
+                </li>
+                <li>
+                  <a class="<%= currentPath === '/terms-conditions' ? 'active' : '' %>" href="/terms-conditions">Terms & Conditions</a>
+                </li>
+                <li>
+                  <a class="<%= currentPath === '/contact' ? 'active' : '' %>" href="/contact">Contact</a>
+                </li>
               </ul>
             </nav>
           </div>
@@ -232,7 +241,7 @@
   <div class="mobile-header-wrapper-inner">
     <div class="mobile-header-top">
       <div class="mobile-header-logo">
-        <a href="index.html"><img src="/user/imgs/theme/logo.svg" alt="logo"></a>
+        <a href="/"><img src="/user/imgs/theme/logo.svg" alt="logo"></a>
       </div>
       <div class="mobile-menu-close close-style-wrap close-style-position-inherit">
         <button class="close-style search-close">
@@ -260,6 +269,11 @@
             </li>
             <% } %>
             <li>
+              <a class="dropdown-item" href="/profile">
+                Profile
+              </a>
+            </li>
+            <li>
               <a class="dropdown-item" href="/api/auth/logout">
                 Sign Out
               </a>
@@ -285,15 +299,24 @@
         <!-- mobile menu start -->
         <nav>
           <ul class="mobile-menu">
-            <% if (categories) { %>
-            <% categories.forEach((category, index) => { %>
-            <% if (index < 8) { %>
-            <li class="menu-item-has-children">
-              <a href="/book-store/categories/<%= category.slug %>"><%= category.name %></a>
+            <li>
+              <a href="/" class="<%= currentPath === '/' ? 'active' : '' %>">Home</a>
             </li>
-            <% } %>
-            <% }) %>
-            <% } %>
+            <li>
+              <a href="/about" class="<%= currentPath === '/about' ? 'active' : '' %>">About Us</a>
+            </li>
+            <li>
+              <a href="/purchase-guide" class="<%= currentPath === '/purchase-guide' ? 'active' : '' %>">Purchase Guide</a>
+            </li>
+            <li>
+              <a href="/privacy-policy" class="<%= currentPath === '/privacy-policy' ? 'active' : '' %>">Privacy Policy</a>
+            </li>
+            <li>
+              <a href="/terms-conditions" class="<%= currentPath === '/terms-conditions' ? 'active' : '' %>">Terms & Conditions</a>
+            </li>
+            <li>
+              <a href="/contact" class="<%= currentPath === '/contact' ? 'active' : '' %>">Contact Us</a>
+            </li>
           </ul>
         </nav>
         <!-- mobile menu end -->
