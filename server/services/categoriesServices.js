@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import { getCategoriesCollection } from "../config/db.js";
 import {
   getAggregatedDocuments,
@@ -8,30 +9,8 @@ import {
   removeDocument,
 } from "../helpers/dbHelper.js";
 
-// Category-specific functions
-const getAggregatedCategories = async (pipeline) =>
-  await getAggregatedDocuments(
-    pipeline,
-    getCategoriesCollection,
-    "Error retrieving categories."
-  );
-
-const getCategories = async (query) =>
-  await getDocuments(
-    query,
-    getCategoriesCollection,
-    "Error retrieving categories."
-  );
-
-const getCategory = async (query) =>
-  await getDocument(query, getCategoriesCollection, "Category Not Found.");
-const addCategory = async (category) =>
-  await addDocument(category, getCategoriesCollection);
-const updateCategory = async (query, operation) =>
-  await updateDocument(query, operation, getCategoriesCollection);
-const removeCategory = async (query) =>
-  await removeDocument(query, getCategoriesCollection);
-
+// Utility variables
+const parentCategoryFilter = { parentCategory: "" };
 const categoriesPipeline = [
   {
     $lookup: {
@@ -57,20 +36,112 @@ const categoriesPipeline = [
   },
 ];
 
-const fetchCategoriesData = async () => {
+// Helper functions
+const uniqueCategoryIds = (categoryIds) => {
+  const uniqueIdStrings = [...new Set(categoryIds.map((id) => id.toString()))];
+  const uniqueIds = uniqueIdStrings.map((id) => new ObjectId(id));
+
+  return uniqueIds;
+};
+
+// Core CRUD Operations
+const addCategory = async (category) => {
   try {
-    categoriesPipeline.unshift({
+    const insertResult = await addDocument(category, getCategoriesCollection);
+
+    return insertResult;
+  } catch (error) {
+    console.error(`Error adding category: ${error}`);
+    throw error;
+  }
+};
+
+const getCategories = async (query) => {
+  try {
+    const categories = await getDocuments(
+      query,
+      getCategoriesCollection,
+      "Error retrieving categories."
+    );
+
+    return categories;
+  } catch (error) {
+    console.error(`Error retrieving categories: ${error}`);
+    throw error;
+  }
+};
+
+const getCategory = async (query) => {
+  try {
+    const category = await getDocument(
+      query,
+      getCategoriesCollection,
+      "Category not found."
+    );
+
+    return category;
+  } catch (error) {
+    console.error(`Error retrieving category: ${error}`);
+    throw error;
+  }
+};
+
+const updateCategory = async (query, operation) => {
+  try {
+    const updateResult = await updateDocument(
+      query,
+      operation,
+      getCategoriesCollection
+    );
+
+    return updateResult;
+  } catch (error) {
+    console.error(`Error updating category: ${error}`);
+    throw error;
+  }
+};
+
+const removeCategory = async (query) => {
+  try {
+    const deleteResult = await removeDocument(query, getCategoriesCollection);
+
+    return deleteResult;
+  } catch (error) {
+    console.error(`Error deleting category: ${error}`);
+    throw error;
+  }
+};
+
+// Data aggregation and fetching
+const getAggregatedCategories = async (pipeline) => {
+  try {
+    const categories = await getAggregatedDocuments(
+      pipeline,
+      getCategoriesCollection,
+      "Error retrieving categories."
+    );
+
+    return categories;
+  } catch (error) {
+    console.error(`Error retrieving categories: ${error}`);
+    throw error;
+  }
+};
+
+const fetchCategoriesData = async (field, value) => {
+  const pipeline = [...categoriesPipeline];
+  pipeline.unshift({ $match: parentCategoryFilter });
+
+  if (field && value) {
+    pipeline.unshift({
       $match: {
-        parentCategory: "",
+        [field]: { $in: value },
       },
     });
+  }
 
-    // console.log(`categoriesPipeline: `);
-    // console.log(categoriesPipeline);
-    const { value: categories } =
-      await getAggregatedCategories(categoriesPipeline);
-    categoriesPipeline.shift();
-
+  try {
+    const { value: categories } = await getAggregatedCategories(pipeline);
     return categories;
   } catch (error) {
     console.error(`Error fetching categories: ${error.message}`);
@@ -78,35 +149,61 @@ const fetchCategoriesData = async () => {
   }
 };
 
-const fetchCategoryData = async (slug) => {
-  try {
-    categoriesPipeline.unshift({
-      $match: {
-        slug: slug,
-      },
-    });
+const fetchCategoryData = async (field, value) => {
+  const pipeline = [...categoriesPipeline];
+  if (value) {
+    pipeline.unshift({ $match: { [field]: value } });
+  }
 
-    // console.log(`categoryPipeline: `);
-    // console.log(categoriesPipeline);
+  try {
     const {
       value: [category],
-    } = await getAggregatedCategories(categoriesPipeline);
-    categoriesPipeline.shift();
+    } = await getAggregatedCategories(pipeline);
 
     return category;
   } catch (error) {
     console.error(`Error fetching category: ${error}`);
-    return null;
+    throw error;
+  }
+};
+
+const fetchCategoriesDataByIds = async (ids) =>
+  await fetchCategoriesData("_id", ids);
+
+const fetchCategoriesDataBySlug = async (slugs) =>
+  await fetchCategoriesData("slug", slugs);
+
+const fetchCategoriesDataByName = async (names) =>
+  await fetchCategoriesData("name", names);
+
+const fetchCategoryDataBySlug = async (slug) =>
+  await fetchCategoryData("slug", slug);
+
+// Additional functionalities
+const fetchCategoryIdsBySlug = async (slug) => {
+  try {
+    const { value: categories } = await getCategories({ slug: { $in: slug } });
+    const categoryIds = categories.map((category) => category._id);
+
+    return categoryIds;
+  } catch (error) {
+    console.error(`Error fetching category: ${error.message}`);
+    throw error;
   }
 };
 
 export {
+  fetchCategoryDataBySlug,
   fetchCategoriesData,
-  fetchCategoryData,
+  fetchCategoriesDataByIds,
+  fetchCategoriesDataBySlug,
+  fetchCategoriesDataByName,
+  fetchCategoryIdsBySlug,
   getAggregatedCategories,
   getCategories,
   getCategory,
   addCategory,
   updateCategory,
   removeCategory,
+  uniqueCategoryIds,
 };
