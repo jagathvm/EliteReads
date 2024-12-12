@@ -29,7 +29,7 @@
           </h3>
           <p>Email: <%= user.email %>
           </p>
-          <p>Joined: <%= user.accountStatus.createdAt %>
+          <p>Joined: <%= formatDate(user.accountStatus.createdAt) %>
           </p>
         </div>
         <!-- col.// -->
@@ -68,7 +68,7 @@
           <p>
             Role: <%= user.role.name %> <br>
               Status: <%= user.accountStatus.status %> <br>
-                Last Login: <%= user.accountStatus?.lastLogin || "Recently" %>
+                Last Login: <%= formatDate(user.accountStatus?.lastLogin) || "Recently" %>
           </p>
         </div>
         <!-- col.// -->
