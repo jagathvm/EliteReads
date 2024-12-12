@@ -17,15 +17,20 @@
     <div class="card-body">
       <div class="row">
         <div class="col-xl col-lg flex-grow-0" style="flex-basis: 230px;">
-          <div class="img-thumbnail shadow w-100 bg-white position-relative text-center" style="height: 200px; width: 200px; margin-top: -120px;">
+          <div class="img-thumbnail shadow w-100 bg-white position-relative text-center"
+            style="height: 200px; width: 200px; margin-top: -120px;">
             <img src="/admin/imgs/theme/image-profile.png" class="center-xy img-fluid" alt="User Profile Picture">
           </div>
         </div>
         <!-- col.// -->
         <div class="col-xl col-lg">
-          <h3><%= user.username %></h3>
-          <p>Email: <%= user.email %></p>
-          <p>Joined: <%= user.accountStatus.createdAt %></p>
+          <h3>
+            <%= user.username %>
+          </h3>
+          <p>Email: <%= user.email %>
+          </p>
+          <p>Joined: <%= user.accountStatus.createdAt %>
+          </p>
         </div>
         <!-- col.// -->
         <div class="col-xl-4 text-md-end">
@@ -54,7 +59,7 @@
           <h6>Contact Information</h6>
           <p>
             Phone: <%= user.phone %> <br>
-            Address: <%= user?.address || "Not Updated" %>
+              Address: <%= user?.address || "Not Updated" %>
           </p>
         </div>
         <!-- col.// -->
@@ -62,8 +67,8 @@
           <h6>Account Settings</h6>
           <p>
             Role: <%= user.role.name %> <br>
-            Status: <%= user.accountStatus.status %> <br>
-            Last Login: <%= user.accountStatus?.lastLogin?.replace(' at', ',') || "Recently" %>
+              Status: <%= user.accountStatus.status %> <br>
+                Last Login: <%= user.accountStatus?.lastLogin || "Recently" %>
           </p>
         </div>
         <!-- col.// -->
@@ -98,7 +103,8 @@
   <!-- card.// -->
 
   <!-- Block/Unblock Modal -->
-  <div class="modal fade" id="blockUnblockModal" tabindex="-1" aria-labelledby="blockUnblockModalLabel" aria-hidden="true">
+  <div class="modal fade" id="blockUnblockModal" tabindex="-1" aria-labelledby="blockUnblockModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -117,7 +123,8 @@
   </div>
 
   <!-- Edit Profile Modal -->
-  <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+  <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -128,15 +135,18 @@
           <form id="editProfileForm">
             <div class="mb-3">
               <label for="profileName" class="form-label">Name</label>
-              <input type="text" class="form-control" id="profileName" placeholder="Enter your name" value="<%= user.email %>">
+              <input type="text" class="form-control" id="profileName" placeholder="Enter your name"
+                value="<%= user.email %>">
             </div>
             <div class="mb-3">
               <label for="profileEmail" class="form-label">Email address</label>
-              <input type="email" class="form-control" id="profileEmail" placeholder="Enter your email" value="<%= user.email %>">
+              <input type="email" class="form-control" id="profileEmail" placeholder="Enter your email"
+                value="<%= user.email %>">
             </div>
             <div class="mb-3">
               <label for="profilePhone" class="form-label">Phone Number</label>
-              <input type="text" class="form-control" id="profilePhone" placeholder="Enter your phone number" value="<%= user.phone %>">
+              <input type="text" class="form-control" id="profilePhone" placeholder="Enter your phone number"
+                value="<%= user.phone %>">
             </div>
             <div class="mb-3">
               <label for="profileAddress" class="form-label">Address</label>
