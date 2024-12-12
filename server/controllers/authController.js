@@ -10,10 +10,10 @@ import { formatDate } from "../helpers/userHelper.js";
 import { sendResponse, renderResponse } from "../helpers/responseHelper.js";
 import { getUser, addUser, updateUser } from "../services/userServices.js";
 
-const getUserSignup = (req, res) =>
+export const getUserSignup = (req, res) =>
   renderResponse(res, 200, "user/user-signup", { req });
 
-const postUserSignup = async (req, res) => {
+export const postUserSignup = async (req, res) => {
   const { username, email, phone, password } = req.validData;
 
   try {
@@ -66,10 +66,10 @@ const postUserSignup = async (req, res) => {
   }
 };
 
-const getUserLogin = (req, res) =>
+export const getUserLogin = (req, res) =>
   renderResponse(res, 200, "user/user-login", { req });
 
-const postUserLogin = async (req, res) => {
+export const postUserLogin = async (req, res) => {
   const { usernameEmailPhone, password } = req.validData;
 
   try {
@@ -120,10 +120,10 @@ const postUserLogin = async (req, res) => {
   }
 };
 
-const getUserLoginVerification = (req, res) =>
+export const getUserLoginVerification = (req, res) =>
   renderResponse(res, 200, "user/user-login-verify", { req });
 
-const postVerifyOtp = async (req, res) => {
+export const postVerifyOtp = async (req, res) => {
   try {
     const otpVerification = await verifyOTP(req.cookies.phone, req.body.otp);
     if (!otpVerification || otpVerification.status !== "approved")
@@ -157,13 +157,4 @@ const postVerifyOtp = async (req, res) => {
     console.error(`An error occurred. Please Try Again Later. ${error}`);
     return sendResponse(res, 500, "An unexpected error occurred.", false);
   }
-};
-
-export {
-  getUserLogin,
-  getUserLoginVerification,
-  getUserSignup,
-  postUserLogin,
-  postVerifyOtp,
-  postUserSignup,
 };
