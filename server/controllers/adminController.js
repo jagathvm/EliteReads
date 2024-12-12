@@ -35,19 +35,19 @@ import { sendResponse, renderResponse } from "../helpers/responseHelper.js";
 // ------------------ ADMIN CONTROLLERS ------------------ //
 
 // Render the Admin Dashboard page.
-const getAdminDashboard = (req, res) => {
+export const getAdminDashboard = (req, res) => {
   req.app.set("layout", "admin/layout/layout-admin");
   return renderResponse(res, 200, "admin/admin-dashboard", { req });
 };
 
 // Render the Admin Settings page.
-const getAdminSettings = (req, res) =>
+export const getAdminSettings = (req, res) =>
   renderResponse(res, 200, "admin/admin-settings", { req });
 
 // ----------------- ADMIN BOOKS ------------------ //
 
 // Fetch and display all books.
-const getAdminBooks = async (req, res) => {
+export const getAdminBooks = async (req, res) => {
   try {
     const books = await fetchBooksData();
     const categories = await fetchCategoriesData();
@@ -64,7 +64,7 @@ const getAdminBooks = async (req, res) => {
 };
 
 // Render the Admin Add Book form.
-const getAdminAddBook = async (req, res) => {
+export const getAdminAddBook = async (req, res) => {
   try {
     const categories = await fetchCategoriesData();
 
@@ -79,7 +79,7 @@ const getAdminAddBook = async (req, res) => {
 };
 
 // Render book details for a specific book.
-const getAdminBookDetails = async (req, res) => {
+export const getAdminBookDetails = async (req, res) => {
   const { bookSlug } = req.params;
 
   try {
@@ -99,7 +99,7 @@ const getAdminBookDetails = async (req, res) => {
 };
 
 // Add a new book to the database.
-const postAdminAddBook = async (req, res) => {
+export const postAdminAddBook = async (req, res) => {
   const {
     title,
     author: { firstName, lastName },
@@ -164,7 +164,7 @@ const postAdminAddBook = async (req, res) => {
 };
 
 // Edit a book in the database.
-const editAdminBook = async (req, res) => {
+export const editAdminBook = async (req, res) => {
   const { bookSlug } = req.params;
   const { title, isbn } = req.body;
   const updatedBookData = {
@@ -245,7 +245,7 @@ const editAdminBook = async (req, res) => {
 };
 
 // Edit a book's cover images in the database.
-const editAdminBookImage = async (req, res) => {
+export const editAdminBookImage = async (req, res) => {
   const { bookSlug } = req.params;
   const { removedImageUrls } = req.body;
   const coverImages = req.files;
@@ -353,7 +353,7 @@ const editAdminBookImage = async (req, res) => {
 };
 
 // Delete a book from the database
-const deleteAdminBook = async (req, res) => {
+export const deleteAdminBook = async (req, res) => {
   const { bookSlug } = req.params;
   try {
     // Retrieve the book to ensure it exists before deletion
@@ -389,7 +389,7 @@ const deleteAdminBook = async (req, res) => {
 // --------------------- ADMIN CATEGORIES --------------------- //
 
 // Fetch and display all categories.
-const getAdminCategories = async (req, res) => {
+export const getAdminCategories = async (req, res) => {
   try {
     const categories = await fetchCategoriesData();
 
@@ -404,7 +404,7 @@ const getAdminCategories = async (req, res) => {
 };
 
 // Render category details for a specific category.
-const getAdminCategoryDetails = async (req, res) => {
+export const getAdminCategoryDetails = async (req, res) => {
   const { categorySlug: slug } = req.params;
 
   try {
@@ -423,7 +423,7 @@ const getAdminCategoryDetails = async (req, res) => {
 };
 
 // Render the Admin Add Category form.
-const getAdminAddCategory = async (req, res) => {
+export const getAdminAddCategory = async (req, res) => {
   try {
     const categories = await fetchCategoriesData();
 
@@ -439,7 +439,7 @@ const getAdminAddCategory = async (req, res) => {
 };
 
 // Add a new category or subcategory.
-const postAdminAddCategory = async (req, res) => {
+export const postAdminAddCategory = async (req, res) => {
   const { name, description, parentCategory } = req.validData;
   const slug = createSlug(name);
   try {
@@ -493,7 +493,7 @@ const postAdminAddCategory = async (req, res) => {
 };
 
 // Edit a category or subcategory.
-const editAdminCategory = async (req, res) => {
+export const editAdminCategory = async (req, res) => {
   const { categorySlug } = req.params;
   const { name, description, parentCategory } = req.validData;
 
@@ -542,7 +542,7 @@ const editAdminCategory = async (req, res) => {
 };
 
 // Delete a category or subcategory.
-const deleteAdminCategory = async (req, res) => {
+export const deleteAdminCategory = async (req, res) => {
   const { categorySlug: slug } = req.params;
 
   try {
@@ -586,7 +586,7 @@ const deleteAdminCategory = async (req, res) => {
 // --------------------- ADMIN USERS --------------------- //
 
 // Fetch and display all users.
-const getAdminUsers = async (req, res) => {
+export const getAdminUsers = async (req, res) => {
   try {
     const users = await fetchUsersData();
 
@@ -601,7 +601,7 @@ const getAdminUsers = async (req, res) => {
 };
 
 // Fetch and display a user's profile.
-const getAdminUserProfile = async (req, res) => {
+export const getAdminUserProfile = async (req, res) => {
   const { username } = req.params;
 
   try {
@@ -619,60 +619,33 @@ const getAdminUserProfile = async (req, res) => {
 // --------------------- ADMIN SELLERS --------------------- //
 
 // Fetch and display all sellers.
-const getAdminSellers = (req, res) =>
+export const getAdminSellers = (req, res) =>
   renderResponse(res, 200, "admin/admin-sellers-cards", { req });
 
 // Fetch and display a seller's profile.
-const getAdminSellerProfile = (req, res) =>
+export const getAdminSellerProfile = (req, res) =>
   renderResponse(res, 200, "admin/admin-seller-profile", { req });
 
 // --------------------- ADMIN REVIEWS --------------------- //
 
 // Fetch and display all reviews.
-const getAdminReviews = (req, res) =>
+export const getAdminReviews = (req, res) =>
   renderResponse(res, 200, "admin/admin-reviews", { req });
 
 // Fetch and display a review's details.
-const getAdminReviewDetails = (req, res) =>
+export const getAdminReviewDetails = (req, res) =>
   renderResponse(res, 200, "admin/admin-review-details", { req });
 
 // --------------------- ADMIN ORDERS --------------------- //
 
 // Fetch and display all orders.
-const getAdminOrders = (req, res) =>
+export const getAdminOrders = (req, res) =>
   renderResponse(res, 200, "admin/admin-orders-list", { req });
 
 // Render order details for a specific order.
-const getAdminOrderDetails = (req, res) =>
+export const getAdminOrderDetails = (req, res) =>
   renderResponse(res, 200, "admin/admin-order-details", { req });
 
 // --------------------- ADMIN TRANSACTIONS --------------------- //
-const getAdminTransactions = (req, res) =>
+export const getAdminTransactions = (req, res) =>
   renderResponse(res, 200, "admin/admin-transactions", { req });
-
-export {
-  getAdminDashboard,
-  getAdminSettings,
-  getAdminBooks,
-  getAdminBookDetails,
-  postAdminAddBook,
-  getAdminAddBook,
-  editAdminBook,
-  editAdminBookImage,
-  deleteAdminBook,
-  getAdminCategories,
-  getAdminCategoryDetails,
-  postAdminAddCategory,
-  getAdminAddCategory,
-  editAdminCategory,
-  deleteAdminCategory,
-  getAdminUsers,
-  getAdminUserProfile,
-  getAdminSellers,
-  getAdminSellerProfile,
-  getAdminReviews,
-  getAdminReviewDetails,
-  getAdminOrders,
-  getAdminOrderDetails,
-  getAdminTransactions,
-};
