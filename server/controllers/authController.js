@@ -41,7 +41,7 @@ export const postUserSignup = async (req, res) => {
       },
       accountStatus: {
         isVerified: false,
-        createdAt: formatDate(new Date()),
+        createdAt: new Date(),
         lastLogin: null,
         isBlocked: false,
         status: "ACTIVE",
@@ -143,7 +143,7 @@ export const postVerifyOtp = async (req, res) => {
 
     const { modifiedCount } = await updateUser(
       { _id: user._id },
-      { $set: { "accountStatus.lastLogin": formatDate(new Date()) } }
+      { $set: { "accountStatus.lastLogin": new Date() } }
     );
 
     if (!modifiedCount)
