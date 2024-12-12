@@ -18,7 +18,7 @@ import { sendResponse, renderResponse } from "../helpers/responseHelper.js";
 // ------------------ HOME & STATIC PAGES ------------------
 
 // Render User Home Page
-const getUserHome = async (req, res) => {
+export const getUserHome = async (req, res) => {
   try {
     const user = await fetchUserDataFromReq(req);
     const books = await fetchBooksData();
@@ -43,7 +43,7 @@ const getUserHome = async (req, res) => {
 };
 
 // Render About Page
-const getUserAbout = async (req, res) => {
+export const getUserAbout = async (req, res) => {
   try {
     const user = await fetchUserDataFromReq(req);
     return renderResponse(res, 200, "user/user-about", {
@@ -63,7 +63,7 @@ const getUserAbout = async (req, res) => {
 };
 
 // Render Contact Page
-const getUserContact = async (req, res) => {
+export const getUserContact = async (req, res) => {
   try {
     const user = await fetchUserDataFromReq(req);
     return renderResponse(res, 200, "user/user-contact", {
@@ -83,7 +83,7 @@ const getUserContact = async (req, res) => {
 };
 
 // Render Privacy Policy Page
-const getUserPrivacyPolicy = async (req, res) => {
+export const getUserPrivacyPolicy = async (req, res) => {
   try {
     const user = await fetchUserDataFromReq(req);
     return renderResponse(res, 200, "user/user-privacy-policy", {
@@ -103,7 +103,7 @@ const getUserPrivacyPolicy = async (req, res) => {
 };
 
 // Render Terms & Conditions Page
-const getUserTermsConditions = async (req, res) => {
+export const getUserTermsConditions = async (req, res) => {
   try {
     const user = await fetchUserDataFromReq(req);
     return renderResponse(res, 200, "user/user-terms-conditions", {
@@ -123,7 +123,7 @@ const getUserTermsConditions = async (req, res) => {
 };
 
 // Render Purchase Guide Page
-const getUserPurchaseGuide = async (req, res) => {
+export const getUserPurchaseGuide = async (req, res) => {
   try {
     const user = await fetchUserDataFromReq(req);
     return renderResponse(res, 200, "user/user-purchase-guide", {
@@ -145,7 +145,7 @@ const getUserPurchaseGuide = async (req, res) => {
 // ------------------ STORE & PRODUCT PAGES ------------------
 
 // Render Store Page
-const getUserStore = async (req, res) => {
+export const getUserStore = async (req, res) => {
   try {
     // Sanitize the incoming query parameters
     const {
@@ -209,7 +209,7 @@ const getUserStore = async (req, res) => {
 };
 
 // Render Single Book Page
-const getUserBook = async (req, res) => {
+export const getUserBook = async (req, res) => {
   const { bookSlug } = req.params;
 
   try {
@@ -240,7 +240,7 @@ const getUserBook = async (req, res) => {
 // ------------------ USER PROFILE & FEATURES ------------------
 
 // Render Cart Page
-const getUserCart = async (req, res) => {
+export const getUserCart = async (req, res) => {
   try {
     const user = await fetchUserDataFromReq(req);
     return renderResponse(res, 200, "user/user-cart", {
@@ -260,7 +260,7 @@ const getUserCart = async (req, res) => {
 };
 
 // Render Readlist Page
-const getUserReadlist = async (req, res) => {
+export const getUserReadlist = async (req, res) => {
   try {
     const user = await fetchUserDataFromReq(req);
     return renderResponse(res, 200, "user/user-readlist", {
@@ -280,7 +280,7 @@ const getUserReadlist = async (req, res) => {
 };
 
 // Render User Profile Page
-const getUserProfile = async (req, res) => {
+export const getUserProfile = async (req, res) => {
   try {
     const user = await fetchUserDataFromReq(req);
     return renderResponse(res, 200, "user/user-profile", {
@@ -297,19 +297,4 @@ const getUserProfile = async (req, res) => {
       false
     );
   }
-};
-
-// ------------------ EXPORTS ------------------
-export {
-  getUserHome,
-  getUserAbout,
-  getUserContact,
-  getUserPrivacyPolicy,
-  getUserPurchaseGuide,
-  getUserTermsConditions,
-  getUserStore,
-  getUserBook,
-  getUserCart,
-  getUserReadlist,
-  getUserProfile,
 };
