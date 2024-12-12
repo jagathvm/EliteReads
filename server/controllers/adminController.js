@@ -28,6 +28,7 @@ import {
   createSlug,
   capitalisation,
   sentenceCase,
+  formatDate,
 } from "../helpers/userHelper.js";
 import { fetchUsersData, fetchUserData } from "../services/userServices.js";
 import { sendResponse, renderResponse } from "../helpers/responseHelper.js";
@@ -609,6 +610,7 @@ export const getAdminUserProfile = async (req, res) => {
     return renderResponse(res, 200, "admin/admin-user-profile", {
       req,
       user,
+      formatDate,
     });
   } catch (error) {
     console.error(`An unexpected error occurred. ${error}`);
