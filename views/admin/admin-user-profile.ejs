@@ -37,8 +37,10 @@
           <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
             Edit Profile
           </button>
-          <button type="button" class="btn btn-danger ms-2" data-bs-toggle="modal" data-bs-target="#blockUnblockModal">
-            Block User
+          <button type="button" class="btn <%= user.accountStatus.isBlocked ? 'btn-success' : 'btn-danger' %> ms-2"
+            data-bs-toggle="modal" data-bs-target="#blockUnblockModal" <%=user.phone===currentUser.phone ? 'disabled'
+            : '' %>>
+            <%= user.accountStatus.isBlocked ? 'Unblock' : 'Block' %> User
           </button>
         </div>
         <!-- col.// -->
@@ -46,7 +48,7 @@
       <!-- card-body.// -->
       <hr class="my-4">
       <div class="row g-4">
-        <div class="col-md-12 col-lg-4 col-xl-2">
+        <div class="col-md-12 col-lg-4 col-xl-3">
           <article class="box">
             <p class="mb-0 text-muted">Total Orders:</p>
             <h5 class="text-success">150</h5>
@@ -55,30 +57,38 @@
           </article>
         </div>
         <!-- col.// -->
-        <div class="col-sm-6 col-lg-4 col-xl-3">
+        <div class="col-sm-6 col-lg-4 col-xl-4">
           <h6>Contact Information</h6>
           <p>
-            Phone: <%= user.phone %> <br>
-              Address: <%= user?.address || "Not Updated" %>
+            Phone: <%= user.phone %> <br> </p>
+          <p>
+            Address: <%= user?.address || "Not Updated" %>
           </p>
         </div>
         <!-- col.// -->
-        <div class="col-sm-6 col-lg-4 col-xl-3">
+        <div class="col-sm-6 col-lg-4 col-xl-4">
           <h6>Account Settings</h6>
           <p>
             Role: <%= user.role.name %> <br>
-              Status: <%= user.accountStatus.status %> <br>
-                Last Login: <%= formatDate(user.accountStatus?.lastLogin) || "Recently" %>
+          </p>
+          <p>
+            Status: <%= user.accountStatus.isBlocked ? 'BLOCKED' : ( user.accountStatus.isActive ? 'ACTIVE' : 'INACTIVE'
+              ) %> <br>
+          </p>
+          <p>
+            Last Login: <%= user.accountStatus?.lastLogin !=null ? formatDate(user.accountStatus?.lastLogin) :
+              formatDate(user.accountStatus?.createdAt) %>
+              <br>
           </p>
         </div>
         <!-- col.// -->
-        <div class="col-sm-6 col-xl-4 text-xl-end">
+        <!-- <div class="col-sm-6 col-xl-4 text-xl-end">
           <select class="form-select w-auto d-inline-block">
             <option hidden>Actions</option>
             <option>Deactivate Account</option>
             <option>Delete Account</option>
           </select>
-        </div>
+        </div> -->
         <!-- col.// -->
       </div>
       <!-- row.// -->
@@ -107,20 +117,31 @@
     aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="blockUnblockModalLabel">Block/Unblock User</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p>Are you sure you want to <span id="blockUnblockAction">block</span> this user?</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-danger" id="confirmBlockUnblock">Confirm</button>
-        </div>
+        <form id="blockUnblockForm" data-username="<%= user.username %>">
+          <div class="modal-header">
+            <h5 class="modal-title" id="blockUnblockModalLabel">
+              <%= user.accountStatus.isBlocked ? 'Unblock' : 'Block' %> User
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to <span id="blockUnblockAction">
+                <%= user.accountStatus.isBlocked ? 'unblock' : 'block' %>
+              </span> this user?</p>
+            <!-- Add hidden fields to send necessary data -->
+            <input type="hidden" name="isBlocked" value="<%= user.accountStatus.isBlocked %>">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn <%= user.accountStatus.isBlocked ? 'btn-success' : 'btn-danger' %>">
+              Confirm
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
+
 
   <!-- Edit Profile Modal -->
   <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel"
@@ -136,7 +157,7 @@
             <div class="mb-3">
               <label for="profileName" class="form-label">Name</label>
               <input type="text" class="form-control" id="profileName" placeholder="Enter your name"
-                value="<%= user.email %>">
+                value="<%= user.username %>">
             </div>
             <div class="mb-3">
               <label for="profileEmail" class="form-label">Email address</label>
@@ -166,3 +187,5 @@
     </div>
   </div>
 </section>
+
+<script type="module" src="/admin/js/utils/admin-user-profile.js"></script>
