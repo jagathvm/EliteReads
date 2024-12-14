@@ -297,10 +297,7 @@ const fetchBookData = async (field, value) => {
   const pipeline = [{ $match: { [field]: value } }, ...bookPipeline];
 
   try {
-    const {
-      value: [book],
-    } = await getAggregatedBooks(pipeline);
-
+    const { value: book } = await getAggregatedBooks(pipeline);
     return book;
   } catch (error) {
     console.error(`Error fetching book by ${field}: ${error}`);
