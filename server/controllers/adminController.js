@@ -30,7 +30,12 @@ import {
   sentenceCase,
   formatDate,
 } from "../helpers/userHelper.js";
-import { fetchUsersData, fetchUserData } from "../services/userServices.js";
+import {
+  fetchUsersData,
+  fetchUserData,
+  fetchUserDataFromReq,
+  updateUser,
+} from "../services/userServices.js";
 import { sendResponse, renderResponse } from "../helpers/responseHelper.js";
 
 // ------------------ ADMIN CONTROLLERS ------------------ //
@@ -84,7 +89,7 @@ export const getAdminBookDetails = async (req, res) => {
   const { bookSlug } = req.params;
 
   try {
-    const book = await fetchBookDataBySlug(bookSlug);
+    const [book] = await fetchBookDataBySlug(bookSlug);
     const categories = await fetchCategoriesData();
 
     return renderResponse(res, 200, "admin/admin-book-details", {
@@ -109,7 +114,7 @@ export const postAdminAddBook = async (req, res) => {
   const coverImages = req.files;
 
   try {
-    const bookFoundWithSameTitle = await fetchBookDataByTitle({ title });
+    const bookFoundWithSameTitle = await fetchBookDataByTitle(title);
     if (bookFoundWithSameTitle)
       return sendResponse(
         res,
@@ -118,7 +123,7 @@ export const postAdminAddBook = async (req, res) => {
         false
       );
 
-    const bookFoundWithSameISBN = await fetchBookDataByIsbn({ isbn });
+    const bookFoundWithSameISBN = await fetchBookDataByIsbn(isbn);
     if (bookFoundWithSameISBN)
       return sendResponse(
         res,
@@ -606,15 +611,45 @@ export const getAdminUserProfile = async (req, res) => {
   const { username } = req.params;
 
   try {
+    const currentUser = await fetchUserDataFromReq(req);
     const user = await fetchUserData(username);
+
     return renderResponse(res, 200, "admin/admin-user-profile", {
       req,
       user,
+      currentUser,
       formatDate,
     });
   } catch (error) {
     console.error(`An unexpected error occurred. ${error}`);
     return sendResponse(res, 500, "An unexpected error occurred.", false);
+  }
+};
+
+export const blockOrUnblockUser = async (req, res) => {
+  const { username } = req.params;
+  const isBlocked = req.body.isBlocked === "true" ? false : true;
+
+  try {
+    const { modifiedCount } = await updateUser(
+      { username },
+      { $set: { "accountStatus.isBlocked": isBlocked } }
+    );
+
+    if (!modifiedCount)
+      return res.status(400).json({
+        success: false,
+        message: `"Failed to ${isBlocked ? "block" : "unblock"} user."`,
+      });
+
+    return res.status(200).json({
+      success: true,
+      message: `User ${isBlocked ? "blocked" : "unblocked"}.`,
+    });
+  } catch (error) {
+    console.log("Error blocking or unblocking user:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+    throw error;
   }
 };
 
