@@ -1,6 +1,7 @@
 import HttpRequest from "../../../helpers/http-request.js";
 import { addBookValidator } from "../validators/admin-add-book-validator.js";
 import { showToast, errorMessage } from "../../../helpers/toast.js";
+import { handleRedirect } from "../../../helpers/handleUrl.js";
 
 const addBookForm = document.getElementById("addBookForm");
 const saveBookButton = document.getElementById("saveBookButton");
@@ -13,19 +14,14 @@ saveBookButton.addEventListener("click", async (e) => {
     return showToast("Kindly fill in all fields to continue.", false);
 
   const formData = new FormData(addBookForm);
-  console.log(formData);
   try {
     const apiClient = new HttpRequest("/admin/books");
-    const response = await apiClient.post("/add-book", formData);
+    const { success, message } = await apiClient.post("/add-book", formData);
 
-    if (response.success) {
-      showToast(response.message, true);
-      setTimeout(() => {
-        window.location.href = "/admin/books";
-      }, 2000);
-    } else {
-      showToast(response.message || response.error || errorMessage, false);
-    }
+    if (!success) return showToast(message, false);
+
+    showToast(message, true);
+    handleRedirect("/admin/books");
   } catch (error) {
     console.log(error);
     showToast(error.message || errorMessage, false);

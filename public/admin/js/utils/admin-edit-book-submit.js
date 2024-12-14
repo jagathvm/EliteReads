@@ -4,6 +4,7 @@ import {
   editBookImageValidator,
 } from "../validators/admin-edit-book-validator.js";
 import { errorMessage, showToast } from "../../../helpers/toast.js";
+import { handleRedirect } from "../../../helpers/handleUrl.js";
 
 const editBookForm = document.getElementById("editBookForm");
 const updateCoverImageForm = document.getElementById("updateCoverImageForm");
@@ -64,20 +65,16 @@ saveBookButton.addEventListener("click", async (e) => {
 
   try {
     const apiClient = new HttpRequest("/admin/books");
-    const response = await apiClient.patch(`/${bookSlug}`, data);
-    if (response.success) {
-      const slug = response.data ? response.data : bookSlug;
-      console.log(slug);
-      showToast(response.message, true);
-      setTimeout(() => {
-        window.location.href = `/admin/books/${slug}`;
-      }, 2000);
-    } else {
-      return showToast(
-        response.message || response.error || errorMessage,
-        false
-      );
-    }
+    const {
+      success,
+      message,
+      data: responseData,
+    } = await apiClient.patch(`/${bookSlug}`, data);
+    const slug = responseData ? responseData : bookSlug;
+
+    if (!success) return showToast(message, false);
+    showToast(message, true);
+    handleRedirect(`/admin/books/${slug}`);
   } catch (error) {
     console.error(error);
     showToast(response.message || response.error || errorMessage, false);

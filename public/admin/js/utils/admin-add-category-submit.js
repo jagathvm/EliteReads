@@ -1,6 +1,7 @@
 import HttpRequest from "../../../helpers/http-request.js";
 import { addCategoryValidator } from "../validators/admin-add-category-validator.js";
 import { showToast, errorMessage } from "../../../helpers/toast.js";
+import { handleRedirect } from "../../../helpers/handleUrl.js";
 
 const addCategoryForm = document.getElementById("addCategoryForm");
 const saveCategoryButton = document.getElementById("saveCategoryButton");
@@ -15,16 +16,11 @@ saveCategoryButton.addEventListener("click", async (e) => {
 
   try {
     const apiClient = new HttpRequest("/admin/categories");
-    const response = await apiClient.post("/add-category", data);
+    const { success, message } = await apiClient.post("/add-category", data);
 
-    if (response.success) {
-      showToast(response.message, true);
-      setTimeout(() => {
-        window.location.href = "/admin/categories";
-      }, 2000);
-    } else {
-      showToast(response.message, false);
-    }
+    if (!success) return showToast(message, false);
+    showToast(message, true);
+    handleRedirect("/admin/categories");
   } catch (error) {
     console.error(error);
     showToast(error.message || errorMessage, false);

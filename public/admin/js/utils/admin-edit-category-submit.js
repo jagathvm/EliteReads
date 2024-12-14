@@ -1,6 +1,7 @@
 import HttpRequest from "../../../helpers/http-request.js";
 import { errorMessage, showToast } from "../../../helpers/toast.js";
 import { editCategoryValidator } from "../validators/admin-edit-category-validator.js";
+import { handleRedirect } from "../../../helpers/handleUrl.js";
 
 // Capture the original form data to compare later
 const originalData = {
@@ -37,20 +38,17 @@ saveCategoryButton.addEventListener("click", async (e) => {
 
   try {
     const apiClient = new HttpRequest("/admin/categories");
-    const response = await apiClient.patch(`/${slug}`, data);
+    const {
+      success,
+      message,
+      data: responseData,
+    } = await apiClient.patch(`/${slug}`, data);
 
-    if (response.success) {
-      showToast(response.message, true);
-      setTimeout(() => {
-        if (response.data) {
-          window.location.href = `/admin/categories/${response.data}`;
-        } else {
-          window.location.href = `/admin/categories`;
-        }
-      }, 2000);
-    } else {
-      showToast(response.message || response.error, false);
-    }
+    if (!success) return showToast(message, false);
+    showToast(message, true);
+    handleRedirect(
+      responseData ? `/admin/categories/${responseData}` : "/admin/categories"
+    );
   } catch (error) {
     showToast(errorMessage, false);
     throw new Error(`An Unexpected Error Occurred: ${error}`);
