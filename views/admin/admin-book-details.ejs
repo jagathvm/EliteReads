@@ -1,21 +1,24 @@
 <section class="content-main">
   <div class="content-header">
-    <a href="/admin/books/">
+    <a href="/admin/books">
       <i class="material-icons md-arrow_back"></i> Go back
     </a>
     <div>
       <!-- Edit Button -->
-      <button type="button" class="btn btn-secondary btn-md rounded" data-bs-toggle="modal" data-bs-target="#editBookModal">
+      <button type="button" class="btn btn-secondary btn-md rounded" data-bs-toggle="modal"
+        data-bs-target="#editBookModal">
         Edit Book Details
       </button>
 
       <!-- Update Cover Image Button -->
-      <button type="button" class="btn btn-secondary btn-md rounded" data-bs-toggle="modal" data-bs-target="#updateCoverImageModal">
+      <button type="button" class="btn btn-secondary btn-md rounded" data-bs-toggle="modal"
+        data-bs-target="#updateCoverImageModal">
         Update Cover Image
       </button>
 
       <!-- Delete Button -->
-      <button type="button" class="btn btn-danger btn-md rounded" data-bs-toggle="modal" data-bs-target="#deleteBookModal">
+      <button type="button" class="btn btn-danger btn-md rounded" data-bs-toggle="modal"
+        data-bs-target="#deleteBookModal">
         Delete Book
       </button>
     </div>
@@ -27,21 +30,24 @@
       <div class="col-md-2" style="display: flex; align-items: center; justify-content: center; position: relative;">
         <div id="bookCoverCarousel" class="carousel slide" style="width: 100%; max-width: 300px; position: relative;">
           <div class="carousel-inner">
-            <% if (book.coverImageUrls?.length > 0) { %>
-            <% book.coverImageUrls.forEach((coverImageUrl, index) => { %>
-            <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
-              <img src="<%= coverImageUrl %>" alt="<%= book.title %> Cover Image" class="d-block w-100 img-fluid" style="object-fit: contain;">
-            </div>
-            <% }) %>
-            <% } else { %>
-            <p>No cover images available.</p>
-            <% } %>
+            <% if (book.coverImageUrls?.length> 0) { %>
+              <% book.coverImageUrls.forEach((coverImageUrl, index)=> { %>
+                <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                  <img src="<%= coverImageUrl %>" alt="<%= book.title %> Cover Image" class="d-block w-100 img-fluid"
+                    style="object-fit: contain;">
+                </div>
+                <% }) %>
+                  <% } else { %>
+                    <p>No cover images available.</p>
+                    <% } %>
           </div>
-          <button class="carousel-control-prev" type="button" data-bs-target="#bookCoverCarousel" data-bs-slide="prev" style="background: none; border: none; position: absolute; top: 50%; transform: translateY(-50%); left: 10px;">
+          <button class="carousel-control-prev" type="button" data-bs-target="#bookCoverCarousel" data-bs-slide="prev"
+            style="background: none; border: none; position: absolute; top: 50%; transform: translateY(-50%); left: 10px;">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Previous</span>
           </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#bookCoverCarousel" data-bs-slide="next" style="background: none; border: none; position: absolute; top: 50%; transform: translateY(-50%); right: 10px;">
+          <button class="carousel-control-next" type="button" data-bs-target="#bookCoverCarousel" data-bs-slide="next"
+            style="background: none; border: none; position: absolute; top: 50%; transform: translateY(-50%); right: 10px;">
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Next</span>
           </button>
@@ -52,19 +58,44 @@
       <div class="col-md-10">
         <div class="card-body text-start">
           <!-- Added text-start for left alignment -->
-          <h3 class="card-title mt-2"><%= book.title %></h3>
-          <p class="card-text"><strong class="text-dark">Author:</strong> <%= book.author %></p>
-          <p class="card-text"><strong class="text-dark">Description:</strong> <%= book.description %></p>
-          <p class="card-text"><strong class="text-dark">Price:</strong> ₹<%= book.price %></p>
-          <p class="card-text"><strong class="text-dark">ISBN:</strong> <%= book.isbn %></p>
-          <p class="card-text"><strong class="text-dark">Publisher:</strong> <%= book.publisher %></p>
-          <p class="card-text"><strong class="text-dark">Year:</strong> <%= book.year %></p>
-          <p class="card-text"><strong class="text-dark">Language:</strong> <%= book.language %></p>
-          <p class="card-text"><strong class="text-dark">Pages:</strong> <%= book.pages %></p>
-          <p class="card-text"><strong class="text-dark">Weight:</strong> <%= book.weight %> grams</p>
-          <p class="card-text"><strong class="text-dark">Category:</strong> <%= book.category.name %></p>
-          <p class="card-text"><strong class="text-dark">Subcategory:</strong> <%= book.subcategory.name %></p>
-          <p class="card-text"><strong class="text-dark">Featured:</strong> <%= book.featured === true ? 'Yes' : 'No' %></p>
+          <h3 class="card-title mt-2">
+            <%= book.title %>
+          </h3>
+          <p class="card-text"><strong class="text-dark">Author:</strong>
+            <%= book.author %>
+          </p>
+          <p class="card-text"><strong class="text-dark">Description:</strong>
+            <%= book.description %>
+          </p>
+          <p class="card-text"><strong class="text-dark">Price:</strong> ₹<%= book.price %>
+          </p>
+          <p class="card-text"><strong class="text-dark">ISBN:</strong>
+            <%= book.isbn %>
+          </p>
+          <p class="card-text"><strong class="text-dark">Publisher:</strong>
+            <%= book.publisher %>
+          </p>
+          <p class="card-text"><strong class="text-dark">Year:</strong>
+            <%= book.year %>
+          </p>
+          <p class="card-text"><strong class="text-dark">Language:</strong>
+            <%= book.language %>
+          </p>
+          <p class="card-text"><strong class="text-dark">Pages:</strong>
+            <%= book.pages %>
+          </p>
+          <p class="card-text"><strong class="text-dark">Weight:</strong>
+            <%= book.weight %> grams
+          </p>
+          <p class="card-text"><strong class="text-dark">Category:</strong>
+            <%= book.category.name %>
+          </p>
+          <p class="card-text"><strong class="text-dark">Subcategory:</strong>
+            <%= book.subcategory.name %>
+          </p>
+          <p class="card-text"><strong class="text-dark">Featured:</strong>
+            <%= book.featured===true ? 'Yes' : 'No' %>
+          </p>
         </div>
       </div>
     </div>
@@ -106,7 +137,9 @@
               <div class="mb-3">
                 <label for="editFeatured" class="form-label">Featured</label>
                 <select class="form-select" id="editFeatured" name="featured">
-                  <option selected hidden><%= book.featured ? 'Yes' : 'No' %></option>
+                  <option selected hidden>
+                    <%= book.featured ? 'Yes' : 'No' %>
+                  </option>
                   <option value="true">Yes</option>
                   <option value="false">No</option>
                 </select>
@@ -116,7 +149,8 @@
 
           <div class="mb-3">
             <label for="editDescription" class="form-label">Description</label>
-            <textarea class="form-control" id="editDescription" name="description" rows="2"><%= book.description %></textarea>
+            <textarea class="form-control" id="editDescription" name="description"
+              rows="2"><%= book.description %></textarea>
           </div>
 
           <div class="row">
@@ -156,25 +190,32 @@
             <div class="col-md-6 mb-3">
               <label for="editCategory" class="form-label">Category</label>
               <select class="form-select" id="editCategory" name="category">
-                <option selected value="<%= book.category._id %>" data-subcategories="<%= JSON.stringify(book.category.subCategories) %>" hidden>
+                <option selected value="<%= book.category._id %>"
+                  data-subcategories="<%= JSON.stringify(book.category.subCategories) %>" hidden>
                   <%= book.category.name %>
                 </option>
                 <option disabled>Select Category</option>
-                <% categories.forEach(category => { %>
-                <option value="<%= category._id %>" data-subcategories="<%= JSON.stringify(category.subCategories) %>">
-                  <%= category.name %>
-                </option>
-                <% }) %>
+                <% categories.forEach(category=> { %>
+                  <option value="<%= category._id %>"
+                    data-subcategories="<%= JSON.stringify(category.subCategories) %>">
+                    <%= category.name %>
+                  </option>
+                  <% }) %>
               </select>
             </div>
             <div class="col-md-6 mb-3">
               <label for="editSubcategory" class="form-label">Subcategory</label>
               <select class="form-select" id="editSubcategory" name="subcategory">
-                <option selected value="<%= book.subcategory ? book.subcategory._id : '' %>" hidden><%= book.subcategory ? book.subcategory.name : '' %></option>
-                <% const parentCategory = categories.find(category => category._id.toString() === book.category._id.toString()) %>
-                <% parentCategory.subCategories.forEach(subCategory => { %>
-                <option value="<%= subCategory._id %>"><%= subCategory.name %></option>
-                <% }) %>
+                <option selected value="<%= book.subcategory ? book.subcategory._id : '' %>" hidden>
+                  <%= book.subcategory ? book.subcategory.name : '' %>
+                </option>
+                <% const parentCategory=categories.find(category=> category._id.toString() ===
+                  book.category._id.toString()) %>
+                  <% parentCategory.subCategories.forEach(subCategory=> { %>
+                    <option value="<%= subCategory._id %>">
+                      <%= subCategory.name %>
+                    </option>
+                    <% }) %>
               </select>
             </div>
           </div>
@@ -186,7 +227,8 @@
 </div>
 
 <!-- Update Cover Image Modal -->
-<div class="modal fade" id="updateCoverImageModal" tabindex="-1" aria-labelledby="updateCoverImageModalLabel" aria-hidden="true">
+<div class="modal fade" id="updateCoverImageModal" tabindex="-1" aria-labelledby="updateCoverImageModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header d-flex justify-content-between align-items-start">
@@ -194,7 +236,8 @@
           <h5 class="modal-title" id="updateCoverImageModalLabel">Update Cover Image</h5>
         </div>
         <div>
-          <button type="submit" id="saveCoverImageButton" class="btn btn-success btn-md rounded" disabled>Save Changes</button>
+          <button type="submit" id="saveCoverImageButton" class="btn btn-success btn-md rounded" disabled>Save
+            Changes</button>
         </div>
       </div>
       <div class="modal-body">
@@ -205,18 +248,20 @@
           </div>
           <div class="mb-3">
             <div id="coverImagePreviews" class="mt-2 d-flex flex-wrap">
-              <% if (book.coverImageUrls && book.coverImageUrls.length > 0) { %>
-              <% book.coverImageUrls.forEach((coverImageUrl, index) => { %>
-              <div class="position-relative me-2 mb-2 preview-container">
-                <img src="<%= coverImageUrl %>" alt="<%= book.title %> Cover Image" class="img-fluid preview-image" style="height: 150px; object-fit: cover;">
-                <button type="button" class="btn btn-link text-danger text-decoration-none p-0 remove-preview-image" data-index="<%= index %>">
-                  &times;
-                </button>
-              </div>
-              <% }) %>
-              <% } else { %>
-              <p>No cover images available.</p>
-              <% } %>
+              <% if (book.coverImageUrls && book.coverImageUrls.length> 0) { %>
+                <% book.coverImageUrls.forEach((coverImageUrl, index)=> { %>
+                  <div class="position-relative me-2 mb-2 preview-container">
+                    <img src="<%= coverImageUrl %>" alt="<%= book.title %> Cover Image" class="img-fluid preview-image"
+                      style="height: 150px; object-fit: cover;">
+                    <button type="button" class="btn btn-link text-danger text-decoration-none p-0 remove-preview-image"
+                      data-index="<%= index %>">
+                      &times;
+                    </button>
+                  </div>
+                  <% }) %>
+                    <% } else { %>
+                      <p>No cover images available.</p>
+                      <% } %>
             </div>
             <!-- newImagePreviews -->
             <div id="newImagePreviews" class="mt-2 d-flex flex-wrap"></div>
@@ -242,7 +287,8 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-md rounded" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger btn-md rounded" id="confirmDeleteButton" data-book-bookSlug="<%= book.bookSlug %>">Delete</button>
+        <button type="button" class="btn btn-danger btn-md rounded" id="confirmDeleteButton"
+          data-book-bookSlug="<%= book.bookSlug %>">Delete</button>
       </div>
     </div>
   </div>
