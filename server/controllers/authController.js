@@ -6,7 +6,6 @@ import {
   sendOTP,
   verifyOTP,
 } from "../services/authServices.js";
-import { formatDate } from "../helpers/userHelper.js";
 import { sendResponse, renderResponse } from "../helpers/responseHelper.js";
 import { getUser, addUser, updateUser } from "../services/userServices.js";
 
@@ -126,32 +125,38 @@ export const getUserLoginVerification = (req, res) =>
 export const postVerifyOtp = async (req, res) => {
   try {
     const otpVerification = await verifyOTP(req.cookies.phone, req.body.otp);
-    if (!otpVerification || otpVerification.status !== "approved")
+    if (!otpVerification || otpVerification.status !== "approved") {
+      res.clearCookie("phone");
       return sendResponse(
         res,
         400,
         "OTP verification failed. Please try again.",
         false
       );
+    }
 
     const {
       found: userFound,
       value: user,
       errorMessage: userNotFound,
-    } = await getUser({ phone: req.cookies.phone });
+    } = await getUser({ phone: parseInt(req.cookies.phone) });
+
     if (!userFound) return sendResponse(res, 404, userNotFound, false);
 
     const { modifiedCount } = await updateUser(
       { _id: user._id },
-      { $set: { "accountStatus.lastLogin": new Date() } }
+      {
+        $set: {
+          "accountStatus.lastLogin": new Date(),
+          "accountStatus.isActive": true,
+        },
+      }
     );
 
     if (!modifiedCount)
       return sendResponse(res, 500, "Failed to login.", false);
 
     setCookie(res, "accessToken", generateAccessToken({ userId: user._id }));
-    res.clearCookie("phone");
-
     return sendResponse(res, 200, "Login Successful.", true);
   } catch (error) {
     console.error(`An error occurred. Please Try Again Later. ${error}`);
