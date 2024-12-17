@@ -20,6 +20,7 @@ router.get("/purchase-guide", userController.getUserPurchaseGuide);
 router.use(authenticateToken);
 router.get("/profile", userController.getUserProfile);
 router.get("/readlist", userController.getUserReadlist);
+router.post("/readlist", userController.postUserReadlist);
 router.get("/cart", userController.getUserCart);
 
 export default router;
