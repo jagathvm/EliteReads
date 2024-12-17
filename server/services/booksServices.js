@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import { getBooksCollection } from "../config/db.js";
 import {
   getAggregatedDocuments,
@@ -305,6 +306,8 @@ const fetchBookData = async (field, value) => {
   }
 };
 
+const fetchBookDataById = async (id) =>
+  await fetchBookData("_id", new ObjectId(id));
 const fetchBookDataBySlug = async (bookSlug) =>
   await fetchBookData("bookSlug", bookSlug);
 const fetchBookDataByTitle = async (title) =>
@@ -340,6 +343,7 @@ const fetchUniqueValuesFromBooksData = (field, booksData) => {
 
 // Export functions
 export {
+  fetchBookDataById,
   fetchBookDataBySlug,
   fetchBookDataByTitle,
   fetchBookDataByIsbn,
