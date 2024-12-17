@@ -1,10 +1,12 @@
 // ------------------ IMPORTS ------------------
 import {
+  fetchBookDataById,
   fetchBookDataBySlug,
   fetchBooksCount,
   fetchBooksData,
   fetchBooksDataByFiltersAndSort,
   fetchUniqueValuesFromBooksData,
+  getBook,
   sanitizeQuery,
 } from "../services/booksServices.js";
 import {
@@ -14,6 +16,8 @@ import {
 } from "../services/categoriesServices.js";
 import { fetchUserDataFromReq } from "../services/userServices.js";
 import { sendResponse, renderResponse } from "../helpers/responseHelper.js";
+import { getReadlistCollection } from "../config/db.js";
+import { ObjectId } from "mongodb";
 
 // ------------------ HOME & STATIC PAGES ------------------
 
@@ -214,7 +218,7 @@ export const getUserBook = async (req, res) => {
 
   try {
     const user = await fetchUserDataFromReq(req);
-    const book = await fetchBookDataBySlug(bookSlug);
+    const [book] = await fetchBookDataBySlug(bookSlug);
     const books = await fetchBooksData();
     const categories = await fetchCategoriesData();
 
@@ -276,6 +280,62 @@ export const getUserReadlist = async (req, res) => {
       `Internal Server Error. ${error.message}`,
       false
     );
+  }
+};
+
+// Post Readlist
+export const postUserReadlist = async (req, res) => {
+  const { bookId } = req.body;
+  const { userId } = req.user;
+
+  try {
+    const [{ title }] = await fetchBookDataById(bookId);
+
+    const readlistCollection = await getReadlistCollection();
+    const readList = await readlistCollection.findOne({ userId });
+
+    if (!readList) {
+      const readListObject = {
+        userId,
+        books: [bookId],
+      };
+      await readlistCollection.insertOne(readListObject);
+      return sendResponse(
+        res,
+        200,
+        `"${title}" added to readlist.`,
+        true,
+        true
+      );
+    }
+
+    const bookExistsInReadlist = readList.books.includes(bookId);
+    if (bookExistsInReadlist) {
+      await readlistCollection.updateOne(
+        { userId },
+        { $pull: { books: bookId } }
+      );
+
+      return sendResponse(
+        res,
+        400,
+        `"${title}" removed from readlist.`,
+        false,
+        false
+      );
+    }
+
+    await readlistCollection.updateOne(
+      { userId },
+      { $push: { books: bookId } }
+    );
+    return sendResponse(res, 200, `"${title}" added to readlist.`, true, true);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong. Please try again.",
+    });
   }
 };
 
