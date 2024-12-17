@@ -1,6 +1,9 @@
-const errorMessage = "An Unexpected Error Occurred. Please try again later.";
-
-const showToast = (message, isSuccess = true, pos = "right", grav = "top") => {
+export const showToast = (
+  message,
+  isSuccess = true,
+  pos = "right",
+  grav = "top"
+) => {
   Toastify({
     text: message,
     duration: 3000,
@@ -12,5 +15,3 @@ const showToast = (message, isSuccess = true, pos = "right", grav = "top") => {
     },
   }).showToast();
 };
-
-export { showToast, errorMessage };
