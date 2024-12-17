@@ -24,8 +24,10 @@ const getCollection = async (collectionName) => {
   return db.collection(collectionName);
 };
 
-const getBooksCollection = async () => await getCollection("books");
-const getCategoriesCollection = async () => await getCollection("categories");
-const getUserCollection = async () => await getCollection("user");
-
-export { getBooksCollection, getCategoriesCollection, getUserCollection };
+export const getBooksCollection = async () => await getCollection("books");
+export const getCategoriesCollection = async () =>
+  await getCollection("categories");
+export const getUserCollection = async () => await getCollection("user");
+export const getReadlistCollection = async () =>
+  await getCollection("readlist");
+export const getCartCollection = async () => await getCollection("cart");
