@@ -15,7 +15,9 @@
             <div class="totall-product">
               <p>
                 We found
-                <strong class="text-brand"><%= books ? books.length : 0 %></strong>
+                <strong class="text-brand">
+                  <%= books ? books.length : 0 %>
+                </strong>
                 items for you!
               </p>
             </div>
@@ -61,74 +63,86 @@
           </div>
           <div class="row product-grid-3">
             <% if (books) { %>
-            <% books.forEach(book => { %>
-            <div class="col-lg-4 col-md-4 col-12 col-sm-6">
-              <div class="product-cart-wrap mb-30">
-                <div class="product-img-action-wrap">
-                  <div class="product-img product-img-zoom">
-                    <a href="/book-details/<%= book.bookSlug %>">
-                      <img class="default-img lazyload" src="<%= book.coverImageUrls && book.coverImageUrls[0] %>" alt="<%= book.title %>" />
-                      <img class="hover-img lazyload" src="<%= book.coverImageUrls[1] ? book.coverImageUrls[1] : book.coverImageUrls[0] %>" alt="<%= book.title %>" />
-                    </a>
-                  </div>
-                  <div class="product-badges product-badges-position product-badges-mrg">
-                    <% if (book.featured) { %>
-                    <span class="hot">Featured</span>
-                    <% } %>
+              <% books.forEach(book=> { %>
+                <div class="col-lg-4 col-md-4 col-12 col-sm-6">
+                  <div class="product-cart-wrap mb-30">
+                    <div class="product-img-action-wrap">
+                      <div class="product-img product-img-zoom">
+                        <a href="/book-details/<%= book.bookSlug %>">
+                          <img class="default-img lazyload" src="<%= book.coverImageUrls && book.coverImageUrls[0] %>"
+                            alt="<%= book.title %>" />
+                          <img class="hover-img lazyload"
+                            src="<%= book.coverImageUrls[1] ? book.coverImageUrls[1] : book.coverImageUrls[0] %>"
+                            alt="<%= book.title %>" />
+                        </a>
+                      </div>
+                      <div class="product-badges product-badges-position product-badges-mrg">
+                        <% if (book.featured) { %>
+                          <span class="hot">Featured</span>
+                          <% } %>
+                      </div>
+                    </div>
+                    <div class="product-content-wrap">
+                      <div class="product-author">
+                        <a>
+                          <%= book.author %>
+                        </a>
+                      </div>
+                      <h2>
+                        <a href="/book-details/<%= book.bookSlug %>">
+                          <%= book.title %>
+                        </a>
+                      </h2>
+                      <div class="product-price">
+                        <span>₹ <%= book.price %> </span>
+                        <!-- <span class="old-price">₹ </span> -->
+                      </div>
+                      <div class="product-action-1 show">
+                        <a aria-label="Add To Readlist" class="action-btn hover-up readlistAction"
+                          data-book-id="<%= book._id %>"><i class="bi bi-heart"></i></i></a>
+                        <!-- <a aria-label="Add To Cart" id="addToCart" class="action-btn hover-up" href=""
+                          data-book-id="<%= book._id %>"><i class="fi-rs-shopping-bag-add"></i></a> -->
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div class="product-content-wrap">
-                  <div class="product-author">
-                    <a><%= book.author %></a>
-                  </div>
-                  <h2>
-                    <a href="/book-details/<%= book.bookSlug %>"><%= book.title %></a>
-                  </h2>
-                  <div class="product-price">
-                    <span>₹ <%= book.price %> </span>
-                    <!-- <span class="old-price">₹ </span> -->
-                  </div>
-                  <div class="product-action-1 show">
-                    <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
-                    <a aria-label="Add To Cart" class="action-btn hover-up" href="shop-cart.html"><i class="fi-rs-shopping-bag-add"></i></a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <% }) %>
-            <% } %>
+                <% }) %>
+                  <% } %>
           </div>
           <!--pagination-->
           <div class="pagination-area mt-15 mb-sm-5 mb-lg-0">
             <nav aria-label="Page navigation example">
               <ul class="pagination justify-content-start">
-                <% const queryString = new URLSearchParams(req.query); %>
-                <% if (currentPage > 1) { %>
-                <% queryString.set('page', currentPage - 1); %>
-                <li class="page-item">
-                  <a class="page-link" href="?<%= queryString.toString() %>">
-                    <i class="fi-rs-angle-double-small-left"></i>
-                  </a>
-                </li>
-                <% } %>
+                <% const queryString=new URLSearchParams(req.query); %>
+                  <% if (currentPage> 1) { %>
+                    <% queryString.set('page', currentPage - 1); %>
+                      <li class="page-item">
+                        <a class="page-link" href="?<%= queryString.toString() %>">
+                          <i class="fi-rs-angle-double-small-left"></i>
+                        </a>
+                      </li>
+                      <% } %>
 
-                <% for( let i = 1; i <= totalPages; i++ ) { %>
-                <% queryString.set('page', i); %>
-                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                  <a class="page-link" href="?<%= queryString.toString() %>"><%= i %></a>
-                </li>
-                <% } %>
+                        <% for( let i=1; i <=totalPages; i++ ) { %>
+                          <% queryString.set('page', i); %>
+                            <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                              <a class="page-link" href="?<%= queryString.toString() %>">
+                                <%= i %>
+                              </a>
+                            </li>
+                            <% } %>
 
-                <!-- <li class="page-item">
+                              <!-- <li class="page-item">
                   <a class="page-link dot" href="#">...</a>
                 </li> -->
 
-                <% if (currentPage < totalPages) { %>
-                <%= queryString.set('page', currentPage + 1) %>
-                <li class="page-item">
-                  <a class="page-link" href="?<%= queryString.toString() %>"><i class="fi-rs-angle-double-small-right"></i></a>
-                </li>
-                <% } %>
+                              <% if (currentPage < totalPages) { %>
+                                <%= queryString.set('page', currentPage + 1) %>
+                                  <li class="page-item">
+                                    <a class="page-link" href="?<%= queryString.toString() %>"><i
+                                        class="fi-rs-angle-double-small-right"></i></a>
+                                  </li>
+                                  <% } %>
               </ul>
             </nav>
           </div>
@@ -152,53 +166,66 @@
             <div class="sidebar-widget filter-options mb-30">
               <div class="widget-header position-relative mb-20 pb-10 d-flex justify-content-between align-items-end">
                 <h5 class="widget-title d-inline">Filter Books</h5>
-                <button id="clear-filters" class="btn-clear-filters" style="border: none; background-color: transparent; color: #046963">CLEAR ALL</button>
+                <button id="clear-filters" class="btn-clear-filters"
+                  style="border: none; background-color: transparent; color: #046963">CLEAR ALL</button>
               </div>
 
               <!-- Filter by Categories -->
               <div class="category-filter mb-20 border-bottom">
                 <!-- Parent Category Dropdown -->
-                <div class="d-flex justify-content-between" data-bs-toggle="collapse" data-bs-target="#category-checkbox-group" aria-expanded="false" aria-controls="category-checkbox-group" style="cursor: pointer;">
+                <div class="d-flex justify-content-between" data-bs-toggle="collapse"
+                  data-bs-target="#category-checkbox-group" aria-expanded="false"
+                  aria-controls="category-checkbox-group" style="cursor: pointer;">
                   <label class="form-label" for="category-filter">Category</label>
                   <i class="bi bi-chevron-down"></i>
                 </div>
 
                 <div id="category-checkbox-group" class="collapse">
-                  <% categories.forEach(category => { %>
-                  <!-- Single Category -->
-                  <div class="mb-10">
-                    <!-- Category Header -->
-                    <div class="d-flex justify-content-between" data-bs-toggle="collapse" data-bs-target="#subcategory-group-<%= category._id %>" aria-expanded="false" aria-controls="subcategory-group-<%= category._id %>" style="cursor: pointer;">
-                      <!-- Category Checkbox -->
-                      <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="category-<%= category._id %>" value="<%= category.slug %>" name="category">
-                        <label class="form-check-label" for="category-<%= category._id %>"><%= category.name %></label>
+                  <% categories.forEach(category=> { %>
+                    <!-- Single Category -->
+                    <div class="mb-10">
+                      <!-- Category Header -->
+                      <div class="d-flex justify-content-between" data-bs-toggle="collapse"
+                        data-bs-target="#subcategory-group-<%= category._id %>" aria-expanded="false"
+                        aria-controls="subcategory-group-<%= category._id %>" style="cursor: pointer;">
+                        <!-- Category Checkbox -->
+                        <div class="form-check">
+                          <input type="checkbox" class="form-check-input" id="category-<%= category._id %>"
+                            value="<%= category.slug %>" name="category">
+                          <label class="form-check-label" for="category-<%= category._id %>">
+                            <%= category.name %>
+                          </label>
+                        </div>
+                        <!-- Subcategory Arrow -->
+                        <% if (category?.subCategories?.length> 0) { %>
+                          <i class="bi bi-chevron-down"></i>
+                          <% } %>
                       </div>
-                      <!-- Subcategory Arrow -->
-                      <% if (category?.subCategories?.length > 0) { %>
-                      <i class="bi bi-chevron-down"></i>
-                      <% } %>
-                    </div>
 
-                    <!-- Subcategories -->
-                    <% if (category?.subCategories?.length > 0) { %>
-                    <div id="subcategory-group-<%= category._id %>" class="collapse ms-3">
-                      <% category.subCategories.forEach(subCategory => { %>
-                      <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="subCategory-<%= subCategory._id %>" value="<%= subCategory.slug %>" name="subcategory">
-                        <label class="form-check-label" for="subCategory-<%= subCategory._id %>"><%= subCategory.name %></label>
-                      </div>
-                      <% }) %>
+                      <!-- Subcategories -->
+                      <% if (category?.subCategories?.length> 0) { %>
+                        <div id="subcategory-group-<%= category._id %>" class="collapse ms-3">
+                          <% category.subCategories.forEach(subCategory=> { %>
+                            <div class="form-check">
+                              <input type="checkbox" class="form-check-input" id="subCategory-<%= subCategory._id %>"
+                                value="<%= subCategory.slug %>" name="subcategory">
+                              <label class="form-check-label" for="subCategory-<%= subCategory._id %>">
+                                <%= subCategory.name %>
+                              </label>
+                            </div>
+                            <% }) %>
+                        </div>
+                        <% } %>
                     </div>
-                    <% } %>
-                  </div>
-                  <% }) %>
+                    <% }) %>
                 </div>
               </div>
 
               <!-- Filter by Price -->
               <div class="price-filter mb-20 border-bottom">
-                <div class="d-flex justify-content-between" data-bs-toggle="collapse" data-bs-target="#price-checkbox-group" aria-expanded="false" aria-controls="price-checkbox-group" style="cursor: pointer;">
+                <div class="d-flex justify-content-between" data-bs-toggle="collapse"
+                  data-bs-target="#price-checkbox-group" aria-expanded="false" aria-controls="price-checkbox-group"
+                  style="cursor: pointer;">
                   <label class="form-label" for="price-filter">
                     Price
                   </label>
@@ -230,55 +257,70 @@
 
               <!-- Filter by Language -->
               <div class="language-filter mb-20 border-bottom">
-                <div class="d-flex justify-content-between" data-bs-toggle="collapse" data-bs-target="#language-checkbox-group" aria-expanded="false" aria-controls="language-checkbox-group" style="cursor: pointer;">
+                <div class="d-flex justify-content-between" data-bs-toggle="collapse"
+                  data-bs-target="#language-checkbox-group" aria-expanded="false"
+                  aria-controls="language-checkbox-group" style="cursor: pointer;">
                   <label class="form-label" for="language-filter">
                     Language
                   </label>
                   <i class="bi bi-chevron-down"></i>
                 </div>
                 <div id="language-checkbox-group" class="collapse">
-                  <% languages.forEach(language => { %>
-                  <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="<%= language %>" value="<%= language %>" name="language">
-                    <label class="form-check-label" for="<%= language %>"><%= language %></label>
-                  </div>
-                  <% }) %>
+                  <% languages.forEach(language=> { %>
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" id="<%= language %>" value="<%= language %>"
+                        name="language">
+                      <label class="form-check-label" for="<%= language %>">
+                        <%= language %>
+                      </label>
+                    </div>
+                    <% }) %>
                 </div>
               </div>
 
               <!-- Filter by Authors -->
               <div class="authors-filter mb-20 border-bottom">
-                <div class="d-flex justify-content-between" data-bs-toggle="collapse" data-bs-target="#author-checkbox-group" aria-expanded="false" aria-controls="author-checkbox-group" style="cursor: pointer;">
+                <div class="d-flex justify-content-between" data-bs-toggle="collapse"
+                  data-bs-target="#author-checkbox-group" aria-expanded="false" aria-controls="author-checkbox-group"
+                  style="cursor: pointer;">
                   <label class="form-label" for="author-filter">
                     Authors
                   </label>
                   <i class="bi bi-chevron-down"></i>
                 </div>
                 <div id="author-checkbox-group" class="collapse">
-                  <% authors.forEach(author => { %>
-                  <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="<%= author %>" value="<%= author %>" name="authors">
-                    <label class="form-check-label" for="<%= author %>"><%= author %></label>
-                  </div>
-                  <% }) %>
+                  <% authors.forEach(author=> { %>
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" id="<%= author %>" value="<%= author %>"
+                        name="authors">
+                      <label class="form-check-label" for="<%= author %>">
+                        <%= author %>
+                      </label>
+                    </div>
+                    <% }) %>
                 </div>
               </div>
 
               <!-- Filter by Publishers -->
               <div class="publishers-filter mb-20 border-bottom">
-                <div class="d-flex justify-content-between" data-bs-toggle="collapse" data-bs-target="#publisher-checkbox-group" aria-expanded="false" aria-controls="publisher-checkbox-group" style="cursor: pointer;">
+                <div class="d-flex justify-content-between" data-bs-toggle="collapse"
+                  data-bs-target="#publisher-checkbox-group" aria-expanded="false"
+                  aria-controls="publisher-checkbox-group" style="cursor: pointer;">
                   <label class="form-label" for="publisher-filter">
                     Publishers
                   </label>
                   <i class="bi bi-chevron-down"></i>
                 </div>
                 <div id="publisher-checkbox-group" class="collapse">
-                  <% publishers.forEach(publisher => { %>
-                  <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="<%= publisher %>" value="<%= publisher %>" name="publisher">
-                    <label class="form-check-label" for="<%= publisher %>"><%= publisher %></label>
-                  </div>
-                  <% }) %>
+                  <% publishers.forEach(publisher=> { %>
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" id="<%= publisher %>" value="<%= publisher %>"
+                        name="publisher">
+                      <label class="form-check-label" for="<%= publisher %>">
+                        <%= publisher %>
+                      </label>
+                    </div>
+                    <% }) %>
                 </div>
               </div>
 
