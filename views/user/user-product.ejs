@@ -3,11 +3,15 @@
     <div class="container">
       <div class="breadcrumb">
         <a href="/" rel="nofollow">Home</a>
-        <span></span> <%= book.category.name %>
-        <% if (book.subcategory) { %>
-        <span></span> <%= book.subcategory.name %>
-        <% } %>
-        <span></span> <strong> <%= book.title %> </strong>
+        <span></span>
+        <%= book.category.name %>
+          <% if (book.subcategory) { %>
+            <span></span>
+            <%= book.subcategory.name %>
+              <% } %>
+                <span></span> <strong>
+                  <%= book.title %>
+                </strong>
       </div>
     </div>
   </div>
@@ -22,41 +26,52 @@
                   <!-- MAIN SLIDES -->
                   <span class="zoom-icon"><i class="fi-rs-search"></i></span>
                   <div class="product-image-slider" style="height: auto; width: 250px; overflow: hidden;">
-                    <% book.coverImageUrls.forEach(url => { %>
-                    <figure class="border-radius-10" style="height: auto; width: 200px;">
-                      <img src="<%= url %>" alt="product image">
-                    </figure>
-                    <% }) %>
+                    <% book.coverImageUrls.forEach(url=> { %>
+                      <figure class="border-radius-10" style="height: auto; width: 200px;">
+                        <img src="<%= url %>" alt="product image">
+                      </figure>
+                      <% }) %>
                   </div>
                   <!-- THUMBNAILS -->
                   <div class="slider-nav-thumbnails pl-15 pr-15" style="width: 250px;">
-                    <% book.coverImageUrls.forEach(url => { %>
-                    <div>
-                      <img src="<%= url %>" alt="product image">
-                    </div>
-                    <% }) %>
+                    <% book.coverImageUrls.forEach(url=> { %>
+                      <div>
+                        <img src="<%= url %>" alt="product image">
+                      </div>
+                      <% }) %>
                   </div>
                 </div>
                 <!-- End Gallery -->
-                <div class="social-icons single-share">
+                <!-- <div class="social-icons single-share">
                   <ul class="text-grey-5 d-inline-block">
                     <li><strong class="mr-10">Share this:</strong></li>
-                    <li class="social-facebook"><a href="#"><img src="/user/imgs/theme/icons/icon-facebook.svg" alt=""></a></li>
-                    <li class="social-twitter"> <a href="#"><img src="/user/imgs/theme/icons/icon-twitter.svg" alt=""></a></li>
-                    <li class="social-instagram"><a href="#"><img src="/user/imgs/theme/icons/icon-instagram.svg" alt=""></a></li>
-                    <li class="social-linkedin"><a href="#"><img src="/user/imgs/theme/icons/icon-pinterest.svg" alt=""></a></li>
+                    <li class="social-facebook"><a href="#"><img src="/user/imgs/theme/icons/icon-facebook.svg"
+                          alt=""></a></li>
+                    <li class="social-twitter"> <a href="#"><img src="/user/imgs/theme/icons/icon-twitter.svg"
+                          alt=""></a></li>
+                    <li class="social-instagram"><a href="#"><img src="/user/imgs/theme/icons/icon-instagram.svg"
+                          alt=""></a></li>
+                    <li class="social-linkedin"><a href="#"><img src="/user/imgs/theme/icons/icon-pinterest.svg"
+                          alt=""></a></li>
                   </ul>
-                </div>
+                </div> -->
               </div>
               <div class="col-md-8 col-sm-12 col-xs-12">
                 <div class="detail-info">
-                  <h2 class="title-detail"><%= book.title %></h2>
+                  <h2 class="title-detail">
+                    <%= book.title %>
+                  </h2>
                   <div class="pro-details-brand mt-2">
-                    <span><a href="shop-grid-right.html" class="h5"><%= book.author %></a></span>
+                    <span><a href="shop-grid-right.html" class="h5">
+                        <%= book.author %>
+                      </a></span>
                   </div>
                   <div class="border p-2 rounded-md-lg border-neutral-500 d-inline-block mt-2">
                     <div>
-                      <p class=" uppercase tracking-wider text-neutral-600 font-semibold text-sm tracking-normal font-manrope"><%= book.language %></p>
+                      <p
+                        class=" uppercase tracking-wider text-neutral-600 font-semibold text-sm tracking-normal font-manrope">
+                        <%= book.language %>
+                      </p>
                     </div>
                   </div>
                   <div class="clearfix product-price-cover">
@@ -88,18 +103,31 @@
                       <a href="#" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
                     </div>
                     <div class="product-extra-link2">
-                      <button type="submit" class="button button-add-to-cart">Add to cart</button>
-                      <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
+                      <button type="<%=book.quantity===0 ? 'button' : 'submit'
+                        %>" class="button button-add-to-cart" <%=book.quantity===0 ? 'disabled' : '' %>>Add to
+                        cart</button>
+                      <a aria-label="Add To Readlist" class="action-btn hover-up readlistAction"
+                        data-book-id="<%= book._id %>"><i
+                          class="bi <%= readlist?.books.includes((book._id).toString()) ? 'bi-heart-fill' : 'bi-heart'  %> "></i></a>
                     </div>
                     <div>
-                      <a>Availability:<span class="in-stock text-success ml-5">8 Items In Stock</span></a>
+                      <a>Availability: <span
+                          class="in-stock <%= book.quantity !== 0 ? 'text-success' : 'text-danger' %> ml-5">
+                          <%= book.quantity !==0 ? book.quantity + ' Items In Stock' : 'Out of Stock' %>
+                        </span></a>
                     </div>
                   </div>
                   <ul class="product-meta font-xs color-grey mt-10">
                     <h2 class="xl:text-2xl section_header mb-2">Details</h2>
-                    <li class="mb-5"><span class="h6 text-dark">Publisher: </span><a href="#" class="h6"><%= book.publisher %></a></li>
-                    <li class="mb-5"><span class="h6 text-dark">Year: </span><a href="#" class="h6"><%= book.year %></a></li>
-                    <li class="mb-5"><span class="h6 text-dark">ISBN 13: </span><a href="#" class="h6"><%= book.isbn %></a></li>
+                    <li class="mb-5"><span class="h6 text-dark">Publisher: </span><a href="#" class="h6">
+                        <%= book.publisher %>
+                      </a></li>
+                    <li class="mb-5"><span class="h6 text-dark">Year: </span><a href="#" class="h6">
+                        <%= book.year %>
+                      </a></li>
+                    <li class="mb-5"><span class="h6 text-dark">ISBN 13: </span><a href="#" class="h6">
+                        <%= book.isbn %>
+                      </a></li>
                   </ul>
                 </div>
                 <!-- Detail Info -->
@@ -108,7 +136,8 @@
             <div class="tab-style3">
               <ul class="nav nav-tabs text-uppercase">
                 <li class="nav-item">
-                  <a class="nav-link active" id="Description-tab" data-bs-toggle="tab" href="#Description">Description</a>
+                  <a class="nav-link active" id="Description-tab" data-bs-toggle="tab"
+                    href="#Description">Description</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" id="Reviews-tab" data-bs-toggle="tab" href="#Reviews">Reviews (3)</a>
@@ -145,7 +174,8 @@
                                 <div class="d-flex justify-content-between">
                                   <div class="d-flex align-items-center">
                                     <p class="font-xs mr-30">December 4, 2020 at 3:12 pm </p>
-                                    <a href="#" class="text-brand btn-reply">Reply <i class="fi-rs-arrow-right"></i> </a>
+                                    <a href="#" class="text-brand btn-reply">Reply <i class="fi-rs-arrow-right"></i>
+                                    </a>
                                   </div>
                                 </div>
                               </div>
@@ -164,23 +194,28 @@
                         </div>
                         <div class="progress">
                           <span>5 star</span>
-                          <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">50%</div>
+                          <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50"
+                            aria-valuemin="0" aria-valuemax="100">50%</div>
                         </div>
                         <div class="progress">
                           <span>4 star</span>
-                          <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+                          <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25"
+                            aria-valuemin="0" aria-valuemax="100">25%</div>
                         </div>
                         <div class="progress">
                           <span>3 star</span>
-                          <div class="progress-bar" role="progressbar" style="width: 45%;" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100">45%</div>
+                          <div class="progress-bar" role="progressbar" style="width: 45%;" aria-valuenow="45"
+                            aria-valuemin="0" aria-valuemax="100">45%</div>
                         </div>
                         <div class="progress">
                           <span>2 star</span>
-                          <div class="progress-bar" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100">65%</div>
+                          <div class="progress-bar" role="progressbar" style="width: 65%;" aria-valuenow="65"
+                            aria-valuemin="0" aria-valuemax="100">65%</div>
                         </div>
                         <div class="progress mb-30">
                           <span>1 star</span>
-                          <div class="progress-bar" role="progressbar" style="width: 85%;" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100">85%</div>
+                          <div class="progress-bar" role="progressbar" style="width: 85%;" aria-valuenow="85"
+                            aria-valuemin="0" aria-valuemax="100">85%</div>
                         </div>
                         <a href="#" class="font-xs text-muted">How are ratings calculated?</a>
                       </div>
@@ -197,7 +232,8 @@
                           <div class="row">
                             <div class="col-12">
                               <div class="form-group">
-                                <textarea class="form-control w-100" name="comment" id="comment" cols="30" rows="9" placeholder="Write Comment"></textarea>
+                                <textarea class="form-control w-100" name="comment" id="comment" cols="30" rows="9"
+                                  placeholder="Write Comment"></textarea>
                               </div>
                             </div>
                             <div class="col-sm-6">
@@ -212,7 +248,8 @@
                             </div>
                             <div class="col-12">
                               <div class="form-group">
-                                <input class="form-control" name="website" id="website" type="text" placeholder="Website">
+                                <input class="form-control" name="website" id="website" type="text"
+                                  placeholder="Website">
                               </div>
                             </div>
                           </div>
@@ -233,38 +270,42 @@
               </div>
               <div class="col-12">
                 <div class="row related-products">
-                  <% books.forEach((book, index) => { %>
-                  <% if (index < 4) { %>
-                  <div class="col-lg-3 col-md-4 col-12 col-sm-6">
-                    <div class="product-cart-wrap small hover-up">
-                      <div class="product-img-action-wrap">
-                        <div class="product-img product-img-zoom">
-                          <a href="/book-details/<%= book.bookSlug %>" tabindex="0">
-                            <img class="default-img" src="<%= book.coverImageUrls[0] %>" alt="">
-                            <img class="hover-img" src="<%= book.coverImageUrls[1] ? book.coverImageUrls[1] : book.coverImageUrls[0] %>" alt="">
-                          </a>
+                  <% books.forEach((book, index)=> { %>
+                    <% if (index < 4) { %>
+                      <div class="col-lg-3 col-md-4 col-12 col-sm-6">
+                        <div class="product-cart-wrap small hover-up">
+                          <div class="product-img-action-wrap">
+                            <div class="product-img product-img-zoom">
+                              <a href="/book-details/<%= book.bookSlug %>" tabindex="0">
+                                <img class="default-img" src="<%= book.coverImageUrls[0] %>" alt="">
+                                <img class="hover-img"
+                                  src="<%= book.coverImageUrls[1] ? book.coverImageUrls[1] : book.coverImageUrls[0] %>"
+                                  alt="">
+                              </a>
+                            </div>
+                            <% if (book.featured) { %>
+                              <div class="product-badges product-badges-position product-badges-mrg">
+                                <span class="hot">Featured</span>
+                              </div>
+                              <% } %>
+                          </div>
+                          <div class="product-content-wrap">
+                            <h2><a href="/book-details/<%= book.bookSlug %>" tabindex="0">
+                                <%= book.title %>
+                              </a></h2>
+                            <div class="rating-result" title="90%">
+                              <span>
+                              </span>
+                            </div>
+                            <div class="product-price">
+                              <span>₹ <%= book.price %> </span>
+                              <span class="old-price">₹ <%= book.price %></span>
+                            </div>
+                          </div>
                         </div>
-                        <% if (book.featured) { %>
-                        <div class="product-badges product-badges-position product-badges-mrg">
-                          <span class="hot">Featured</span>
-                        </div>
-                        <% } %>
                       </div>
-                      <div class="product-content-wrap">
-                        <h2><a href="/book-details/<%= book.bookSlug %>" tabindex="0"><%= book.title %></a></h2>
-                        <div class="rating-result" title="90%">
-                          <span>
-                          </span>
-                        </div>
-                        <div class="product-price">
-                          <span>₹ <%= book.price %> </span>
-                          <span class="old-price">₹ <%= book.price %></span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <% } %>
-                  <% }) %>
+                      <% } %>
+                        <% }) %>
                 </div>
               </div>
             </div>
@@ -274,9 +315,11 @@
           <div class="widget-category mb-30">
             <h5 class="section-title style-1 mb-30 wow fadeIn animated">Categories</h5>
             <ul class="categories">
-              <% categories.forEach((category) => { %>
-              <li><a href="/book-store?category=<%= category.slug %>"><%= category.name %></a></li>
-              <% }) %>
+              <% categories.forEach((category)=> { %>
+                <li><a href="/book-store?category=<%= category.slug %>">
+                    <%= category.name %>
+                  </a></li>
+                <% }) %>
             </ul>
           </div>
           <!-- Product sidebar Widget -->
@@ -285,26 +328,33 @@
               <h5 class="widget-title mb-10">New Books</h5>
               <div class="bt-1 border-color-1"></div>
             </div>
-            <% books.forEach((book, index) => { %>
-            <% if (index < 3) { %>
-            <div class="single-post clearfix">
-              <div class="image">
-                <img src="<%= book.coverImageUrls[0] %>" alt="<%= book.title %>">
-              </div>
-              <div class="content pt-10">
-                <h5><a href="/book-details/<%= book.bookSlug %>"><%= book.title %></a></h5>
-                <p class="author mb-0 mt-5 text-dark"><%= book.author %></p>
-                <p class="price mb-0 mt-5">₹ <%= book.price %></p>
-                <!-- <div class="product-rate">
+            <% books.forEach((book, index)=> { %>
+              <% if (index < 3) { %>
+                <div class="single-post clearfix">
+                  <div class="image">
+                    <img src="<%= book.coverImageUrls[0] %>" alt="<%= book.title %>">
+                  </div>
+                  <div class="content pt-10">
+                    <h5><a href="/book-details/<%= book.bookSlug %>">
+                        <%= book.title %>
+                      </a></h5>
+                    <p class="author mb-0 mt-5 text-dark">
+                      <%= book.author %>
+                    </p>
+                    <p class="price mb-0 mt-5">₹ <%= book.price %>
+                    </p>
+                    <!-- <div class="product-rate">
                   <div class="product-rating" style="width:90%"></div>
                 </div> -->
-              </div>
-            </div>
-            <% } %>
-            <% }) %>
+                  </div>
+                </div>
+                <% } %>
+                  <% }) %>
           </div>
         </div>
       </div>
     </div>
   </section>
 </main>
+
+<script type="module" src="/user/js/utils/user-product.js"></script>
