@@ -5,8 +5,8 @@ import {
   fetchBooksCount,
   fetchBooksData,
   fetchBooksDataByFiltersAndSort,
+  fetchBooksDataFromReadlist,
   fetchUniqueValuesFromBooksData,
-  getBook,
   sanitizeQuery,
 } from "../services/booksServices.js";
 import {
@@ -16,23 +16,32 @@ import {
 } from "../services/categoriesServices.js";
 import { fetchUserDataFromReq } from "../services/userServices.js";
 import { sendResponse, renderResponse } from "../helpers/responseHelper.js";
-import { getReadlistCollection } from "../config/db.js";
-import { ObjectId } from "mongodb";
+import {
+  addReadlistData,
+  getReadlistByUserId,
+  updateReadlistData,
+} from "../services/readlistServices.js";
 
 // ------------------ HOME & STATIC PAGES ------------------
 
 // Render User Home Page
 export const getUserHome = async (req, res) => {
+  const userId = req?.user?.userId;
+
   try {
     const user = await fetchUserDataFromReq(req);
     const books = await fetchBooksData();
     const categories = await fetchCategoriesData();
+
+    // Fetch user's readlist
+    const readlist = await getReadlistByUserId(userId);
 
     return renderResponse(res, 200, "user/user-home", {
       req,
       user,
       books,
       categories,
+      readlist,
       currentPath: req.path,
     });
   } catch (error) {
@@ -150,6 +159,8 @@ export const getUserPurchaseGuide = async (req, res) => {
 
 // Render Store Page
 export const getUserStore = async (req, res) => {
+  const userId = req?.user?.userId;
+
   try {
     // Sanitize the incoming query parameters
     const {
@@ -167,6 +178,9 @@ export const getUserStore = async (req, res) => {
 
     // Fetch all books data
     const booksData = await fetchBooksData();
+
+    // Fetch user's readlist
+    const readlist = await getReadlistByUserId(userId);
 
     // Fetch all filtered books data
     const books = await fetchBooksDataByFiltersAndSort(
@@ -195,6 +209,7 @@ export const getUserStore = async (req, res) => {
       authors,
       books,
       categories,
+      readlist,
       languages,
       publishers,
       currentPage,
@@ -214,6 +229,7 @@ export const getUserStore = async (req, res) => {
 
 // Render Single Book Page
 export const getUserBook = async (req, res) => {
+  const userId = req?.user?.userId;
   const { bookSlug } = req.params;
 
   try {
@@ -221,6 +237,8 @@ export const getUserBook = async (req, res) => {
     const [book] = await fetchBookDataBySlug(bookSlug);
     const books = await fetchBooksData();
     const categories = await fetchCategoriesData();
+    // Fetch user's readlist
+    const readlist = await getReadlistByUserId(userId);
 
     return renderResponse(res, 200, "user/user-product", {
       req,
@@ -228,6 +246,7 @@ export const getUserBook = async (req, res) => {
       book,
       books,
       categories,
+      readlist,
       currentPath: req.path,
     });
   } catch (error) {
@@ -263,13 +282,24 @@ export const getUserCart = async (req, res) => {
   }
 };
 
+// Post Cart
+export const postUserCart = async (req, res) => {};
+
 // Render Readlist Page
 export const getUserReadlist = async (req, res) => {
+  const userId = req?.user?.userId;
+
   try {
     const user = await fetchUserDataFromReq(req);
+
+    // Fetch user's readlist
+    const readlist = await getReadlistByUserId(userId);
+    const { value: books } = await fetchBooksDataFromReadlist(readlist);
+
     return renderResponse(res, 200, "user/user-readlist", {
       req,
       user,
+      books,
       currentPath: req.path,
     });
   } catch (error) {
@@ -290,16 +320,15 @@ export const postUserReadlist = async (req, res) => {
 
   try {
     const [{ title }] = await fetchBookDataById(bookId);
-
-    const readlistCollection = await getReadlistCollection();
-    const readList = await readlistCollection.findOne({ userId });
+    const readList = await getReadlistByUserId(userId);
 
     if (!readList) {
       const readListObject = {
         userId,
         books: [bookId],
       };
-      await readlistCollection.insertOne(readListObject);
+
+      await addReadlistData(readListObject);
       return sendResponse(
         res,
         200,
@@ -311,10 +340,7 @@ export const postUserReadlist = async (req, res) => {
 
     const bookExistsInReadlist = readList.books.includes(bookId);
     if (bookExistsInReadlist) {
-      await readlistCollection.updateOne(
-        { userId },
-        { $pull: { books: bookId } }
-      );
+      await updateReadlistData({ userId }, { $pull: { books: bookId } });
 
       return sendResponse(
         res,
@@ -325,10 +351,7 @@ export const postUserReadlist = async (req, res) => {
       );
     }
 
-    await readlistCollection.updateOne(
-      { userId },
-      { $push: { books: bookId } }
-    );
+    await updateReadlistData({ userId }, { $push: { books: bookId } });
     return sendResponse(res, 200, `"${title}" added to readlist.`, true, true);
   } catch (error) {
     console.error(error);
