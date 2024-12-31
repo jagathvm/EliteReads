@@ -307,7 +307,7 @@ export const fetchBookData = async (field, value) => {
 
   try {
     const { value: book } = await getAggregatedBooks(pipeline);
-    return book;
+    return book?.[0] || null;
   } catch (error) {
     console.error(`Error fetching book by ${field}: ${error}`);
     throw error;
