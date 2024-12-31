@@ -79,7 +79,7 @@ const sortOptions = {
 // Helper functions
 const parseCommaSeparatedValues = (value) => value.split(",").filter(Boolean);
 
-const sanitizeQuery = async (query) => {
+export const sanitizeQuery = async (query) => {
   const sanitizedQuery = {};
 
   sanitizedQuery.sort = query.sort ? sortOptions[query.sort] : { title: 1 };
@@ -145,7 +145,7 @@ const sanitizeQuery = async (query) => {
 };
 
 // Core CRUD Operations
-const addBook = async (book) => {
+export const addBook = async (book) => {
   try {
     const insertResult = await addDocument(book, getBooksCollection);
 
@@ -156,7 +156,7 @@ const addBook = async (book) => {
   }
 };
 
-const getBooks = async (query = {}) => {
+export const getBooks = async (query = {}) => {
   try {
     const books = await getDocuments(
       query,
@@ -171,7 +171,7 @@ const getBooks = async (query = {}) => {
   }
 };
 
-const getBook = async (query) => {
+export const getBook = async (query) => {
   try {
     const book = await getDocument(
       query,
@@ -186,7 +186,7 @@ const getBook = async (query) => {
   }
 };
 
-const updateBook = async (query, operation) => {
+export const updateBook = async (query, operation) => {
   try {
     const updateResult = await updateDocument(
       query,
@@ -201,7 +201,7 @@ const updateBook = async (query, operation) => {
   }
 };
 
-const removeBook = async (query) => {
+export const removeBook = async (query) => {
   try {
     const deleteResult = await removeDocument(query, getBooksCollection);
 
@@ -228,7 +228,20 @@ const getAggregatedBooks = async (pipeline) => {
   }
 };
 
-const fetchBooksData = async (categorySlug) => {
+export const fetchBooksDataFromReadlist = async (readlist) => {
+  try {
+    const booksIdStrings = readlist?.books;
+    const booksIds = booksIdStrings?.map((id) => new ObjectId(id));
+
+    const books = await getBooks({ _id: { $in: booksIds } });
+    return books;
+  } catch (error) {
+    console.error("Error fetching books from readlist", error);
+    throw error;
+  }
+};
+
+export const fetchBooksData = async (categorySlug) => {
   const pipeline = [...booksPipeline];
 
   try {
@@ -254,7 +267,7 @@ const fetchBooksData = async (categorySlug) => {
   }
 };
 
-const fetchBooksDataByFiltersAndSort = async (
+export const fetchBooksDataByFiltersAndSort = async (
   queryObject = null,
   sortObject = null,
   skipValue = null,
@@ -285,16 +298,11 @@ const fetchBooksDataByFiltersAndSort = async (
     return books;
   } catch (error) {
     console.error("Error in fetchBooksDataByFiltersAndSort: ", error.message);
-    console.debug("Query Object: ", queryObject);
-    console.debug("Sort Object: ", sortObject);
-    console.debug("Skip Value: ", skipValue);
-    console.debug("Limit: ", limit);
-
     throw error;
   }
 };
 
-const fetchBookData = async (field, value) => {
+export const fetchBookData = async (field, value) => {
   const pipeline = [{ $match: { [field]: value } }, ...bookPipeline];
 
   try {
@@ -306,16 +314,17 @@ const fetchBookData = async (field, value) => {
   }
 };
 
-const fetchBookDataById = async (id) =>
+export const fetchBookDataById = async (id) =>
   await fetchBookData("_id", new ObjectId(id));
-const fetchBookDataBySlug = async (bookSlug) =>
+export const fetchBookDataBySlug = async (bookSlug) =>
   await fetchBookData("bookSlug", bookSlug);
-const fetchBookDataByTitle = async (title) =>
+export const fetchBookDataByTitle = async (title) =>
   await fetchBookData("title", title);
-const fetchBookDataByIsbn = async (isbn) => await fetchBookData("isbn", isbn);
+export const fetchBookDataByIsbn = async (isbn) =>
+  await fetchBookData("isbn", isbn);
 
 // Additional functionalities
-const fetchBooksCount = async (queryObject = {}) => {
+export const fetchBooksCount = async (queryObject = {}) => {
   try {
     const booksCount = await getDocumentsCount(queryObject, getBooksCollection);
 
@@ -329,7 +338,7 @@ const fetchBooksCount = async (queryObject = {}) => {
   }
 };
 
-const fetchUniqueValuesFromBooksData = (field, booksData) => {
+export const fetchUniqueValuesFromBooksData = (field, booksData) => {
   try {
     const uniqueValues = [
       ...new Set(booksData.map((book) => book[field]).filter(Boolean)),
@@ -339,23 +348,4 @@ const fetchUniqueValuesFromBooksData = (field, booksData) => {
     console.error(`Error fetching books unique values: ${error}`);
     throw error;
   }
-};
-
-// Export functions
-export {
-  fetchBookDataById,
-  fetchBookDataBySlug,
-  fetchBookDataByTitle,
-  fetchBookDataByIsbn,
-  fetchBooksData,
-  fetchBooksDataByFiltersAndSort,
-  fetchBooksCount,
-  fetchUniqueValuesFromBooksData,
-  getAggregatedBooks,
-  getBooks,
-  getBook,
-  addBook,
-  updateBook,
-  removeBook,
-  sanitizeQuery,
 };
