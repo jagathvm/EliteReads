@@ -1,6 +1,6 @@
 import HttpRequest from "../../../helpers/http-request.js";
 import { addBookValidator } from "../validators/admin-add-book-validator.js";
-import { showToast, errorMessage } from "../../../helpers/toast.js";
+import { showToast } from "../../../helpers/toast.js";
 import { handleRedirect } from "../../../helpers/handleUrl.js";
 
 const addBookForm = document.getElementById("addBookForm");
@@ -24,7 +24,7 @@ saveBookButton.addEventListener("click", async (e) => {
     handleRedirect("/admin/books");
   } catch (error) {
     console.log(error);
-    showToast(error.message || errorMessage, false);
+    showToast(error.message, false);
   }
 });
 

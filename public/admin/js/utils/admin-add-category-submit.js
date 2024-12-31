@@ -1,6 +1,6 @@
 import HttpRequest from "../../../helpers/http-request.js";
 import { addCategoryValidator } from "../validators/admin-add-category-validator.js";
-import { showToast, errorMessage } from "../../../helpers/toast.js";
+import { showToast } from "../../../helpers/toast.js";
 import { handleRedirect } from "../../../helpers/handleUrl.js";
 
 const addCategoryForm = document.getElementById("addCategoryForm");
@@ -23,6 +23,6 @@ saveCategoryButton.addEventListener("click", async (e) => {
     handleRedirect("/admin/categories");
   } catch (error) {
     console.error(error);
-    showToast(error.message || errorMessage, false);
+    showToast(error.message, false);
   }
 });
