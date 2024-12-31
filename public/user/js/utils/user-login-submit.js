@@ -1,6 +1,7 @@
 import HttpRequest from "../../../helpers/http-request.js";
 import { userLoginValidator } from "../validators/user-login-validator.js";
-import { showToast, errorMessage } from "../../../helpers/toast.js";
+import { showToast } from "../../../helpers/toast.js";
+import { handleRedirect } from "../../../helpers/handleUrl.js";
 
 const postUserLoginForm = document.getElementById("formLogIn");
 const invalidCredentialsMessage = document.getElementById(
@@ -17,23 +18,20 @@ postUserLoginForm.addEventListener("submit", async (e) => {
   const data = Object.fromEntries(formData);
   try {
     const apiClient = new HttpRequest("/api/auth");
-    const response = await apiClient.post("/login", data);
+    const { success, message } = await apiClient.post("/login", data);
 
-    if (response.success) {
-      showToast(response.message, true, "center");
-
-      // Delay the redirection to give time for the toast to be visible
-      setTimeout(() => {
-        window.location.href = "/api/auth/loginVerification";
-      }, 2000); // 2 seconds delay
-    } else {
+    if (!success) {
       invalidCredentialsMessage.style.display = "block";
       setTimeout(() => {
         invalidCredentialsMessage.style.display = "none";
       }, 3000);
     }
+
+    showToast(message, true, "center");
+    // Delay the redirection to give time for the toast to be visible
+    handleRedirect("/api/auth/loginVerification");
   } catch (error) {
     console.error(`Error during login: `, error);
-    showToast(error.message || errorMessage, false);
+    showToast(error.message, false);
   }
 });
