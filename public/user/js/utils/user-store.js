@@ -2,16 +2,23 @@ import HttpRequest from "../../../helpers/http-request.js";
 import { showToast } from "../../../helpers/toast.js";
 const readlistButtons = document.querySelectorAll(".readlistAction");
 
+const heartIconAction = (button, success) => {
+  const heartIcon = button?.querySelector("i");
+
+  heartIcon?.classList.toggle("bi-heart-fill", success);
+  heartIcon?.classList.toggle("bi-heart", !success);
+};
+
 readlistButtons.forEach((button) => {
   button.addEventListener("click", async (e) => {
-    e.preventDefault();
     const bookId = button.getAttribute("data-book-id");
-    const data = { bookId: bookId };
+    const data = { bookId };
 
     try {
       const apiClient = new HttpRequest("/");
       const { success, message } = await apiClient.post("readlist", data);
 
+      heartIconAction(button, success);
       return showToast(message, success ? true : false, "center", "bottom");
     } catch (error) {
       console.error(`Error adding to/removing from readlist`);
