@@ -1,6 +1,7 @@
 import HttpRequest from "../../../helpers/http-request.js";
 import { userSignupValidator } from "../validators/user-signup-validator.js";
-import { errorMessage, showToast } from "../../../helpers/toast.js";
+import { showToast } from "../../../helpers/toast.js";
+import { handleRedirect } from "../../../helpers/handleUrl.js";
 const postUserSignUpForm = document.getElementById("formSignUp");
 
 postUserSignUpForm.addEventListener("submit", async (e) => {
@@ -12,18 +13,14 @@ postUserSignUpForm.addEventListener("submit", async (e) => {
 
   try {
     const apiClient = new HttpRequest("/api/auth");
-    const response = await apiClient.post("/signup", data);
+    const { success, message } = await apiClient.post("/signup", data);
 
-    if (response.success) {
-      showToast(response.message, true);
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 2000);
-    } else {
-      showToast(response.message || response.error, false);
+    showToast(message, success ? true : false);
+    if (success) {
+      handleRedirect("/");
     }
   } catch (error) {
-    showToast(errorMessage, false);
+    showToast(error.message, false);
     console.error(`Error during signup: `, error);
   }
 });
