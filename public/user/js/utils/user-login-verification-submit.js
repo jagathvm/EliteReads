@@ -1,6 +1,7 @@
 import HttpRequest from "../../../helpers/http-request.js";
 import { userOtpValidator } from "../validators/user-otp-validator.js";
-import { showToast, errorMessage } from "../../../helpers/toast.js";
+import { showToast } from "../../../helpers/toast.js";
+import { handleRedirect } from "../../../helpers/handleUrl.js";
 
 const formOtp = document.getElementById("formOtp");
 const otpErrorMessage = document.getElementById("otpErrorMessage");
@@ -14,20 +15,25 @@ formOtp.addEventListener("submit", async (e) => {
 
   try {
     const apiClient = new HttpRequest("/api/auth");
-    const response = await apiClient.post("/loginVerification", data);
+    const { success, message } = await apiClient.post(
+      "/loginVerification",
+      data
+    );
 
-    if (response.success) {
-      showToast(response.message, true, "center");
+    const changeStyle = (style) => {
+      otpErrorMessage.style.display = style;
+    };
+    if (!success) {
+      changeStyle("block");
       setTimeout(() => {
-        window.location.href = "/";
-      }, 2000);
-    } else {
-      otpErrorMessage.style.display = "block";
-      setTimeout(() => {
-        otpErrorMessage.style.display = "none";
+        changeStyle("none");
       }, 3000);
+      return;
     }
+
+    showToast(message, true, "center");
+    handleRedirect("/");
   } catch (error) {
-    showToast(errorMessage, false);
+    showToast(error.message, false);
   }
 });
