@@ -176,22 +176,22 @@
   border-radius: 4px;
 }
 
-.detail-qty > a {
+.detail-qty>a {
   font-size: 16px;
   position: absolute;
   right: 8px;
   color: #707070;
 }
 
-.detail-qty > a:hover {
+.detail-qty>a:hover {
   color: #088178;
 }
 
-.detail-qty > a.qty-up {
+.detail-qty>a.qty-up {
   top: 0;
 }
 
-.detail-qty > a.qty-down {
+.detail-qty>a.qty-down {
   bottom: 0;
 }
 
@@ -213,7 +213,7 @@
   margin-bottom: 15px;
 }
 
-.detail-extralink > div {
+.detail-extralink>div {
   display: inline-block;
   vertical-align: top;
 }
@@ -242,13 +242,13 @@
 }
 
 .button.button-add-to-cart {
-  padding: 8px 40px;
+  padding: 12px 40px;
 }
 
 .product-extra-link2 a {
   background: #fff none repeat scroll 0 0;
   border: 1px solid #e5e5e5;
-  color: #333;
+  /* color: #333; */
   border-radius: 4px;
   display: inline-block;
   height: 40px;
@@ -262,10 +262,10 @@
   -webkit-transition: all 0.5s ease-out 0s;
 }
 
-.product-extra-link2 a:hover {
+/* .product-extra-link2 a:hover {
   background-color: #088178;
   color: #fff;
-}
+} */
 
 .tab-style3 .nav-tabs .nav-item a.active {
   border-bottom-color: #088178;
@@ -417,7 +417,7 @@
   margin: 0 0 0;
 }
 
-.progress + .progress {
+.progress+.progress {
   margin-top: 1rem;
 }
 
@@ -473,7 +473,7 @@
   font-size: 12px;
 }
 
-.shop-product-fillter-header .categor-list li + li {
+.shop-product-fillter-header .categor-list li+li {
   border-top: 1px solid #f7f8f9;
   padding-top: 5px;
   margin-top: 5px;
@@ -495,7 +495,7 @@
   margin-bottom: 20px;
 }
 
-.shop-product-fillter-header .product-rate-cover + .product-rate-cover {
+.shop-product-fillter-header .product-rate-cover+.product-rate-cover {
   margin-top: 15px;
 }
 
@@ -545,7 +545,7 @@
   margin-right: 8px;
 }
 
-.custome-radio input[type="radio"] + .form-check-label::after {
+.custome-radio input[type="radio"]+.form-check-label::after {
   content: "";
   height: 10px;
   width: 10px;
@@ -556,7 +556,7 @@
   opacity: 0;
 }
 
-.custome-radio input[type="radio"]:checked + .form-check-label::after {
+.custome-radio input[type="radio"]:checked+.form-check-label::after {
   opacity: 1;
   background-color: #088178;
 }
