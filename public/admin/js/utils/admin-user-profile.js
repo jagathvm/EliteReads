@@ -1,5 +1,5 @@
 import HttpRequest from "../../../helpers/http-request.js";
-import { showToast, errorMessage } from "../../../helpers/toast.js";
+import { showToast } from "../../../helpers/toast.js";
 import { handleReload } from "../../../helpers/handleUrl.js";
 
 const blockUnblockForm = document.getElementById("blockUnblockForm");
@@ -14,11 +14,11 @@ blockUnblockForm.addEventListener("submit", async (e) => {
     const apiClient = new HttpRequest("/admin/user-profile");
     const { success, message } = await apiClient.patch(`/${username}`, data);
 
-    if (!success) return showToast(message || errorMessage, false);
+    if (!success) return showToast(message, false);
     showToast(message, true, "center", "top");
     handleReload();
   } catch (error) {
     console.error(error);
-    showToast(errorMessage, false);
+    showToast(error.message, false);
   }
 });
