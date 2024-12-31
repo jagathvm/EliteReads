@@ -126,7 +126,6 @@ export const postVerifyOtp = async (req, res) => {
   try {
     const otpVerification = await verifyOTP(req.cookies.phone, req.body.otp);
     if (!otpVerification || otpVerification.status !== "approved") {
-      res.clearCookie("phone");
       return sendResponse(
         res,
         400,
@@ -156,6 +155,7 @@ export const postVerifyOtp = async (req, res) => {
     if (!modifiedCount)
       return sendResponse(res, 500, "Failed to login.", false);
 
+    res.clearCookie("phone");
     setCookie(res, "accessToken", generateAccessToken({ userId: user._id }));
     return sendResponse(res, 200, "Login Successful.", true);
   } catch (error) {
