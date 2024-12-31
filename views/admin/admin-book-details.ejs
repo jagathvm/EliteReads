@@ -96,6 +96,30 @@
           <p class="card-text"><strong class="text-dark">Featured:</strong>
             <%= book.featured===true ? 'Yes' : 'No' %>
           </p>
+          <div class="d-flex align-items-center">
+            <!-- Quantity Title -->
+            <strong class="text-dark me-2">Quantity:</strong>
+
+            <!-- Quantity Controls -->
+            <span class="d-flex align-items-center">
+              <!-- Decrease Quantity Button -->
+              <button class="btn btn-outline-secondary btn-sm d-flex justify-content-center align-items-center qty-down"
+                data-bookslug="<%= book.bookSlug %>">
+                <i class="bi bi-dash"></i> <!-- Bootstrap icon for minus -->
+              </button>
+
+              <!-- Quantity Display with ID for targeting -->
+              <span id="quantity-value" class="mx-3 fw-bold">
+                <%= book.quantity %>
+              </span>
+
+              <!-- Increase Quantity Button -->
+              <button class="btn btn-outline-secondary btn-sm d-flex justify-content-center align-items-center qty-up"
+                data-bookslug="<%= book.bookSlug %>">
+                <i class="bi bi-plus"></i> <!-- Bootstrap icon for plus -->
+              </button>
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -137,7 +161,7 @@
               <div class="mb-3">
                 <label for="editFeatured" class="form-label">Featured</label>
                 <select class="form-select" id="editFeatured" name="featured">
-                  <option selected hidden>
+                  <option value="" selected hidden>
                     <%= book.featured ? 'Yes' : 'No' %>
                   </option>
                   <option value="true">Yes</option>
@@ -163,7 +187,6 @@
               <input type="number" class="form-control" id="editISBN" name="isbn" value="<%= book.isbn %>">
             </div>
           </div>
-
           <div class="row">
             <div class="col-md-6 mb-3">
               <label for="editPublisher" class="form-label">Publisher</label>
@@ -220,7 +243,6 @@
             </div>
           </div>
         </form>
-
       </div>
     </div>
   </div>
@@ -296,8 +318,6 @@
 
 <script type="module" src="/admin/js/validators/admin-edit-book-validator.js"></script>
 
-<script type="module" src="/admin/js/utils/admin-edit-book-submit.js"></script>
-
-<script type="module" src="/admin/js/utils/admin-delete-book-submit.js"></script>
-
 <script type="module" src="/admin/js/helpers/edit-book-image-preview.js"></script>
+
+<script type="module" src="/admin/js/utils/admin-book-details.js"></script>
