@@ -1,3 +1,4 @@
+// Initialize JustValidate for the edit book form
 export const editBookDetailsValidator = new JustValidate("#editBookForm", {
   errorFieldCssClass: "error-field",
   errorLabelCssClass: "error-label",
@@ -16,12 +17,11 @@ editBookDetailsValidator
   // Book Title
   .addField("#editTitle", [
     {
-      rule: "required",
-      errorMessage: "Book title is required",
-    },
-    {
-      rule: "customRegexp",
-      value: capitalizedRegex,
+      rule: "custom",
+      validator: (value) => {
+        if (value === "") return true; // Skip validation if empty
+        return capitalizedRegex.test(value);
+      },
       errorMessage:
         "Title must start with a capital letter, only one space between words, and no trailing spaces",
     },
@@ -30,80 +30,62 @@ editBookDetailsValidator
   // Author
   .addField("#editAuthor", [
     {
-      rule: "required",
-      errorMessage: "Author is required",
-    },
-    {
-      rule: "customRegexp",
-      value: capitalizedRegex,
+      rule: "custom",
+      validator: (value) => {
+        if (value === "") return true; // Skip validation if empty
+        return capitalizedRegex.test(value);
+      },
       errorMessage:
-        "Names must start with a capital letter, only one space between words, and no trailing spaces",
+        "Author name must start with a capital letter, only one space between words, and no trailing spaces",
     },
   ])
 
   // Description
   .addField("#editDescription", [
     {
-      rule: "required",
-      errorMessage: "Book description is required",
-    },
-    {
-      rule: "minLength",
-      value: 10,
-      errorMessage: "Description must be at least 10 characters long",
-    },
-    {
-      rule: "maxLength",
-      value: 1000,
-      errorMessage: "Description must be less than 1000 characters",
+      rule: "custom",
+      validator: (value) => {
+        if (value === "") return true; // Skip validation if empty
+        return value.length >= 10 && value.length <= 1000;
+      },
+      errorMessage:
+        "Description must be between 10 and 1000 characters long if provided",
     },
   ])
 
-  // Price (supports decimals)
+  // Price
   .addField("#editPrice", [
     {
-      rule: "required",
-      errorMessage: "Price is required",
-    },
-    {
-      rule: "number",
-      errorMessage: "Price must be a valid number",
-    },
-    {
-      rule: "minNumber",
-      value: 0.1,
-      errorMessage: "Price must be greater than 0",
-    },
-    {
-      rule: "customRegexp",
-      value: /^[0-9]+(\.[0-9]{1,2})?$/,
+      rule: "custom",
+      validator: (value) => {
+        if (value === "") return true; // Skip validation if empty
+        return /^[0-9]+(\.[0-9]{1,2})?$/.test(value) && parseFloat(value) > 0;
+      },
       errorMessage:
-        "Price must be a valid positive number, with up to two decimal places, and no spaces",
+        "Price must be a valid positive number with up to two decimal places",
     },
   ])
 
-  // ISBN (exactly 13 digits)
+  // ISBN
   .addField("#editISBN", [
     {
-      rule: "required",
-      errorMessage: "ISBN is required",
-    },
-    {
-      rule: "customRegexp",
-      value: /^[0-9]{13}$/,
-      errorMessage: "ISBN must be exactly 13 digits",
+      rule: "custom",
+      validator: (value) => {
+        if (value === "") return true; // Skip validation if empty
+        return /^[0-9]{13}$/.test(value);
+      },
+      errorMessage: "ISBN must be exactly 13 digits if provided",
     },
   ])
 
   // Publisher
   .addField("#editPublisher", [
     {
-      rule: "required",
-      errorMessage: "Publisher is required",
-    },
-    {
-      rule: "customRegexp",
-      value: capitalizedRegex,
+      rule: "custom",
+      validator: (value) => {
+        if (value === "") return true; // Skip validation if empty
+        return capitalizedRegex.test(value);
+      },
       errorMessage:
         "Publisher name must start with a capital letter, only one space between words, and no trailing spaces",
     },
@@ -112,44 +94,29 @@ editBookDetailsValidator
   // Publication Year
   .addField("#editYear", [
     {
-      rule: "required",
-      errorMessage: "Publication year is required",
-    },
-    {
-      rule: "number",
-      errorMessage: "Publication year must be a number",
-    },
-    {
-      rule: "minNumber",
-      value: 1000,
-      errorMessage: "Year must be a valid year",
-    },
-    {
-      rule: "maxNumber",
-      value: new Date().getFullYear(),
-      errorMessage: "Year cannot be in the future",
-    },
-    {
-      rule: "customRegexp",
-      value: numberRegex,
-      errorMessage: "Year must be a valid number with no spaces",
+      rule: "custom",
+      validator: (value) => {
+        if (value === "") return true; // Skip validation if empty
+        const year = parseInt(value, 10);
+        return (
+          numberRegex.test(value) &&
+          year >= 1000 &&
+          year <= new Date().getFullYear()
+        );
+      },
+      errorMessage:
+        "Year must be a valid number between 1000 and the current year",
     },
   ])
 
   // Language
   .addField("#editLanguage", [
     {
-      rule: "required",
-      errorMessage: "Language is required",
-    },
-    {
-      rule: "minLength",
-      value: 2,
-      errorMessage: "Language must be at least 2 characters long",
-    },
-    {
-      rule: "customRegexp",
-      value: capitalizedRegex,
+      rule: "custom",
+      validator: (value) => {
+        if (value === "") return true; // Skip validation if empty
+        return capitalizedRegex.test(value);
+      },
       errorMessage:
         "Language must start with a capital letter, only one space between words, and no trailing spaces",
     },
@@ -158,69 +125,64 @@ editBookDetailsValidator
   // Pages
   .addField("#editPages", [
     {
-      rule: "required",
-      errorMessage: "Pages are required",
-    },
-    {
-      rule: "number",
-      errorMessage: "Pages must be a number",
-    },
-    {
-      rule: "minNumber",
-      value: 1,
-      errorMessage: "Pages must be greater than 0",
-    },
-    {
-      rule: "customRegexp",
-      value: numberRegex,
-      errorMessage: "Pages must be a number with no spaces",
+      rule: "custom",
+      validator: (value) => {
+        if (value === "") return true; // Skip validation if empty
+        const pages = parseInt(value, 10);
+        return numberRegex.test(value) && pages > 0;
+      },
+      errorMessage: "Pages must be a valid number greater than 0 if provided",
     },
   ])
 
   // Weight
   .addField("#editWeight", [
     {
-      rule: "required",
-      errorMessage: "Weight is required",
-    },
-    {
-      rule: "number",
-      errorMessage: "Weight must be a number",
-    },
-    {
-      rule: "minNumber",
-      value: 1,
-      errorMessage: "Weight must be greater than 0",
-    },
-    {
-      rule: "customRegexp",
-      value: numberRegex,
-      errorMessage: "Weight must be a number with no spaces",
+      rule: "custom",
+      validator: (value) => {
+        if (value === "") return true; // Skip validation if empty
+        const weight = parseInt(value, 10);
+        return numberRegex.test(value) && weight > 0;
+      },
+      errorMessage: "Weight must be a valid number greater than 0 if provided",
     },
   ])
 
   // Featured
   .addField("#editFeatured", [
     {
-      rule: "required",
-      errorMessage: "Please select the featured option",
+      rule: "custom",
+      validator: (value) => {
+        // Skip validation if empty
+        if (value === "") return true;
+        // Validate only "true" or "false"
+        return value === "true" || value === "false";
+      },
+      errorMessage: "Please select a valid option for featured",
     },
   ])
 
   // Category
   .addField("#editCategory", [
     {
-      rule: "required",
-      errorMessage: "Category is required",
+      rule: "custom",
+      validator: (value) => {
+        if (value === "") return true; // Skip validation if empty
+        return true; // Additional validation logic can be added if needed
+      },
+      errorMessage: "Category selection is invalid",
     },
   ])
 
   // Subcategory
   .addField("#editSubcategory", [
     {
-      rule: "minLength",
-      value: 1,
-      errorMessage: "Subcategory selection is invalid",
+      rule: "custom",
+      validator: (value) => {
+        if (value === "") return true; // Skip validation if empty
+        return value.length >= 1;
+      },
+      errorMessage: "Subcategory selection is invalid if provided",
     },
   ]);
 
