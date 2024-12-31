@@ -3,7 +3,12 @@ import * as adminController from "../controllers/adminController.js";
 import upload from "../middlewares/upload.js";
 import validateData from "../middlewares/validateData.js";
 import { authenticateToken } from "../middlewares/authenticate.js";
-import { bookSchema, categorySchema } from "../validators/adminSchema.js";
+import {
+  bookSchema,
+  categorySchema,
+  editBookSchema,
+  editCategorySchema,
+} from "../validators/adminSchema.js";
 
 const router = Router();
 
@@ -41,7 +46,12 @@ router.patch(
   upload.array("cover_image", 6),
   adminController.editAdminBookImage
 );
-router.patch("/books/:bookSlug", adminController.editAdminBook);
+router.patch(
+  "/books/:bookSlug",
+  validateData(editBookSchema),
+  adminController.editAdminBook
+);
+router.post("/books/:bookSlug/quantity", adminController.editAdminBookQuantity);
 router.delete("/books/:bookSlug", adminController.deleteAdminBook);
 
 router.post(
@@ -51,7 +61,7 @@ router.post(
 );
 router.patch(
   "/categories/:categorySlug",
-  validateData(categorySchema),
+  validateData(editCategorySchema),
   adminController.editAdminCategory
 );
 router.delete("/categories/:categorySlug", adminController.deleteAdminCategory);
