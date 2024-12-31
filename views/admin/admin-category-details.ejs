@@ -5,10 +5,12 @@
     </a>
     <!-- Action Buttons -->
     <div>
-      <button type="button" class="btn btn-secondary btn-md rounded" data-bs-toggle="modal" data-bs-target="#editCategoryModal">
+      <button type="button" class="btn btn-secondary btn-md rounded" data-bs-toggle="modal"
+        data-bs-target="#editCategoryModal">
         Edit Category Details
       </button>
-      <button type="button" class="btn btn-danger btn-md rounded" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal">
+      <button type="button" class="btn btn-danger btn-md rounded" data-bs-toggle="modal"
+        data-bs-target="#deleteCategoryModal">
         Delete Category
       </button>
     </div>
@@ -18,65 +20,72 @@
     <div class="row g-0">
       <!-- Details -->
       <% if (category) { %>
-      <div class="col-md-8">
-        <div class="card-body">
-          <!-- Category Name -->
-          <h3 class="card-title text-primary mb-4 text-start">
-            <%= category.name %>
-          </h3>
-          <!-- Category Details -->
-          <div class="mb-3">
-            <p class="mb-1 text-secondary text-start">
-              <strong>Description: </strong>
-              <span class="text-dark"><%= category.description %></span>
-            </p>
-          </div>
-          <div class="mb-3">
-            <p class="mb-1 text-secondary text-start">
-              <strong>Slug: </strong>
-              <span class="text-dark">/<%= category.slug %></span>
-            </p>
-          </div>
-          <div class="mb-3">
-            <p class="mb-1 text-secondary text-start">
-              <strong>Parent Category: </strong>
-              <% if (category.parentCategory) { %>
-              <a href='<%=
+        <div class="col-md-8">
+          <div class="card-body">
+            <!-- Category Name -->
+            <h3 class="card-title text-primary mb-4 text-start">
+              <%= category.name %>
+            </h3>
+            <!-- Category Details -->
+            <div class="mb-3">
+              <p class="mb-1 text-secondary text-start">
+                <strong>Description: </strong>
+                <span class="text-dark">
+                  <%= category.description %>
+                </span>
+              </p>
+            </div>
+            <div class="mb-3">
+              <p class="mb-1 text-secondary text-start">
+                <strong>Slug: </strong>
+                <span class="text-dark">/<%= category.slug %></span>
+              </p>
+            </div>
+            <div class="mb-3">
+              <p class="mb-1 text-secondary text-start">
+                <strong>Parent Category: </strong>
+                <% if (category.parentCategory) { %>
+                  <a href='<%=
               category.parentCategory
               ? `/admin/categories/${category.parentCategory.slug}`
-              : '#'
-              %>' class="px-2 py-1 pop-out-btn d-inline-block">
-                <span class=" text-dark"><%= category.parentCategory.name %></span>
-              </a>
-              <% } else { %>
-              <span class="text-dark">None</span>
-              <% } %>
-            </p>
-          </div>
-          <!-- Subcategories Section -->
-          <div class="mb-3">
-            <p class="mb-1 text-secondary text-start">
-              <strong>Subcategories:</strong>
-              <% if (category?.subCategories?.length > 0) { %>
-              <% category.subCategories.forEach(subCategory => { %>
-              <a href="<%=`/admin/categories/${subCategory.slug}`%>" class="px-2 py-1 pop-out-btn d-inline-block me-1">
-                <span class="text-dark"><%= subCategory.name %></span>
-              </a>
-              <% }) %>
-              <% } else { %>
-              <span class="text-dark">None</span>
-              <% } %>
-            </p>
+              : ' #' %>' class="px-2 py-1 pop-out-btn d-inline-block">
+                    <span class=" text-dark">
+                      <%= category.parentCategory.name %>
+                    </span>
+                  </a>
+                  <% } else { %>
+                    <span class="text-dark">None</span>
+                    <% } %>
+              </p>
+            </div>
+            <!-- Subcategories Section -->
+            <div class="mb-3">
+              <p class="mb-1 text-secondary text-start">
+                <strong>Subcategories:</strong>
+                <% if (category?.subCategories?.length> 0) { %>
+                  <% category.subCategories.forEach(subCategory=> { %>
+                    <a href="<%=`/admin/categories/${subCategory.slug}`%>"
+                      class="px-2 py-1 pop-out-btn d-inline-block me-1">
+                      <span class="text-dark">
+                        <%= subCategory.name %>
+                      </span>
+                    </a>
+                    <% }) %>
+                      <% } else { %>
+                        <span class="text-dark">None</span>
+                        <% } %>
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-      <% } %>
+        <% } %>
     </div>
   </div>
 </section>
 
 <!-- Edit Category Modal -->
-<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -92,22 +101,28 @@
           </div>
           <div class="mb-4">
             <label for="edit_category_description" class="form-label">Description</label>
-            <input type="text" class="form-control" id="edit_category_description" name="description" value="<%= category.description %>" />
+            <input type="text" class="form-control" id="edit_category_description" name="description"
+              value="<%= category.description %>" />
           </div>
           <div class="mb-4">
             <label for="edit_category_parent" class="form-label">Parent Category</label>
             <select class="form-select" id="edit_category_parent" name="parentCategory">
-              <option value="<%= category.parentCategory ? category.parentCategory._id : "" %>" selected hidden><%= category.parentCategory ? category.parentCategory.name : 'None' %></option>
+              <option value="<%= category.parentCategory ? category.parentCategory._id : "" %>" selected hidden>
+                <%= category.parentCategory ? category.parentCategory.name : 'None' %>
+              </option>
               <option value="">None</option>
-              <% categories.forEach(category => { %>
-              <option value="<%= category._id %>"><%= category.name %></option>
-              <% }) %>
+              <% categories.forEach(category=> { %>
+                <option value="<%= category._id %>">
+                  <%= category.name %>
+                </option>
+                <% }) %>
             </select>
           </div>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-success btn-md rounded" id="saveCategoryButton" data-category-slug="<%= category.slug %>">
+        <button type="button" class="btn btn-success btn-md rounded" id="saveCategoryButton"
+          data-category-slug="<%= category.slug %>">
           Save changes
         </button>
       </div>
@@ -116,7 +131,8 @@
 </div>
 
 <!-- Delete Category Modal -->
-<div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
+<div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-header">
@@ -132,7 +148,8 @@
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
           Cancel
         </button>
-        <button type="button" id="deleteCategoryButton" class="btn btn-danger" data-category-slug="<%= category.slug %>">Delete</button>
+        <button type="button" id="deleteCategoryButton" class="btn btn-danger"
+          data-category-slug="<%= category.slug %>">Delete</button>
       </div>
     </div>
   </div>
@@ -140,6 +157,4 @@
 
 <script type="module" src="/admin/js/validators/admin-edit-category-validator.js"></script>
 
-<script defer type="module" src="/admin/js/utils/admin-edit-category-submit.js"></script>
-
-<script defer type="module" src="/admin/js/utils/admin-delete-category-submit.js"></script>
+<script defer type="module" src="/admin/js/utils/admin-category-details.js"></script>
