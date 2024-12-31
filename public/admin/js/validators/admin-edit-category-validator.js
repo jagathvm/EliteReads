@@ -8,36 +8,28 @@ editCategoryValidator
   // Category Name
   .addField("#edit_category_name", [
     {
-      rule: "required",
-      errorMessage: "Category name is required",
-    },
-    {
-      rule: "minLength",
-      value: 3,
-      errorMessage: "Category name must be at least 3 characters long",
-    },
-    {
-      rule: "maxLength",
-      value: 100,
-      errorMessage: "Category name must be less than 100 characters",
+      rule: "custom",
+      validator: (value) => {
+        // Skip validation if the field is empty (optional field)
+        if (value === "") return true;
+        // Validate if the field is not empty
+        return value.length >= 3 && value.length <= 100;
+      },
+      errorMessage: "Category name must be between 3 and 100 characters",
     },
   ])
 
   // Category Description
   .addField("#edit_category_description", [
     {
-      rule: "required",
-      errorMessage: "Description is required",
-    },
-    {
-      rule: "minLength",
-      value: 10,
-      errorMessage: "Description must be at least 10 characters long",
-    },
-    {
-      rule: "maxLength",
-      value: 500,
-      errorMessage: "Description must be less than 500 characters",
+      rule: "custom",
+      validator: (value) => {
+        // Skip validation if the field is empty (optional field)
+        if (value === "") return true;
+        // Validate if the field is not empty
+        return value.length >= 10 && value.length <= 500;
+      },
+      errorMessage: "Description must be between 10 and 500 characters",
     },
   ])
 
@@ -46,8 +38,10 @@ editCategoryValidator
     {
       rule: "custom",
       validator: (value) => {
-        // Allow "None" or any valid category name
-        return value === "" || value !== "";
+        // Skip validation if the field is empty (optional field)
+        if (value === "") return true;
+        // Allow any valid category name if the field is not empty
+        return value !== "";
       },
       errorMessage: "Parent category selection is invalid.",
     },
