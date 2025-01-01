@@ -44,11 +44,11 @@
                       </td>
                       <td class="text-center" data-title="Stock">
                         <span class="color3 font-weight-bold">
-                          <%= book.quantity ? 'In Stock' : 'Out of Stock' %>
+                          <%= book?.quantity> 0 ? 'In Stock' : 'Out of Stock' %>
                         </span>
                       </td>
                       <td class="text-right" data-title="Cart">
-                        <button class="btn btn-sm">
+                        <button class="btn btn-sm" <%=book.quantity> 0 ? '' : 'disabled' %>>
                           <i class="fi-rs-shopping-bag mr-5"></i>Add to cart
                         </button>
                       </td>
