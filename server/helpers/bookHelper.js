@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { sentenceCase } from "./userHelper.js";
+import { createSlug, sentenceCase } from "./stringHelper.js";
 
 export const processBookData = (changedData) => {
   const updatedBookData = {};
@@ -56,4 +56,43 @@ export const processBookData = (changedData) => {
   }
 
   return updatedBookData;
+};
+
+export const buildBookObject = (validData, coverImageUrls) => {
+  const {
+    title,
+    author: { firstName, lastName },
+    description,
+    price,
+    isbn,
+    publisher,
+    year,
+    language,
+    pages,
+    weight,
+    featured,
+    category,
+    subcategory,
+  } = validData;
+
+  const bookSlug = `${createSlug(title)}-${isbn}`;
+
+  return {
+    title,
+    author: `${firstName} ${lastName}`,
+    description: sentenceCase(description),
+    price: parseFloat(price),
+    isbn: parseInt(isbn),
+    publisher,
+    year: parseInt(year),
+    language,
+    pages: parseInt(pages),
+    weight: parseFloat(weight),
+    featured: featured === "on" ? true : false,
+    coverImageUrls,
+    bookSlug,
+    category: new ObjectId(category),
+    subcategory: subcategory ? new ObjectId(subcategory) : "",
+    quantity: 1,
+  };
 };
