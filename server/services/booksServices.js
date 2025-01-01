@@ -55,6 +55,7 @@ const booksPipeline = [
       category: 1,
       subcategory: 1,
       bookSlug: 1,
+      quantity: 1,
     },
   },
 ];
@@ -228,19 +229,6 @@ const getAggregatedBooks = async (pipeline) => {
   }
 };
 
-export const fetchBooksDataFromReadlist = async (readlist) => {
-  try {
-    const booksIdStrings = readlist?.books;
-    const booksIds = booksIdStrings?.map((id) => new ObjectId(id));
-
-    const books = await getBooks({ _id: { $in: booksIds } });
-    return books;
-  } catch (error) {
-    console.error("Error fetching books from readlist", error);
-    throw error;
-  }
-};
-
 export const fetchBooksData = async (categorySlug) => {
   const pipeline = [...booksPipeline];
 
@@ -263,6 +251,24 @@ export const fetchBooksData = async (categorySlug) => {
     return books;
   } catch (error) {
     console.error(`Error fetching books: ${error.message}`);
+    throw error;
+  }
+};
+
+export const fetchBooksDataFromReadlist = async (readlist) => {
+  const pipeline = [...booksPipeline];
+
+  try {
+    const booksIdStrings = readlist?.books;
+    const booksIds = booksIdStrings?.map((id) => new ObjectId(id));
+
+    const booksQuery = { $match: { _id: { $in: booksIds } } };
+    pipeline.unshift(booksQuery);
+
+    const { value: books } = await getAggregatedBooks(pipeline);
+    return books;
+  } catch (error) {
+    console.error("Error fetching books from readlist", error);
     throw error;
   }
 };
