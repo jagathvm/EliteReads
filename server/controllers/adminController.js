@@ -7,29 +7,25 @@ import {
   addCategory,
   updateCategory,
   removeCategory,
-  fetchCategoriesDataBySlug,
-  fetchCategoriesDataByName,
-  fetchCategoryDataBySlug,
   fetchCategoriesData,
+  fetchCategoriesDataByName,
+  fetchCategoriesDataBySlug,
+  fetchCategoryDataBySlug,
 } from "../services/categoriesServices.js";
 import {
-  getBook,
   addBook,
   updateBook,
   removeBook,
+  fetchBooksData,
   fetchBookDataByTitle,
   fetchBookDataByIsbn,
-} from "../services/booksServices.js";
-import {
-  fetchBooksData,
   fetchBookDataBySlug,
 } from "../services/booksServices.js";
 import {
   createSlug,
   capitalisation,
-  sentenceCase,
   formatDate,
-} from "../helpers/userHelper.js";
+} from "../helpers/stringHelper.js";
 import {
   fetchUsersData,
   fetchUserData,
@@ -37,6 +33,13 @@ import {
   updateUser,
 } from "../services/userServices.js";
 import { sendResponse, renderResponse } from "../helpers/responseHelper.js";
+import { buildBookObject, processBookData } from "../helpers/bookHelper.js";
+import { processCategoryData } from "../helpers/categoryHelper.js";
+import {
+  getAllOrders,
+  getOrderByOrderId,
+  getOrdersByUserId,
+} from "../services/orderServices.js";
 
 // ------------------ ADMIN CONTROLLERS ------------------ //
 
@@ -89,7 +92,7 @@ export const getAdminBookDetails = async (req, res) => {
   const { bookSlug } = req.params;
 
   try {
-    const [book] = await fetchBookDataBySlug(bookSlug);
+    const book = await fetchBookDataBySlug(bookSlug);
     const categories = await fetchCategoriesData();
 
     return renderResponse(res, 200, "admin/admin-book-details", {
@@ -106,11 +109,7 @@ export const getAdminBookDetails = async (req, res) => {
 
 // Add a new book to the database.
 export const postAdminAddBook = async (req, res) => {
-  const {
-    title,
-    author: { firstName, lastName },
-    isbn,
-  } = req.validData;
+  const { title, isbn } = req.validData;
   const coverImages = req.files;
 
   try {
@@ -136,27 +135,7 @@ export const postAdminAddBook = async (req, res) => {
       return sendResponse(res, 400, "No cover images uploaded", false);
 
     const coverImageUrls = await uploadToCloudinary(coverImages, "books");
-    const bookSlug = `${createSlug(title)}-${isbn}`;
-
-    const newBook = {
-      title,
-      author: `${firstName} ${lastName}`,
-      description: sentenceCase(req.validData.description),
-      price: parseFloat(req.validData.price),
-      isbn: parseInt(req.validData.isbn),
-      publisher: req.validData.publisher,
-      year: parseInt(req.validData.year),
-      language: req.validData.language,
-      pages: parseInt(req.validData.pages),
-      weight: parseFloat(req.validData.weight),
-      featured: req.validData.featured === "on" ? true : false,
-      coverImageUrls,
-      bookSlug,
-      category: new ObjectId(req.validData.category),
-      subcategory: req.validData.subcategory
-        ? new ObjectId(req.validData.subcategory)
-        : "",
-    };
+    const newBook = buildBookObject(req.validData, coverImageUrls);
 
     const { acknowledged } = await addBook(newBook);
     if (!acknowledged)
@@ -172,74 +151,65 @@ export const postAdminAddBook = async (req, res) => {
 // Edit a book in the database.
 export const editAdminBook = async (req, res) => {
   const { bookSlug } = req.params;
-  const { title, isbn } = req.body;
-  const updatedBookData = {
-    title,
-    author: req.body.author,
-    language: req.body.language,
-    featured: req.body.featured === "true",
-    description: sentenceCase(req.body.description),
-    price: parseFloat(req.body.price),
-    isbn: parseInt(req.body.isbn),
-    publisher: req.body.publisher,
-    year: parseInt(req.body.year),
-    pages: parseInt(req.body.pages),
-    weight: parseFloat(req.body.weight),
-    category: new ObjectId(req.body.category),
-    subcategory: req.body.subcategory ? new ObjectId(req.body.subcategory) : "",
-  };
+  // Process changed data using the helper function
+  const changedData = processBookData(req.validData);
 
   try {
-    const { value: book } = await getBook({ bookSlug });
+    // Retrieve the current book from the database
+    const book = await fetchBookDataBySlug(bookSlug);
 
-    if (book.title !== title || book.isbn !== isbn) {
-      updatedBookData.bookSlug = `${createSlug(title)}-${isbn}`;
+    // Check if title is provided and if there's already a book with the same title
+    if (changedData.title) {
+      const existingBookWithTitle = await fetchBookDataByTitle(
+        changedData.title
+      );
 
-      // Check if the new slug already exists to avoid conflicts
-      const { found: bookExists } = await getBook({
-        bookSlug: updatedBookData.bookSlug,
-      });
-
-      if (bookExists)
+      if (existingBookWithTitle) {
         return sendResponse(
           res,
           400,
-          "A book with the same title or ISBN already exists.",
+          "A book with the same title already exists.",
           false
         );
-
-      // Update the book in the database
-      const { acknowledged } = await updateBook(
-        { bookSlug },
-        {
-          $set: updatedBookData,
-        }
-      );
-      if (!acknowledged)
-        return sendResponse(res, 400, "Failed to update book", false);
-
-      return sendResponse(
-        res,
-        200,
-        "Book updated successfully",
-        true,
-        updatedBookData.bookSlug
-      );
+      }
     }
 
-    // Update the book in the database
-    const { acknowledged } = await updateBook(
-      { bookSlug },
-      {
-        $set: updatedBookData,
+    // Check if ISBN is provided and if there's already a book with the same ISBN
+    if (changedData.isbn) {
+      const existingBookWithIsbn = await fetchBookDataByIsbn(changedData.isbn);
+
+      if (existingBookWithIsbn) {
+        return sendResponse(
+          res,
+          400,
+          "A book with the same ISBN already exists.",
+          false
+        );
       }
+    }
+
+    // Generate the new slug based on title and ISBN
+    const newTitle = changedData?.title || book.title;
+    const newIsbn = changedData?.isbn || book.isbn;
+    changedData.bookSlug = `${createSlug(newTitle)}-${newIsbn}`;
+
+    // Update the book in the database
+    const { modifiedCount } = await updateBook(
+      { bookSlug },
+      { $set: changedData }
     );
-    if (!acknowledged)
+    if (!modifiedCount)
       return sendResponse(res, 400, "Failed to update book", false);
 
-    return sendResponse(res, 200, "Book updated successfully", true);
+    return sendResponse(
+      res,
+      200,
+      "Book updated successfully",
+      true,
+      changedData?.bookSlug ? changedData.bookSlug : book.bookSlug
+    );
   } catch (error) {
-    console.error(`An unexpected error occurred. ${error}`);
+    console.error(`An unexpected error occurred. ${error.message}`);
     // Send error response
     return sendResponse(
       res,
@@ -358,13 +328,47 @@ export const editAdminBookImage = async (req, res) => {
   }
 };
 
+// Edit book's quantity
+export const editAdminBookQuantity = async (req, res) => {
+  const { quantityIncrement, bookSlug } = req.body;
+  const quantityValue = quantityIncrement ? 1 : -1;
+  const successResponse = quantityIncrement ? "increment" : "decrement";
+  const errorResponse = quantityIncrement ? "incrementing" : "decrementing";
+
+  try {
+    const { modifiedCount } = await updateBook(
+      { bookSlug },
+      { $inc: { quantity: quantityValue } }
+    );
+
+    if (!modifiedCount)
+      return sendResponse(
+        res,
+        400,
+        `An error occured while ${errorResponse} the quantity`,
+        false
+      );
+
+    return sendResponse(
+      res,
+      200,
+      `Quantity ${successResponse} successfull`,
+      true,
+      quantityIncrement
+    );
+  } catch (error) {
+    console.error("An error occured. ", error.message);
+    throw error;
+  }
+};
+
 // Delete a book from the database
 export const deleteAdminBook = async (req, res) => {
   const { bookSlug } = req.params;
   try {
     // Retrieve the book to ensure it exists before deletion
-    const { found, value: book } = await getBook({ bookSlug });
-    if (!found)
+    const book = await fetchBookDataBySlug(bookSlug);
+    if (!book)
       // Send error response if book is not found
       return sendResponse(res, 404, "Book Not Found.", false);
 
@@ -448,12 +452,13 @@ export const getAdminAddCategory = async (req, res) => {
 export const postAdminAddCategory = async (req, res) => {
   const { name, description, parentCategory } = req.validData;
   const slug = createSlug(name);
+
   try {
     // Check if a category with the same name exists
-    const { found: catFoundByName } = await fetchCategoriesDataByName([name]);
+    const catFoundByName = await fetchCategoriesDataByName([name]);
 
     // Check if a category with the same slug exists
-    const { found: catFoundBySlug } = await fetchCategoriesDataBySlug([slug]);
+    const catFoundBySlug = await fetchCategoriesDataBySlug([slug]);
 
     // Send error response if category exists
     if (catFoundByName)
@@ -488,7 +493,7 @@ export const postAdminAddCategory = async (req, res) => {
     // Send success response if category was added
     return sendResponse(res, 200, `Category ${name} added.`, true);
   } catch (error) {
-    console.error(`An unexpected error occurred. ${error}`);
+    console.error(`An unexpected error occurred. ${error.message}`);
     return sendResponse(
       res,
       500,
@@ -501,38 +506,32 @@ export const postAdminAddCategory = async (req, res) => {
 // Edit a category or subcategory.
 export const editAdminCategory = async (req, res) => {
   const { categorySlug } = req.params;
-  const { name, description, parentCategory } = req.validData;
+  const changedData = processCategoryData(req.validData);
 
   try {
-    const category = await fetchCategoriesDataBySlug([categorySlug]);
-    const slug = createSlug(name);
+    const categoryExits = await fetchCategoryDataBySlug(categorySlug);
+    if (!categoryExits)
+      return sendResponse(res, 404, "Category not found", false);
 
-    // Check if any data has changed when the front-end validation fails
-    const isUnchanged =
-      category.name === name &&
-      category.description === description &&
-      category.parentCategory === parentCategory;
-
-    // If no changes were made, return a 400 status
-    if (isUnchanged)
+    const categoryNameExists = await fetchCategoriesDataByName([
+      changedData?.name,
+    ]);
+    if (categoryNameExists)
       return sendResponse(
         res,
         400,
-        "No changes were made to the category.",
+        "Category already exists with the same",
         false
       );
 
-    const categoryData = {
-      name,
-      description,
-      slug,
-      parentCategory: parentCategory ? new ObjectId(parentCategory) : "",
-    };
+    if (changedData.name) {
+      changedData.slug = createSlug(changedData.name);
+    }
 
     // Update the category in the database
     const { acknowledged } = await updateCategory(
       { slug: categorySlug },
-      { $set: categoryData }
+      { $set: changedData }
     );
 
     // If update was not acknowledged, return a 400 status
@@ -540,7 +539,7 @@ export const editAdminCategory = async (req, res) => {
       return sendResponse(res, 400, "Error updating category.", false);
 
     // Success: return a 200 status with a success message
-    return sendResponse(res, 200, "Category updated.", true, slug);
+    return sendResponse(res, 200, "Category updated.", true, changedData?.slug);
   } catch (error) {
     console.error(`An unexpected error occurred: ${error}`);
     return sendResponse(res, 500, "An unexpected error occurred", false);
@@ -626,6 +625,7 @@ export const getAdminUserProfile = async (req, res) => {
   }
 };
 
+// Block or Unblock a user.
 export const blockOrUnblockUser = async (req, res) => {
   const { username } = req.params;
   const isBlocked = req.body.isBlocked === "true" ? false : true;
@@ -676,12 +676,40 @@ export const getAdminReviewDetails = (req, res) =>
 // --------------------- ADMIN ORDERS --------------------- //
 
 // Fetch and display all orders.
-export const getAdminOrders = (req, res) =>
-  renderResponse(res, 200, "admin/admin-orders-list", { req });
+export const getAdminOrders = async (req, res) => {
+  try {
+    const orders = await getAllOrders();
+
+    return renderResponse(res, 200, "admin/admin-orders-list", {
+      req,
+      orders,
+      capitalisation,
+      formatDate,
+    });
+  } catch (error) {
+    console.error("Error retrieving orders", error);
+    throw error;
+  }
+};
 
 // Render order details for a specific order.
-export const getAdminOrderDetails = (req, res) =>
-  renderResponse(res, 200, "admin/admin-order-details", { req });
+export const getAdminOrderDetails = async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const order = await getOrderByOrderId(orderId);
+
+    return renderResponse(res, 200, "admin/admin-order-details", {
+      req,
+      order,
+      formatDate,
+      capitalisation,
+    });
+  } catch (error) {
+    console.error(`An unexpected error occurred. ${error}`);
+    throw error;
+  }
+};
 
 // --------------------- ADMIN TRANSACTIONS --------------------- //
 export const getAdminTransactions = (req, res) =>
