@@ -3,14 +3,14 @@ import bcrypt from "bcrypt";
 import { client } from "../config/twilio.js";
 
 // Generate access token
-const generateAccessToken = (user) => {
+export const generateAccessToken = (user) => {
   return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "1d",
+    expiresIn: "30d",
   });
 };
 
 // Verify the access token
-const verifyAccessToken = (token) => {
+export const verifyAccessToken = (token) => {
   return new Promise((resolve, reject) => {
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
       if (err) return reject(err);
@@ -20,11 +20,12 @@ const verifyAccessToken = (token) => {
 };
 
 // Set cookie
-const setCookie = (
+export const setCookie = (
   res,
   cookieName,
   cookieValue,
-  maxAge = 24 * 60 * 60 * 1000
+  // maxAge = 24 * 60 * 60 * 1000,
+  maxAge = 30 * 24 * 60 * 60 * 1000
 ) => {
   res.cookie(cookieName, cookieValue, {
     httpOnly: true,
@@ -35,14 +36,14 @@ const setCookie = (
 };
 
 // Hash password
-const hashPassword = async (enteredPassword) =>
+export const hashPassword = async (enteredPassword) =>
   await bcrypt.hash(enteredPassword, 12);
 
 // Verify password
-const verifyPassword = async (enteredPassword, hashedPassword) =>
+export const verifyPassword = async (enteredPassword, hashedPassword) =>
   await bcrypt.compare(enteredPassword, hashedPassword);
 
-const sendOTP = async (to) => {
+export const sendOTP = async (to) => {
   try {
     const response = await client.verify.v2
       .services(process.env.TWILIO_SERVICE_SID)
@@ -56,7 +57,7 @@ const sendOTP = async (to) => {
   }
 };
 
-const verifyOTP = async (to, otp) => {
+export const verifyOTP = async (to, otp) => {
   try {
     const response = await client.verify.v2
       .services(process.env.TWILIO_SERVICE_SID)
@@ -69,14 +70,4 @@ const verifyOTP = async (to, otp) => {
     console.log(`Error verifying otp: ${error}`);
     throw error;
   }
-};
-
-export {
-  generateAccessToken,
-  verifyAccessToken,
-  setCookie,
-  verifyPassword,
-  hashPassword,
-  sendOTP,
-  verifyOTP,
 };
