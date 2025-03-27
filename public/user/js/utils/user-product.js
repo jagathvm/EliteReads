@@ -1,6 +1,15 @@
 import HttpRequest from "../../../helpers/http-request.js";
 import { showToast } from "../../../helpers/toast.js";
-const readListButton = document.querySelector(".readlistAction");
+
+const cartCountElement = document.querySelector(".cart-count");
+const readlistCountElement = document.querySelector(".readlist-count");
+
+const readListButton = document.querySelector(".button-readlist");
+const addToCartButton = document.querySelector(".button-add-to-cart");
+const goToCartButton = document.querySelector(".button-go-to-cart");
+
+const bookId = document.getElementById("bookId").value;
+const data = { bookId };
 
 const heartIconAction = (button, success) => {
   const heartIcon = button?.querySelector("i");
@@ -9,20 +18,64 @@ const heartIconAction = (button, success) => {
   heartIcon?.classList.toggle("bi-heart", !success);
 };
 
-const readlistAction = async (e) => {
-  const bookId = readListButton.getAttribute("data-book-id");
-  const data = { bookId };
+const updateReadlistCount = (success) => {
+  // Safely update the count
+  const currentCount = parseInt(readlistCountElement.textContent, 10);
+  readlistCountElement.textContent = success
+    ? currentCount + 1
+    : currentCount - 1;
+};
 
+const updateCartCount = () => {
+  // Safely update the count
+  const currentCount = parseInt(cartCountElement.textContent, 10);
+  cartCountElement.textContent = currentCount + 1;
+};
+
+const readlistAction = async (e) => {
   try {
     const apiClient = new HttpRequest("/");
-    const { success, message } = await apiClient.post("readlist", data);
+    const {
+      message,
+      data: { heart },
+    } = await apiClient.post("readlist", data);
 
-    heartIconAction(readListButton, success);
-    return showToast(message, success ? true : false, "center", "center");
+    updateReadlistCount(heart);
+    heartIconAction(readListButton, heart);
+    return showToast(message, heart, "center", "center");
   } catch (error) {
-    console.error(`Error adding to/removing from readlist`);
+    console.error(`Error adding to/removing from readlist, ${error}`);
     throw error;
   }
 };
 
+const addToCartAction = async (e) => {
+  try {
+    const apiClient = new HttpRequest("/");
+    const { success, message } = await apiClient.post("cart", data);
+
+    if (success) {
+      // Hide Add to Cart button
+      addToCartButton.hidden = true;
+
+      // Update cart count
+      updateCartCount();
+
+      // Show Go to Cart button
+      goToCartButton.hidden = false;
+    }
+
+    return showToast(message, success, "center", "center");
+  } catch (error) {
+    console.error(`Error adding to cart: ${error}`);
+    throw error;
+  }
+};
+
+const goToCartAction = async () => {
+  window.location.href = "/cart";
+};
+
 readListButton.addEventListener("click", readlistAction);
+addToCartButton.addEventListener("click", addToCartAction);
+goToCartButton.addEventListener("click", goToCartAction);
