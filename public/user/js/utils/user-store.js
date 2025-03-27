@@ -1,6 +1,16 @@
 import HttpRequest from "../../../helpers/http-request.js";
 import { showToast } from "../../../helpers/toast.js";
-const readlistButtons = document.querySelectorAll(".readlistAction");
+const readlistButtons = document.querySelectorAll(".button-readlist");
+const readlistCountElement = document.querySelector(".pro-count");
+
+const updateReadlistCount = (success) => {
+  // Safely update the count
+  const currentCount = parseInt(readlistCountElement.textContent, 10);
+
+  readlistCountElement.textContent = success
+    ? currentCount + 1
+    : currentCount - 1;
+};
 
 const heartIconAction = (button, success) => {
   const heartIcon = button?.querySelector("i");
@@ -9,28 +19,36 @@ const heartIconAction = (button, success) => {
   heartIcon?.classList.toggle("bi-heart", !success);
 };
 
+const readlistAction = async (e) => {
+  // Use `currentTarget` to refer to the button
+  const button = e.currentTarget;
+  const bookId = button.getAttribute("data-book-id");
+  const data = { bookId };
+
+  try {
+    const apiClient = new HttpRequest("/");
+    const {
+      message,
+      data: { heart },
+    } = await apiClient.post("readlist", data);
+
+    heartIconAction(button, heart);
+    updateReadlistCount(heart);
+    return showToast(message, heart, "center", "bottom");
+  } catch (error) {
+    console.error(`Error adding to/removing from readlist`);
+    showToast(
+      "An unexpected error occurred. Please try again.",
+      false,
+      "center",
+      "top"
+    );
+    throw error;
+  }
+};
+
 readlistButtons.forEach((button) => {
-  button.addEventListener("click", async (e) => {
-    const bookId = button.getAttribute("data-book-id");
-    const data = { bookId };
-
-    try {
-      const apiClient = new HttpRequest("/");
-      const { success, message } = await apiClient.post("readlist", data);
-
-      heartIconAction(button, success);
-      return showToast(message, success ? true : false, "center", "bottom");
-    } catch (error) {
-      console.error(`Error adding to/removing from readlist`);
-      showToast(
-        "An unexpected error occurred. Please try again.",
-        false,
-        "center",
-        "top"
-      );
-      throw error;
-    }
-  });
+  button.addEventListener("click", readlistAction);
 });
 
 document.addEventListener("DOMContentLoaded", function () {
