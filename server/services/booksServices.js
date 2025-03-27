@@ -10,6 +10,7 @@ import {
   removeDocument,
 } from "../helpers/dbHelper.js";
 import { fetchCategoryIdsBySlug } from "./categoriesServices.js";
+import { getAggregatedCart } from "./cartServices.js";
 
 // Utility Constants
 const bookPipeline = [
@@ -261,6 +262,10 @@ export const fetchBooksDataFromReadlist = async (readlist) => {
   try {
     const booksIdStrings = readlist?.books;
     const booksIds = booksIdStrings?.map((id) => new ObjectId(id));
+
+    if (!booksIds || booksIds.length === 0) {
+      return [];
+    }
 
     const booksQuery = { $match: { _id: { $in: booksIds } } };
     pipeline.unshift(booksQuery);
