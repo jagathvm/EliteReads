@@ -1,4 +1,10 @@
-const sendResponse = (res, statusCode, message, success, data = null) =>
+export const sendResponse = (
+  res,
+  statusCode,
+  message = null,
+  success,
+  data = null
+) =>
   res.status(statusCode).json({
     success,
     message,
@@ -6,7 +12,5 @@ const sendResponse = (res, statusCode, message, success, data = null) =>
     data,
   });
 
-const renderResponse = (res, statusCode, path, data) =>
+export const renderResponse = (res, statusCode, path, data) =>
   res.status(statusCode).render(path, data);
-
-export { sendResponse, renderResponse };
