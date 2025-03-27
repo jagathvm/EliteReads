@@ -39,7 +39,7 @@
   background-color: transparent !important;
 }
 
-.btn-check:focus + .btn,
+.btn-check:focus+.btn,
 .btn:focus {
   outline: 0;
   -webkit-box-shadow: none !important;
@@ -191,6 +191,11 @@ button[type='submit']:hover {
 .btn.btn-brush.btn-brush-3,
 .button.btn-brush.btn-brush-3 {
   background-image: url(/user/imgs/theme/btn-brush-bg-3.png);
+}
+
+.button-go-to-cart {
+  border: 1px solid #1ce804 !important;
+  background-color: #1ce804 !important;
 }
 
 .comments-area .btn-reply {
