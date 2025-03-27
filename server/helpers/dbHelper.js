@@ -1,5 +1,5 @@
 // Generic documents retrieval using aggregation pipeline
-const getAggregatedDocuments = async (
+export const getAggregatedDocuments = async (
   pipeline = [],
   getCollection,
   errorMessage = "Error retrieving documents."
@@ -17,12 +17,12 @@ const getAggregatedDocuments = async (
     }
     return { found: true, value: documents };
   } catch (error) {
-    throw new Error(`Error retrieving documents: ${error.message}`);
+    throw new Error(`Error retrieving documents: ${error}`);
   }
 };
 
 // Generic documents count
-const getDocumentsCount = async (query = {}, getCollection) => {
+export const getDocumentsCount = async (query = {}, getCollection) => {
   try {
     const collection = await getCollection();
     const count = await collection.countDocuments(query);
@@ -33,7 +33,7 @@ const getDocumentsCount = async (query = {}, getCollection) => {
 };
 
 // Generic documents retrieval
-const getDocuments = async (
+export const getDocuments = async (
   query = {},
   getCollection,
   errorMessage = "Error retrieving documents."
@@ -59,7 +59,7 @@ const getDocuments = async (
 };
 
 // Generic document retrieval
-const getDocument = async (
+export const getDocument = async (
   query,
   getCollection,
   errorMessage = "Document not found."
@@ -86,7 +86,7 @@ const getDocument = async (
 };
 
 // Generic document addition
-const addDocument = async (document, getCollection) => {
+export const addDocument = async (document, getCollection) => {
   try {
     const collection = await getCollection();
     const result = await collection.insertOne(document);
@@ -97,7 +97,7 @@ const addDocument = async (document, getCollection) => {
 };
 
 // Generic document updation
-const updateDocument = async (query, operation, getCollection) => {
+export const updateDocument = async (query, operation, getCollection) => {
   try {
     const collection = await getCollection();
     const result = await collection.updateOne(query, operation);
@@ -111,7 +111,7 @@ const updateDocument = async (query, operation, getCollection) => {
 };
 
 // Generic document deletion
-const removeDocument = async (query, getCollection) => {
+export const removeDocument = async (query, getCollection) => {
   try {
     const collection = await getCollection();
     const result = await collection.deleteOne(query);
@@ -119,14 +119,4 @@ const removeDocument = async (query, getCollection) => {
   } catch (error) {
     throw new Error(`Error deleting document: ${error.message}`);
   }
-};
-
-export {
-  getAggregatedDocuments,
-  getDocumentsCount,
-  getDocuments,
-  getDocument,
-  addDocument,
-  updateDocument,
-  removeDocument,
 };
