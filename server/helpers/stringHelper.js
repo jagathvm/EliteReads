@@ -1,4 +1,4 @@
-const createSlug = (title) => {
+export const createSlug = (title) => {
   return (
     title
       .trim()
@@ -12,7 +12,7 @@ const createSlug = (title) => {
   );
 };
 
-const sentenceCase = (str) => {
+export const sentenceCase = (str) => {
   // Trim any leading or trailing spaces
   str = str.trim();
 
@@ -35,15 +35,15 @@ const sentenceCase = (str) => {
   return sentences.join(". ").trim() + (str.endsWith(".") ? "." : "");
 };
 
-const capitalisation = (data) => {
+export const capitalisation = (data) => {
   return data
     .split("-")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join("-");
 };
 
-const formatDate = (date) =>
-  new Date(date).toLocaleString("en-IN", {
+export const formatDate = (date) => {
+  const fullDate = new Date(date).toLocaleString("en-IN", {
     timeZone: "Asia/Kolkata",
     year: "numeric",
     month: "long",
@@ -54,4 +54,11 @@ const formatDate = (date) =>
     hour12: true,
   });
 
-export { createSlug, capitalisation, sentenceCase, formatDate };
+  const monthYear = new Date(date).toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "long",
+  });
+
+  return { fullDate, monthYear };
+};
