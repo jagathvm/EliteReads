@@ -210,7 +210,7 @@
                                   <span class="old-price">₹ <%= book.price %></span>
                                 </div>
                                 <div class="product-action-1 show">
-                                  <a aria-label="Add To Wishlist" class="action-btn hover-up readlistAction"
+                                  <a aria-label="Add To Wishlist" class="action-btn hover-up button-readlist"
                                     data-book-id="<%= book._id %>"><i
                                       class="bi <%= readlist?.books.includes((book._id).toString()) ? 'bi-heart-fill' : 'bi-heart'  %>"></i></a>
                                   <!-- <a aria-label="Add To Cart" id="addToCart" class="action-btn hover-up" href="shop-cart.html"><i class="fi-rs-shopping-bag-add"></i></a> -->
@@ -307,3 +307,5 @@
   </section> -->
 
     </main>
+
+    <script type="module" src="/user/js/utils/user-home.js"></script>
