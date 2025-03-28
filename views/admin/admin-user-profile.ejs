@@ -29,7 +29,7 @@
           </h3>
           <p>Email: <%= user.email %>
           </p>
-          <p>Joined: <%= formatDate(user.accountStatus.createdAt) %>
+          <p>Joined: <%= formatDate(user.accountStatus.createdAt).fullDate %>
           </p>
         </div>
         <!-- col.// -->
@@ -76,8 +76,8 @@
               ) %> <br>
           </p>
           <p>
-            Last Login: <%= user.accountStatus?.lastLogin !=null ? formatDate(user.accountStatus?.lastLogin) :
-              formatDate(user.accountStatus?.createdAt) %>
+            Last Login: <%= user.accountStatus?.lastLogin !=null ? formatDate(user.accountStatus?.lastLogin).fullDate :
+              formatDate(user.accountStatus?.createdAt).fullDate %>
               <br>
           </p>
         </div>
