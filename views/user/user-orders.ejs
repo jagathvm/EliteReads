@@ -1,0 +1,88 @@
+<main class="main">
+  <div class="page-header breadcrumb-wrap">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="/" rel="nofollow">Home</a>
+        <span></span> Pages <span></span> Orders
+      </div>
+    </div>
+  </div>
+  <section class="pt-50 pb-150">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-10 m-auto">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="dashboard-menu">
+                <%- include('partials/profile/dashboard-menu') %>
+              </div>
+            </div>
+            <% if (orders && orders.length> 0) { %>
+              <!-- Orders Content -->
+              <div class="col-md-8">
+                <div class="dashboard-content">
+                  <div class="card">
+                    <div class="card-header">
+                      <h5 class="mb-0">Your Orders</h5>
+                    </div>
+                    <div class="card-body">
+                      <div class="table-responsive">
+                        <table class="table">
+                          <thead>
+                            <tr>
+                              <th>Order</th>
+                              <th>Date</th>
+                              <th>Status</th>
+                              <th>Total</th>
+                              <th>Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <% orders.forEach(order=> { %>
+                              <tr>
+                                <td>#<%= String(order._id).toUpperCase() %>
+                                </td>
+                                <td>
+                                  <%= formatDate(order.createdAt).monthYear %>
+                                </td>
+                                <td>
+                                  <%= capitalisation(order.status) %>
+                                </td>
+                                <td>₹ <%= order.totalPrice %> for <%= order.items.length %> item(s).</td>
+                                <td>
+                                  <a href="#" class="btn-small d-block">View</a>
+                                </td>
+                              </tr>
+                              <% }) %>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div> <!-- End dashboard-content -->
+              </div> <!-- End col-md-8 -->
+              <% } else { %>
+                <!-- Empty Orders Content -->
+                <div class="col-md-8">
+                  <div class="dashboard-content">
+                    <div class="card">
+                      <div class="card-header">
+                        <h5 class="mb-0">Your Orders</h5>
+                      </div>
+                      <div class="card-body text-center py-4">
+                        <h3>You haven't placed any orders yet</h3>
+                        <p class="font-xs mt-2">Browse our book store and place your first order!</p>
+                        <a href="/book-store" class="btn btn-primary mt-2">
+                          <i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div> <!-- End col-md-8 -->
+                <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
