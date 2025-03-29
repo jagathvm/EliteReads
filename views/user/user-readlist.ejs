@@ -3,6 +3,7 @@
     <div class="container">
       <div class="breadcrumb">
         <a href="/" rel="nofollow">Home</a>
+        <span></span> Store
         <span></span> Readlist
       </div>
     </div>
@@ -48,9 +49,21 @@
                         </span>
                       </td>
                       <td class="text-right" data-title="Cart">
-                        <button class="btn btn-sm" <%=book.quantity> 0 ? '' : 'disabled' %>>
-                          <i class="fi-rs-shopping-bag mr-5"></i>Add to cart
-                        </button>
+                        <input type="hidden" id="bookId" value="<%= book._id %>">
+                        <% const bookExistsInCart=cart?.books?.map(book=>
+                          book.bookId.toString()).includes((book._id.toString()));
+                          %>
+
+                          <!-- Add to Cart Button -->
+                          <button class="btn btn-sm button-add-to-cart" <%=book.quantity> 0 ? '' : 'disabled' %> <%=
+                              bookExistsInCart ? 'hidden' : '' %>>
+                              <i class="fi-rs-shopping-bag mr-5"></i>Add to cart
+                          </button>
+
+                          <!-- Go to Cart Button -->
+                          <button class="btn btn-sm button-go-to-cart" <%=bookExistsInCart ? '' : 'hidden' %>>
+                            <i class="fi-rs-shopping-bag mr-5 "></i>Go to cart
+                          </button>
                       </td>
                       <td class="action readlistAction" data-book-id="<%= book._id %>" data-title="Remove">
                         <a><i class="fi-rs-trash"></i></a>
@@ -59,21 +72,20 @@
                     <% }) %>
                 </tbody>
               </table>
-              <% } else { %>
-                <div class="text-center py-5">
-                  <div class="alert alert-warning d-inline-block w-auto px-4 py-3">
-                    <h5 class="mb-3">
-                      <i class="fi-rs-shopping-cart text-warning"></i> No Books Found
-                    </h5>
-                    <p class="mb-4 text-secondary">
-                      Your list is currently empty. Browse our collection to find your next read!
-                    </p>
-                    <a href="/book-store" class="btn btn-primary">
-                      Browse Books
-                    </a>
-                  </div>
-                </div>
-                <% } %>
+              <% } %>
+          </div>
+          <div class="text-center py-5 empty-readlist" <%=books && books?.length> 0 ? 'hidden' : '' %>>
+            <div class="alert alert-warning d-inline-block w-auto px-4 py-3">
+              <h5 class="mb-3">
+                <i class="fi-rs-shopping-cart text-warning"></i> No Books Found
+              </h5>
+              <p class="mb-4 text-secondary">
+                Your list is currently empty. Browse our collection to find your next read!
+              </p>
+              <a href="/book-store" class="btn btn-primary">
+                Browse Books
+              </a>
+            </div>
           </div>
         </div>
       </div>
