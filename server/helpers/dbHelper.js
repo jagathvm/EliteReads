@@ -26,6 +26,7 @@ export const getDocumentsCount = async (query = {}, getCollection) => {
   try {
     const collection = await getCollection();
     const count = await collection.countDocuments(query);
+
     return count;
   } catch (error) {
     throw new Error(`Error retrieving documents count: ${error.message}`);
@@ -90,6 +91,7 @@ export const addDocument = async (document, getCollection) => {
   try {
     const collection = await getCollection();
     const result = await collection.insertOne(document);
+
     return result;
   } catch (error) {
     throw new Error(`Error adding document: ${error.message}`);
@@ -101,6 +103,7 @@ export const updateDocument = async (query, operation, getCollection) => {
   try {
     const collection = await getCollection();
     const result = await collection.updateOne(query, operation);
+
     return result;
     // console.log("Update Result: ");
     // console.log(result);
@@ -115,6 +118,7 @@ export const removeDocument = async (query, getCollection) => {
   try {
     const collection = await getCollection();
     const result = await collection.deleteOne(query);
+
     return result;
   } catch (error) {
     throw new Error(`Error deleting document: ${error.message}`);
