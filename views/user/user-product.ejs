@@ -28,7 +28,7 @@
                   <div class="product-image-slider" style="height: auto; width: 250px; overflow: hidden;">
                     <% book.coverImageUrls.forEach(url=> { %>
                       <figure class="border-radius-10" style="height: auto; width: 200px;">
-                        <img src="<%= url %>" alt="product image">
+                        <img src="<%= url %>" alt="<%= book.title %>">
                       </figure>
                       <% }) %>
                   </div>
@@ -62,14 +62,14 @@
                     <%= book.title %>
                   </h2>
                   <div class="pro-details-brand mt-2">
-                    <span><a href="shop-grid-right.html" class="h5">
+                    <span><a class="h5">
                         <%= book.author %>
                       </a></span>
                   </div>
                   <div class="border p-2 rounded-md-lg border-neutral-500 d-inline-block mt-2">
                     <div>
                       <p
-                        class=" uppercase tracking-wider text-neutral-600 font-semibold text-sm tracking-normal font-manrope">
+                        class="uppercase tracking-wider text-neutral-600 font-semibold text-sm tracking-normal font-manrope">
                         <%= book.language %>
                       </p>
                     </div>
@@ -97,19 +97,32 @@
                   </div>
                   <div class="bt-1 border-color-1 mt-30 mb-30"></div>
                   <div class="detail-extralink">
-                    <div class="detail-qty border radius" <%=book?.quantity> 0 ? '' : 'hidden'
-                      %>>
+                    <!-- <div class="detail-qty border radius" // ejs // book?.quantity> 0 ? '' : 'hidden' // ejs //
+                      >
                       <a class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
                       <span class="qty-val">1</span>
                       <a class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
-                    </div>
+                    </div> -->
                     <div class="product-extra-link2">
-                      <button class="btn btn-md button-add-to-cart" <%=book?.quantity> 0 ? '' : 'disabled' %>>
-                        <i class="fi-rs-shopping-bag mr-5"></i>
-                        Add to cart</button>
-                      <a aria-label="Add To Readlist" class="action-btn hover-up readlistAction"
-                        data-book-id="<%= book._id %>"><i
-                          class="bi <%= readlist?.books.includes((book._id).toString()) ? 'bi-heart-fill' : 'bi-heart'  %> "></i></a>
+                      <input type="hidden" id="bookId" value="<%= book._id %>">
+                      <% const bookExistsInCart=cart?.books?.map(book=>
+                        book.bookId.toString()).includes((book._id).toString());
+                        const bookExistsInReadlist = readlist?.books?.includes((book._id).toString());
+                        %>
+
+                        <!-- Add to Cart Button -->
+                        <button class="btn btn-md button-add-to-cart" <%=book?.quantity> 0 ? '' :
+                          'disabled' %> <%= bookExistsInCart ? 'hidden' : '' %>>
+                            <i class="fi-rs-shopping-bag mr-5"></i> Add to cart
+                        </button>
+
+                        <!-- Go to Cart Button -->
+                        <button class="btn btn-md button-go-to-cart" <%=bookExistsInCart ? '' : 'hidden' %>>
+                          <i class="fi-rs-shopping-bag mr-5"></i> Go to cart
+                        </button>
+
+                        <a aria-label="Add To Readlist" class="action-btn hover-up button-readlist"><i
+                            class="bi <%= bookExistsInReadlist ? 'bi-heart-fill' : 'bi-heart'  %> "></i></a>
                     </div>
                     <div class="p-2">
                       <p>Availability: <span
