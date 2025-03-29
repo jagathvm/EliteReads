@@ -1,56 +1,24 @@
-<ul class="nav flex-column" role="tablist">
+<ul class="nav flex-column">
   <li class="nav-item">
-    <a
-      class="nav-link active"
-      id="dashboard-tab"
-      data-bs-toggle="tab"
-      href="#dashboard"
-      role="tab"
-      aria-controls="dashboard"
-      aria-selected="false"
-      ><i class="fi-rs-settings-sliders mr-10"></i
-      >Dashboard</a
-    >
+    <a class="nav-link" href="/profile">
+      <i class="fi-rs-settings-sliders mr-10"></i> Dashboard
+    </a>
   </li>
   <li class="nav-item">
-    <a
-      class="nav-link"
-      id="orders-tab"
-      data-bs-toggle="tab"
-      href="#orders"
-      role="tab"
-      aria-controls="orders"
-      aria-selected="false"
-      ><i class="fi-rs-shopping-bag mr-10"></i>Orders</a
-    >
+    <a class="nav-link" href="/profile/orders">
+      <i class="fi-rs-shopping-bag mr-10"></i> Orders
+    </a>
   </li>
   <li class="nav-item">
-    <a
-      class="nav-link"
-      id="address-tab"
-      data-bs-toggle="tab"
-      href="#address"
-      role="tab"
-      aria-controls="address"
-      aria-selected="true"
-      ><i class="fi-rs-marker mr-10"></i>My Address</a
-    >
+    <a class="nav-link" href="/profile/address">
+      <i class="fi-rs-marker mr-10"></i> My Address
+    </a>
   </li>
   <li class="nav-item">
-    <a
-      class="nav-link"
-      id="account-detail-tab"
-      data-bs-toggle="tab"
-      href="#account-detail"
-      role="tab"
-      aria-controls="account-detail"
-      aria-selected="true"
-      ><i class="fi-rs-user mr-10"></i>Account details</a
-    >
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="/api/user/auth/login"
-      ><i class="fi-rs-sign-out mr-10"></i>Logout</a
-    >
+    <a class="nav-link" href="/api/user/auth/login">
+      <i class="fi-rs-sign-out mr-10"></i> Logout
+    </a>
   </li>
 </ul>
+
+<script type="module" src="/user/js/utils/user-profile.js"></script>
