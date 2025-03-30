@@ -35,11 +35,7 @@ import {
 import { sendResponse, renderResponse } from "../helpers/responseHelper.js";
 import { buildBookObject, processBookData } from "../helpers/bookHelper.js";
 import { processCategoryData } from "../helpers/categoryHelper.js";
-import {
-  getAllOrders,
-  getOrderByOrderId,
-  getOrdersByUserId,
-} from "../services/orderServices.js";
+import { getAllOrders, getOrderByOrderId } from "../services/orderServices.js";
 
 // ------------------ ADMIN CONTROLLERS ------------------ //
 
