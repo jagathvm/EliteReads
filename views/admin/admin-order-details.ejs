@@ -19,11 +19,17 @@
         </div>
         <div class="col-lg-6 col-md-6 ms-auto text-md-end">
           <select class="form-select d-inline-block mb-lg-0 mb-15 mw-200">
-            <option>Change status</option>
-            <option>Awaiting payment</option>
-            <option>Confirmed</option>
-            <option>Shipped</option>
-            <option>Delivered</option>
+            <option value="pending" <%=order.status==='pending' ? 'selected' : '' %>>Pending
+            </option>
+            <option value="confirmed" <%=order.status==='confirmed' ? 'selected' : '' %>>Confirmed</option>
+            <option value="processing" <%=order.status==='processing' ? 'selected' : '' %>>Processing</option>
+            <option value="shipped" <%=order.status==='shipped' ? 'selected' : '' %>>Shipped</option>
+            <option value="outForDelivery" <%=order.status==='outForDelivery' ? 'selected' : '' %>>Out for Delivery
+            </option>
+            <option value="delivered" <%=order.status==='delivered' ? 'selected' : '' %>>Delivered</option>
+            <option value="cancelled" <%=order.status==='cancelled' ? 'selected' : '' %>>Cancelled</option>
+            <option value="returned" <%=order.status==='returned' ? 'selected' : '' %>>Returned</option>
+            <option value="refunded" <%=order.status==='refunded' ? 'selected' : '' %>>Refunded</option>
           </select>
           <a class="btn btn-primary" href="#">Save</a>
           <a class="btn btn-secondary print ms-2" href="#">
