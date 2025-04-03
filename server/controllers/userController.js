@@ -28,15 +28,15 @@ import {
   removeCartData,
   updateCartData,
 } from "../services/cartServices.js";
-import { buildCartObject, updateCartObject } from "../helpers/cartHelper.js";
-import { capitalisation, formatDate } from "../helpers/stringHelper.js";
+import { addOrderData, getOrdersByUserId } from "../services/orderServices.js";
 import {
   sanitizeEditAddress,
   sanitizePostAddress,
 } from "../helpers/profileHelper.js";
 import { buildOrderObject } from "../helpers/orderHelper.js";
 import { buildReadlistObject } from "../helpers/readlistHelper.js";
-import { addOrderData, getOrdersByUserId } from "../services/orderServices.js";
+import { formatDate } from "../helpers/stringHelper.js";
+import { buildCartObject, updateCartObject } from "../helpers/cartHelper.js";
 
 // ------------------ HOME & STATIC PAGES ------------------
 
@@ -727,7 +727,6 @@ export const getUserOrders = async (req, res) => {
       user,
       orders,
       formatDate,
-      capitalisation,
       currentPath: req.path,
     });
   } catch (error) {
@@ -872,20 +871,21 @@ export const postUserPlaceOrder = async (req, res) => {
   const { userId } = req?.user;
 
   try {
-    const { selectedAddress, paymentMethod } = req.body;
+    const { selectedAddress, paymentMethodId } = req.body;
 
-    if (!selectedAddress || !paymentMethod) {
-      return sendResponse(res, 400, "Missing required fields.", false);
-    }
+    if (!selectedAddress)
+      return sendResponse(res, 400, "Please select a shipping address.", false);
 
-    if (paymentMethod === "upi") {
+    if (isNaN(paymentMethodId) || paymentMethodId === null)
+      return sendResponse(res, 400, "Please select a payment method.", false);
+
+    if (paymentMethodId === 1)
       return sendResponse(
         res,
         400,
         "UPI payment is currently unavailable. Please choose Cash on Delivery.",
         false
       );
-    }
 
     // Fetch user and cart data
     const user = await fetchUserDataFromReq(req);
@@ -912,7 +912,7 @@ export const postUserPlaceOrder = async (req, res) => {
       userId,
       addressObj,
       cart,
-      paymentMethod
+      paymentMethodId
     );
 
     const { acknowledged } = await addOrderData(orderObject);
