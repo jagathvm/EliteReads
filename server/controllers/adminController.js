@@ -35,7 +35,12 @@ import {
 import { sendResponse, renderResponse } from "../helpers/responseHelper.js";
 import { buildBookObject, processBookData } from "../helpers/bookHelper.js";
 import { processCategoryData } from "../helpers/categoryHelper.js";
-import { getAllOrders, getOrderByOrderId } from "../services/orderServices.js";
+import {
+  fetchAggregatedOrderByOrderId,
+  getAllOrders,
+  updateOrderData,
+} from "../services/orderServices.js";
+import { ORDER_STATUSES } from "../helpers/orderHelper.js";
 
 // ------------------ ADMIN CONTROLLERS ------------------ //
 
@@ -679,7 +684,6 @@ export const getAdminOrders = async (req, res) => {
     return renderResponse(res, 200, "admin/admin-orders-list", {
       req,
       orders,
-      capitalisation,
       formatDate,
     });
   } catch (error) {
@@ -693,14 +697,43 @@ export const getAdminOrderDetails = async (req, res) => {
   const { orderId } = req.params;
 
   try {
-    const order = await getOrderByOrderId(orderId);
+    const order = await fetchAggregatedOrderByOrderId(orderId);
 
     return renderResponse(res, 200, "admin/admin-order-details", {
       req,
       order,
+      ORDER_STATUSES,
       formatDate,
-      capitalisation,
     });
+  } catch (error) {
+    console.error(`An unexpected error occurred. ${error}`);
+    throw error;
+  }
+};
+
+// Update order status
+export const updateOrderStatus = async (req, res) => {
+  const { orderStatusId, orderId } = req.body;
+
+  try {
+    const newOrderStatus = ORDER_STATUSES[orderStatusId];
+    newOrderStatus.changedAt = new Date();
+
+    const { modifiedCount } = await updateOrderData(orderId, {
+      $set: {
+        orderStatus: newOrderStatus,
+      },
+    });
+
+    if (!modifiedCount)
+      return sendResponse(
+        res,
+        400,
+        "Error occurred while changing Order Status.",
+        false
+      );
+
+    return sendResponse(res, 200, "Order status changed successfully.", true);
   } catch (error) {
     console.error(`An unexpected error occurred. ${error}`);
     throw error;
