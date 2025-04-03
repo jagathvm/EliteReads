@@ -38,36 +38,40 @@ placeOrderBtn.addEventListener("click", async (e) => {
     'input[name="selected_address"]:checked'
   )?.value;
 
-  if (!selectedAddress) {
-    showToast("Please select a shipping address.", false, "center", "bottom");
-    return;
-  }
+  if (!selectedAddress)
+    return showToast(
+      "Please select a shipping address.",
+      false,
+      "center",
+      "bottom"
+    );
 
   // Get the selected payment method
   const paymentMethod = document.querySelector(
     'input[name="payment_option"]:checked'
   )?.value;
 
-  if (!paymentMethod) {
+  // Convert paymentMethod to number
+  const paymentMethodId = Number(paymentMethod);
+
+  if (isNaN(paymentMethodId))
     return showToast(
       "Please select a payment method.",
       false,
       "center",
       "bottom"
     );
-  }
 
   // Restrict to COD only
-  if (paymentMethod === "upi") {
+  if (paymentMethodId === 1)
     return showToast(
       "UPI payment is currently unavailable. Please choose Cash on Delivery.",
       false,
       "center",
       "bottom"
     );
-  }
 
-  const data = { selectedAddress, paymentMethod };
+  const data = { selectedAddress, paymentMethodId };
 
   try {
     const apiClient = new HttpRequest("/cart");
