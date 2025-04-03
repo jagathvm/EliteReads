@@ -32,45 +32,53 @@
     </header>
     <!-- card-header end// -->
     <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>#ID</th>
-              <th scope="col">Name</th>
-              <th scope="col">Total</th>
-              <th scope="col">Status</th>
-              <th scope="col">Date</th>
-              <th scope="col" class="text-end">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% orders.forEach(order=> { %>
+      <% if (orders.length> 0) { %>
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
               <tr>
-                <td>#<%= String(order._id).toUpperCase() %>
-                </td>
-                <td><b>
-                    <%= order.address.name %>
-                  </b></td>
-                <td>₹ <%= order.totalPrice %>
-                </td>
-                <td>
-                  <span class="badge rounded-pill alert-warning">
-                    <%= capitalisation(order.status) %>
-                  </span>
-                </td>
-                <td>
-                  <%= formatDate(order.createdAt).monthYear %>
-                </td>
-                <td class="text-end">
-                  <a href="/admin/order-details/<%= order._id %>" class="btn btn-md rounded font-sm">View Order</a>
-                </td>
+                <th>#ID</th>
+                <th scope="col">Name</th>
+                <th scope="col">Total</th>
+                <th scope="col">Status</th>
+                <th scope="col">Date</th>
+                <th scope="col" class="text-end">Action</th>
               </tr>
-              <% }) %>
-          </tbody>
-        </table>
-      </div>
-      <!-- table-responsive //end -->
+            </thead>
+            <tbody>
+              <% orders.forEach(order=> { %>
+                <tr>
+                  <td>#<%= String(order._id).toUpperCase() %>
+                  </td>
+                  <td><b>
+                      <%= order.address.name %>
+                    </b></td>
+                  <td>₹ <%= order.totalPrice %>
+                  </td>
+                  <td>
+                    <span class="badge rounded-pill alert-warning">
+                      <%= order.orderStatus.status %>
+                    </span>
+                  </td>
+                  <td>
+                    <%= formatDate(order.createdAt).monthYear %>
+                  </td>
+                  <td class="text-end">
+                    <a href="/admin/order-details/<%= order._id %>" class="btn btn-md rounded font-sm">View
+                      Order</a>
+                  </td>
+                </tr>
+                <% }) %>
+            </tbody>
+          </table>
+        </div>
+        <!-- table-responsive //end -->
+        <% } else { %>
+          <div class="text-center p-5">
+            <h5>No orders found.</h5>
+          </div>
+          <% } %>
+
     </div>
     <!-- card-body end// -->
   </div>
