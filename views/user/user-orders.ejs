@@ -46,7 +46,7 @@
                                   <%= formatDate(order.createdAt).monthYear %>
                                 </td>
                                 <td>
-                                  <%= capitalisation(order.status) %>
+                                  <%= order.orderStatus.status %>
                                 </td>
                                 <td>₹ <%= order.totalPrice %> for <%= order.items.length %> item(s).</td>
                                 <td>
