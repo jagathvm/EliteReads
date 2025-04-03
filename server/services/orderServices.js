@@ -1,5 +1,11 @@
 import { ObjectId } from "mongodb";
-import { addDocument, getDocument, getDocuments } from "../helpers/dbHelper.js";
+import {
+  addDocument,
+  getAggregatedDocuments,
+  getDocument,
+  getDocuments,
+  updateDocument,
+} from "../helpers/dbHelper.js";
 import { getOrdersCollection } from "../config/db.js";
 
 export const addOrderData = async (order) => {
@@ -43,6 +49,92 @@ export const getOrderByOrderId = async (orderId) => {
     return order;
   } catch (error) {
     console.error("Error retrieving orders", error);
+    throw error;
+  }
+};
+
+export const updateOrderData = async (orderId, operation) => {
+  try {
+    const updateResult = await updateDocument(
+      { _id: new ObjectId(orderId) },
+      operation,
+      getOrdersCollection
+    );
+
+    return updateResult;
+  } catch (error) {
+    console.error("Error updating order", error);
+    throw error;
+  }
+};
+
+export const fetchAggregatedOrderByOrderId = async (orderId) => {
+  const pipeline = [
+    {
+      $match: {
+        _id: new ObjectId(orderId),
+      },
+    },
+    {
+      $unwind: "$items",
+    },
+    {
+      $lookup: {
+        from: "books",
+        localField: "items.bookId",
+        foreignField: "_id",
+        as: "bookDetails",
+      },
+    },
+    {
+      $unwind: "$bookDetails",
+    },
+    {
+      $project: {
+        _id: 1,
+        userId: 1,
+        address: 1,
+        totalPrice: 1,
+        paymentMethod: 1,
+        orderStatus: 1,
+        createdAt: 1,
+        items: {
+          quantity: "$items.quantity",
+          title: "$bookDetails.title",
+          author: "$bookDetails.author",
+          bookSlug: "$bookDetails.bookSlug",
+          price: "$items.price",
+          coverImageUrl: {
+            $arrayElemAt: ["$bookDetails.coverImageUrls", 0],
+          },
+        },
+      },
+    },
+    {
+      $group: {
+        _id: "$_id",
+        userId: { $first: "$userId" },
+        address: { $first: "$address" },
+        totalPrice: { $first: "$totalPrice" },
+        paymentMethod: { $first: "$paymentMethod" },
+        orderStatus: { $first: "$orderStatus" },
+        createdAt: { $first: "$createdAt" },
+        items: { $push: "$items" },
+      },
+    },
+  ];
+
+  try {
+    const { found, value } = await getAggregatedDocuments(
+      pipeline,
+      getOrdersCollection,
+      "Order not found."
+    );
+
+    const order = found ? value[0] : [];
+    return order;
+  } catch (error) {
+    console.error("Error retrieving order", error);
     throw error;
   }
 };
