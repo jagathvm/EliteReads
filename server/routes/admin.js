@@ -28,6 +28,7 @@ router.get("/user-profile/:username", adminController.getAdminUserProfile);
 router.patch("/user-profile/:username", adminController.blockOrUnblockUser);
 router.get("/orders", adminController.getAdminOrders);
 router.get("/order-details/:orderId", adminController.getAdminOrderDetails);
+router.post("/order-details/:orderId", adminController.updateOrderStatus);
 router.get("/sellers", adminController.getAdminSellers);
 router.get("/seller-profile", adminController.getAdminSellerProfile);
 router.get("/reviews", adminController.getAdminReviews);
