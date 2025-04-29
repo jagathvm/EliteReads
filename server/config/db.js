@@ -32,3 +32,5 @@ export const getReadlistCollection = async () =>
   await getCollection("readlist");
 export const getCartCollection = async () => await getCollection("cart");
 export const getOrdersCollection = async () => await getCollection("orders");
+export const getPaymentsCollection = async () =>
+  await getCollection("payments");
