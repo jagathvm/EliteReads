@@ -168,6 +168,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Get `data-sort-name` for display
     const sortName = event.target.getAttribute("data-sort-name");
+    console.log(sortName);
     // Get `href` attribute and extract the query string after `?`
     const sortQuery = event.target
       .getAttribute("href")
