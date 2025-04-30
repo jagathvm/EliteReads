@@ -38,6 +38,9 @@
                 </div>
                 <div class="sort-by-dropdown">
                   <ul>
+                    <!-- <li>
+                      <a href="/book-store?" data-sort-name="None">None</a>
+                    </li> -->
                     <li>
                       <a href="/book-store?sort=featured" data-sort-name="Featured">Featured</a>
                     </li>
@@ -132,10 +135,6 @@
                               </a>
                             </li>
                             <% } %>
-
-                              <!-- <li class="page-item">
-                  <a class="page-link dot" href="#">...</a>
-                </li> -->
 
                               <% if (currentPage < totalPages) { %>
                                 <%= queryString.set('page', currentPage + 1) %>
