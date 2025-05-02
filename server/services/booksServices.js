@@ -10,7 +10,6 @@ import {
   removeDocument,
 } from "../helpers/dbHelper.js";
 import { fetchCategoryIdsBySlug } from "./categoriesServices.js";
-import { getAggregatedCart } from "./cartServices.js";
 
 // Utility Constants
 const bookPipeline = [
@@ -86,7 +85,7 @@ export const sanitizeQuery = async (query) => {
 
   sanitizedQuery.sort = query.sort ? sortOptions[query.sort] : { title: 1 };
   sanitizedQuery.page = parseInt(query.page) || 1;
-  sanitizedQuery.limit = parseInt(query.limit) || 9;
+  sanitizedQuery.limit = parseInt(query.limit) || 6;
 
   if (query.price) {
     // Split comma-separated values
