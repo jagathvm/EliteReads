@@ -16,10 +16,12 @@ import {
   addBook,
   updateBook,
   removeBook,
-  fetchBooksData,
-  fetchBookDataByTitle,
+  sanitizeQuery,
+  fetchBooksCount,
   fetchBookDataByIsbn,
   fetchBookDataBySlug,
+  fetchBookDataByTitle,
+  fetchBooksDataByFiltersAndSort,
 } from "../services/booksServices.js";
 import {
   createSlug,
@@ -37,10 +39,14 @@ import { buildBookObject, processBookData } from "../helpers/bookHelper.js";
 import { processCategoryData } from "../helpers/categoryHelper.js";
 import {
   fetchAggregatedOrderByOrderId,
-  getAllOrders,
+  fetchAggregatedOrders,
   updateOrderData,
 } from "../services/orderServices.js";
-import { ORDER_STATUSES } from "../helpers/orderHelper.js";
+import {
+  ORDER_STATUSES,
+  sanitizeOrderQueryObject,
+} from "../helpers/orderHelper.js";
+import { razorpay } from "../config/payments.js";
 
 // ------------------ ADMIN CONTROLLERS ------------------ //
 
@@ -59,13 +65,35 @@ export const getAdminSettings = (req, res) =>
 // Fetch and display all books.
 export const getAdminBooks = async (req, res) => {
   try {
-    const books = await fetchBooksData();
+    const {
+      sort: sortObject,
+      page: currentPage,
+      limit,
+      ...queryObject
+    } = await sanitizeQuery(req.query);
+
+    // Calculate skip value for pagination
+    const skipValue = parseInt((currentPage - 1) * limit);
+
+    const books = await fetchBooksDataByFiltersAndSort(
+      queryObject,
+      sortObject,
+      skipValue,
+      limit
+    );
+
+    // Fetch categories and count
     const categories = await fetchCategoriesData();
+    const booksCount = await fetchBooksCount(queryObject);
+    const totalPages = Math.ceil(booksCount / limit);
 
     return renderResponse(res, 200, "admin/admin-books", {
       req,
       books,
       categories,
+      currentPage,
+      totalPages,
+      currentPath: req.path,
     });
   } catch (error) {
     console.error(`An unexpected error occurred. ${error}`);
@@ -678,13 +706,16 @@ export const getAdminReviewDetails = (req, res) =>
 
 // Fetch and display all orders.
 export const getAdminOrders = async (req, res) => {
+  const { status, dateRange } = sanitizeOrderQueryObject(req?.query);
+
   try {
-    const orders = await getAllOrders();
+    const orders = await fetchAggregatedOrders(status, dateRange);
 
     return renderResponse(res, 200, "admin/admin-orders-list", {
       req,
       orders,
       formatDate,
+      ORDER_STATUSES,
     });
   } catch (error) {
     console.error("Error retrieving orders", error);
@@ -699,10 +730,33 @@ export const getAdminOrderDetails = async (req, res) => {
   try {
     const order = await fetchAggregatedOrderByOrderId(orderId);
 
+    let razorpayPayment = null;
+
+    if (order?.payment?.paymentDetails?.razorpay_payment_id) {
+      // Fetch payment details from Razorpay
+      try {
+        razorpayPayment = await razorpay.payments.fetch(
+          order?.payment?.paymentDetails.razorpay_payment_id
+        );
+      } catch (error) {
+        console.error("Failed to fetch Razorpay payment details:", error);
+      }
+    } else if (order?.payment?.paymentDetails?.razorpay_order_id) {
+      // Fetch payment details from Razorpay
+      try {
+        razorpayPayment = await razorpay.orders.fetch(
+          order?.payment?.paymentDetails.razorpay_order_id
+        );
+      } catch (error) {
+        console.error("Failed to fetch Razorpay payment details:", error);
+      }
+    }
+
     return renderResponse(res, 200, "admin/admin-order-details", {
       req,
       order,
       ORDER_STATUSES,
+      razorpayPayment,
       formatDate,
     });
   } catch (error) {
