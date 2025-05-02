@@ -223,10 +223,17 @@
                 </div>
 
                 <div class="custome-radio">
-                  <input class="form-check-input" required type="radio" name="payment_option" id="payment_upi"
+                  <input class="form-check-input" required type="radio" name="payment_option" id="payment_razorpay"
                     value="1">
-                  <label class="form-check-label" for="payment_upi">UPI</label>
+                  <label class="form-check-label" for="payment_razorpay">Razorpay</label>
                 </div>
+
+                <div class="custome-radio">
+                  <input class="form-check-input" required type="radio" name="payment_option" id="payment_paypal"
+                    value="2">
+                  <label class="form-check-label" for="payment_paypal">PayPal</label>
+                </div>
+                <div id="paypal-button-container" class="mt-3"></div>
               </div>
             </div>
             <a id="placeOrderBtn" class="btn btn-fill-out btn-block mt-30">Place Order</a>
@@ -237,5 +244,6 @@
   </section>
 </main>
 
-<script defer type="module" src="/user/js/validators/user-address-validator.js"></script>
+<script defer src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=<%= PAYPAL_CLIENT_ID %>&currency=USD"></script>
 <script defer type="module" src="/user/js/utils/user-checkout.js"></script>
