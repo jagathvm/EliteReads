@@ -46,6 +46,21 @@ router.post("/cart", userController.postUserCart);
 router.put("/cart/quantity-update", userController.putUserCartQuantity);
 router.put("/cart/remove", userController.removeBookFromCart);
 router.get("/cart/checkout", userController.getUserCheckout);
-router.post("/cart/place-order", userController.postUserPlaceOrder);
+router.post("/cart/create-order", userController.postUserCreateOrder);
+router.post("/cart/create-razorpay-order", userController.createRazorpayOrder);
+router.post(
+  "/cart/mark-razorpay-payment-failed",
+  userController.postMarkRazorPayPaymentFailed
+);
+router.post(
+  "/cart/verify-razorpay-payment",
+  userController.verifyRazorpayPayment
+);
+router.post("/cart/create-paypal-order", userController.createPayPalOrder);
+router.post("/cart/capture-paypal-order", userController.capturePayPalOrder);
+router.post(
+  "/cart/mark-paypal-payment-failed",
+  userController.postMarkPayPalPaymentFailed
+);
 
 export default router;
