@@ -14,19 +14,17 @@
           <input type="text" placeholder="Search..." class="form-control" />
         </div>
         <div class="col-lg-2 col-6 col-md-3">
-          <select class="form-select">
-            <option>Status</option>
-            <option>Active</option>
-            <option>Disabled</option>
-            <option>Show all</option>
+          <select id="statusFilter" class="form-select">
+            <option value="">All Status</option>
+            <% Object.values(ORDER_STATUSES).forEach(({ id, status })=> { %>
+              <option value="<%= id %>">
+                <%= status %>
+              </option>
+              <% }) %>
           </select>
         </div>
         <div class="col-lg-2 col-6 col-md-3">
-          <select class="form-select">
-            <option>Show 20</option>
-            <option>Show 30</option>
-            <option>Show 40</option>
-          </select>
+          <input type="date" id="dateFilter" class="form-control" />
         </div>
       </div>
     </header>
@@ -84,3 +82,5 @@
   </div>
   <!-- card end// -->
 </section>
+
+<script defer type="module" src="/admin/js/utils/admin-orders-list.js"></script>
