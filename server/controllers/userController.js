@@ -25,18 +25,25 @@ import {
   addCartData,
   fetchAggregatedCartData,
   fetchCartByUserId,
-  removeCartData,
   updateCartData,
 } from "../services/cartServices.js";
-import { addOrderData, getOrdersByUserId } from "../services/orderServices.js";
+import { getOrdersByUserId } from "../services/orderServices.js";
 import {
   sanitizeEditAddress,
   sanitizePostAddress,
 } from "../helpers/profileHelper.js";
-import { buildOrderObject } from "../helpers/orderHelper.js";
+import { PAYMENT_STATUSES, placeUserOrder } from "../helpers/orderHelper.js";
 import { buildReadlistObject } from "../helpers/readlistHelper.js";
 import { formatDate } from "../helpers/stringHelper.js";
 import { buildCartObject, updateCartObject } from "../helpers/cartHelper.js";
+import { razorpay, paypalClient } from "../config/payments.js";
+import { updatePaymentData } from "../services/paymentServices.js";
+import {
+  generateReceipt,
+  verifyRazorpaySignature,
+} from "../helpers/paymentHelper.js";
+import { OrdersController, ApiError } from "@paypal/paypal-server-sdk";
+import { convertINRtoUSD } from "../services/exchangeRateServices.js";
 
 // ------------------ HOME & STATIC PAGES ------------------
 
@@ -855,6 +862,7 @@ export const getUserCheckout = async (req, res) => {
       readlist,
       cart,
       currentPath: req.path,
+      PAYPAL_CLIENT_ID: process.env.PAYPAL_CLIENT_ID,
     });
   } catch (error) {
     console.error(`An unexpected occured: ${error}`);
@@ -867,74 +875,25 @@ export const getUserCheckout = async (req, res) => {
   }
 };
 
-export const postUserPlaceOrder = async (req, res) => {
+export const postUserCreateOrder = async (req, res) => {
   const { userId } = req?.user;
+  const { selectedAddress, paymentMethodId, totalPrice } = req.body;
 
   try {
-    const { selectedAddress, paymentMethodId } = req.body;
-
     if (!selectedAddress)
       return sendResponse(res, 400, "Please select a shipping address.", false);
 
     if (isNaN(paymentMethodId) || paymentMethodId === null)
       return sendResponse(res, 400, "Please select a payment method.", false);
 
-    if (paymentMethodId === 1)
-      return sendResponse(
-        res,
-        400,
-        "UPI payment is currently unavailable. Please choose Cash on Delivery.",
-        false
-      );
-
-    // Fetch user and cart data
-    const user = await fetchUserDataFromReq(req);
-    const cart = await fetchAggregatedCartData(userId);
-
-    // Full address object
-    const addressObj = user.addresses.find(
-      (addr) => addr._id === selectedAddress
-    );
-
-    if (!addressObj)
-      return sendResponse(res, 404, "Selected address not found.", false);
-
-    if (!cart.books || cart.books.length === 0)
-      return sendResponse(
-        res,
-        400,
-        "Your cart is empty. Add items before placing an order.",
-        false
-      );
-
-    // Create order object
-    const orderObject = buildOrderObject(
+    const placeOrderResult = await placeUserOrder(req, res, {
       userId,
-      addressObj,
-      cart,
-      paymentMethodId
-    );
+      selectedAddress,
+      paymentMethodId,
+      totalPrice,
+    });
 
-    const { acknowledged } = await addOrderData(orderObject);
-
-    if (!acknowledged)
-      return sendResponse(
-        res,
-        400,
-        `Error placing order. Please try again later.`,
-        false
-      );
-
-    const { deletedCount } = await removeCartData({ userId });
-    if (!deletedCount)
-      return sendResponse(
-        res,
-        400,
-        `Error placing order. Please try again later.`,
-        false
-      );
-
-    return sendResponse(res, 200, "Order placed successfully.", true);
+    return placeOrderResult;
   } catch (error) {
     console.error(`An unexpected occured while placing order: ${error}`);
     return sendResponse(
@@ -943,5 +902,321 @@ export const postUserPlaceOrder = async (req, res) => {
       `Internal Server Error. ${error.message}`,
       false
     );
+  }
+};
+
+export const createRazorpayOrder = async (req, res) => {
+  const { amount } = req.body;
+
+  if (!amount || isNaN(amount)) {
+    return sendResponse(res, 400, "Invalid amount", false);
+  }
+
+  try {
+    const options = {
+      amount: amount * 100, // convert to paise
+      currency: "INR",
+      receipt: generateReceipt(),
+    };
+
+    // Fetch user
+    const { username, email } = await fetchUserDataFromReq(req);
+
+    // Create Razorpay Order
+    const razorpayOrder = await razorpay.orders.create(options);
+
+    return sendResponse(res, 200, "Order created using razorpay.", true, {
+      razorpayOrder,
+      name: username,
+      email,
+      RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID,
+    });
+  } catch (error) {
+    console.error(
+      `An unexpected occured while placing order (Razorpay): `,
+      error
+    );
+    return sendResponse(
+      res,
+      500,
+      `Internal Server Error. ${error.message}`,
+      false
+    );
+  }
+};
+
+export const postMarkRazorPayPaymentFailed = async (req, res) => {
+  const { orderId, razorpay_order_id } = req.body;
+
+  if (!orderId || !razorpay_order_id) {
+    return sendResponse(
+      res,
+      400,
+      "Missing order ID or Razorpay order ID",
+      false
+    );
+  }
+
+  try {
+    const { modifiedCount } = await updatePaymentData(
+      { orderId },
+      {
+        $set: {
+          paymentStatus: PAYMENT_STATUSES[2],
+          paymentDetails: {
+            razorpay_order_id,
+            cancelledAt: new Date(),
+          },
+        },
+      }
+    );
+
+    if (!modifiedCount)
+      return sendResponse(
+        res,
+        400,
+        "Error occurred while updating payment status.",
+        false
+      );
+
+    return sendResponse(
+      res,
+      200,
+      "Payment was cancelled. You can try again from your orders.",
+      true
+    );
+  } catch (error) {
+    console.error(`Razorpay payment failure update failed: ${error}`);
+    return sendResponse(
+      res,
+      500,
+      `Internal Server Error. ${error.message}`,
+      false
+    );
+  }
+};
+
+export const verifyRazorpayPayment = async (req, res) => {
+  const {
+    razorpay_payment_id,
+    razorpay_order_id,
+    razorpay_signature,
+    orderId,
+  } = req.body;
+
+  if (
+    !orderId ||
+    !razorpay_order_id ||
+    !razorpay_payment_id ||
+    !razorpay_signature
+  ) {
+    return sendResponse(res, 400, "Missing Razorpay payment details", false);
+  }
+
+  const isValid = verifyRazorpaySignature({
+    razorpay_payment_id,
+    razorpay_order_id,
+    razorpay_signature,
+  });
+
+  if (!isValid) {
+    return sendResponse(
+      res,
+      400,
+      "Payment verification failed. Signature mismatch.",
+      false
+    );
+  }
+
+  try {
+    const { modifiedCount } = await updatePaymentData(
+      { orderId },
+      {
+        $set: {
+          paymentStatus: PAYMENT_STATUSES[1],
+          paymentDetails: {
+            razorpay_payment_id,
+            razorpay_order_id,
+            razorpay_signature,
+            verifiedAt: new Date(),
+          },
+        },
+      }
+    );
+
+    if (!modifiedCount)
+      return sendResponse(
+        res,
+        400,
+        "Error occurred while updating payment status.",
+        false
+      );
+
+    return sendResponse(res, 200, "Payment verified successfully.", true);
+  } catch (error) {
+    console.error("Error verifying Razorpay payment:", error);
+    return sendResponse(res, 500, "Internal server error.", false);
+  }
+};
+
+export const createPayPalOrder = async (req, res) => {
+  const { orderId, totalPrice } = req.body;
+
+  if (!totalPrice || !orderId) {
+    return sendResponse(res, 400, "Missing total price or order ID", false);
+  }
+
+  try {
+    const usdAmount = await convertINRtoUSD(totalPrice);
+    const ordersController = new OrdersController(paypalClient());
+
+    const orderPayload = {
+      body: {
+        intent: "CAPTURE",
+        purchaseUnits: [
+          {
+            referenceId: orderId,
+            description: "EliteReads Order Payment",
+            amount: {
+              currencyCode: "USD",
+              value: usdAmount.toString(),
+            },
+          },
+        ],
+      },
+      prefer: "return=representation",
+    };
+
+    const { body, statusCode } =
+      await ordersController.createOrder(orderPayload);
+
+    const { id: orderID, status } = JSON.parse(body);
+
+    if (status !== "CREATED")
+      return sendResponse(res, 400, "Failed to create PayPal order.", false);
+
+    return sendResponse(
+      res,
+      statusCode,
+      "PayPal order created successfully.",
+      true,
+      { orderID }
+    );
+  } catch (error) {
+    console.error("Error creating PayPal order:", error);
+
+    if (error instanceof ApiError) {
+      return sendResponse(
+        res,
+        error.statusCode || 500,
+        "PayPal API error.",
+        false
+      );
+    }
+
+    return sendResponse(res, 500, "Internal server error.", false);
+  }
+};
+
+export const postMarkPayPalPaymentFailed = async (req, res) => {
+  const { orderId, orderID } = req.body;
+
+  if (!orderId || !orderID) {
+    return sendResponse(
+      res,
+      400,
+      "Missing order ID or Razorpay order ID",
+      false
+    );
+  }
+
+  try {
+    const { modifiedCount } = await updatePaymentData(
+      { orderId },
+      {
+        $set: {
+          paymentStatus: PAYMENT_STATUSES[2],
+          paymentDetails: {
+            paypal_order_id: orderID,
+            cancelledAt: new Date(),
+          },
+        },
+      }
+    );
+
+    if (!modifiedCount)
+      return sendResponse(
+        res,
+        400,
+        "Error occurred while updating payment status.",
+        false
+      );
+
+    return sendResponse(
+      res,
+      200,
+      "Payment was cancelled. You can try again from your orders.",
+      true
+    );
+  } catch (error) {
+    console.error(`PayPal payment failure update failed: ${error}`);
+    return sendResponse(
+      res,
+      500,
+      `Internal Server Error. ${error.message}`,
+      false
+    );
+  }
+};
+
+export const capturePayPalOrder = async (req, res) => {
+  const { orderID, orderId } = req.body;
+
+  const collect = {
+    id: orderID,
+    prefer: "return=minimal",
+  };
+
+  try {
+    const ordersController = new OrdersController(paypalClient());
+
+    // Call captureOrder directly (it returns a response)
+    const { body } = await ordersController.captureOrder(collect);
+    const { id, status } = JSON.parse(body);
+
+    if (status !== "COMPLETED") {
+      return sendResponse(res, 400, "Payment not completed", false);
+    }
+
+    const { modifiedCount } = await updatePaymentData(
+      { orderId },
+      {
+        $set: {
+          paymentStatus: PAYMENT_STATUSES[1],
+          paymentDetails: {
+            paypal_payment_id: id,
+            verifiedAt: new Date(),
+          },
+        },
+      }
+    );
+
+    if (!modifiedCount)
+      return sendResponse(
+        res,
+        400,
+        "Error occurred while updating payment status.",
+        false
+      );
+
+    return sendResponse(
+      res,
+      200,
+      "Payment verified and captured successfully.",
+      true
+    );
+  } catch (error) {
+    console.error("Error capturing PayPal order:", error);
+    return sendResponse(res, 500, "Internal Server Error", false);
   }
 };
