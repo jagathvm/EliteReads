@@ -14,20 +14,45 @@
         <input type="text" placeholder="Search by title, author..." class="form-control">
       </div>
       <div class="col-lg-2 col-6 col-md-3">
-        <select class="form-select">
-          <option>All categories</option>
+        <!-- <select id="categoryFilter" class="form-select">
+          <option value="">All categories</option>
           <% if (categories) { %>
-          <% categories.forEach(category => { %>
-          <option value="<%= category.name %>"><%= category.name %></option>
-          <% }) %>
-          <% } %>
+            <% categories.forEach(category=> { %>
+              <option value="<%= category.name %>">
+                <%= category.name %>
+              </option>
+              <% }) %>
+                <% } %>
+        </select> -->
+        <select id="categoryFilter" class="form-select">
+          <option value="">All categories</option>
+          <% if (categories) { %>
+            <% categories.forEach(category=> { %>
+              <option value="<%= category.slug %>" <%=req.query.category===category.slug ? 'selected' : '' %>>
+                <%= category.name %>
+              </option>
+              <% }) %>
+                <% } %>
         </select>
       </div>
       <div class="col-lg-2 col-6 col-md-3">
-        <select class="form-select">
-          <option>Recently added</option>
-          <option>Price Low to High</option>
-          <option>Price High to Low</option>
+        <!-- <select id="sortFilter" class="form-select">
+          <option value="">None</option>
+          <option value="featured">Featured</option>
+          <option value="titleAsc">Name A to Z</option>
+          <option value="titleDesc">Name Z to A</option>
+          <option value="priceAsc">Price Low to High</option>
+          <option value="priceDesc">Price High to Low</option>
+          <option value="releaseDate">Release Date</option>
+        </select> -->
+        <select id="sortFilter" class="form-select">
+          <option value="" <%=!req.query.sort ? 'selected' : '' %>>None</option>
+          <option value="featured" <%=req.query.sort==='featured' ? 'selected' : '' %>>Featured</option>
+          <option value="titleAsc" <%=req.query.sort==='titleAsc' ? 'selected' : '' %>>Name A to Z</option>
+          <option value="titleDesc" <%=req.query.sort==='titleDesc' ? 'selected' : '' %>>Name Z to A</option>
+          <option value="priceAsc" <%=req.query.sort==='priceAsc' ? 'selected' : '' %>>Price Low to High</option>
+          <option value="priceDesc" <%=req.query.sort==='priceDesc' ? 'selected' : '' %>>Price High to Low</option>
+          <option value="releaseDate" <%=req.query.sort==='releaseDate' ? 'selected' : '' %>>Release Date</option>
         </select>
       </div>
     </div>
@@ -36,47 +61,62 @@
   <div class="row">
     <!-- book -->
     <% if (books) { %>
-    <% books.forEach(book => { %>
-    <div class="col-xl-auto col-lg-4 col-md-6">
-      <div class="card card-product-grid">
-        <a href="/admin/books/<%= book.bookSlug %>" class="img-wrap">
-          <img src="<%= book.coverImageUrls[0] %>" style="max-width: 125px; object-fit: cover;" alt="Book Cover">
-        </a>
-        <div class="info-wrap">
-          <div class="title mt-1 h6"><%= book.title %></div>
-          <div class="author mt-1"><%= book.author %></div>
-          <div class="price mt-1">₹ <%= book.price %></div>
+      <% books.forEach(book=> { %>
+        <div class="col-xl-auto col-lg-4 col-md-6">
+          <div class="card card-product-grid">
+            <a href="/admin/books/<%= book.bookSlug %>" class="img-wrap">
+              <img src="<%= book.coverImageUrls[0] %>" style="max-width: 125px; object-fit: cover;" alt="Book Cover">
+            </a>
+            <div class="info-wrap">
+              <div class="title mt-1 h6">
+                <%= book.title %>
+              </div>
+              <div class="author mt-1">
+                <%= book.author %>
+              </div>
+              <div class="price mt-1">₹ <%= book.price %>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-    <% }) %>
-    <% } else { %>
-    <h3>No books found</h3>
-    <% } %>
+        <% }) %>
+          <% } else { %>
+            <h3>No books found</h3>
+            <% } %>
   </div>
 
   <div class="pagination-area mt-15 mb-50">
     <nav aria-label="Page navigation example">
       <ul class="pagination justify-content-start">
-        <li class="page-item active">
-          <a class="page-link" href="#">01</a>
-        </li>
-        <li class="page-item">
-          <a class="page-link" href="#">02</a>
-        </li>
-        <li class="page-item">
-          <a class="page-link" href="#">03</a>
-        </li>
-        <li class="page-item">
-          <a class="page-link dot" href="#">...</a>
-        </li>
-        <li class="page-item">
-          <a class="page-link" href="#">16</a>
-        </li>
-        <li class="page-item">
-          <a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
-        </li>
+
+        <% const queryString=new URLSearchParams(req.query); %>
+          <% if (currentPage> 1) { %>
+            <% queryString.set('page', currentPage - 1); %>
+              <li class="page-item">
+                <a class="page-link" href="?<%= queryString.toString() %>">
+                  <i class="material-icons md-chevron_left"></i></a>
+              </li>
+              <% } %>
+
+                <% for( let i=1; i <=totalPages ; i++ ) { %>
+                  <% queryString.set('page', i); %>
+                    <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                      <a class="page-link" href="?<%= queryString.toString() %>">
+                        <%= i %>
+                      </a>
+                    </li>
+                    <% } %>
+
+                      <% if (currentPage < totalPages) { %>
+                        <%= queryString.set('page', currentPage + 1); %>
+                          <li class="page-item">
+                            <a class="page-link" href="?<%= queryString.toString() %>"><i
+                                class="material-icons md-chevron_right"></i></a>
+                          </li>
+                          <% } %>
       </ul>
     </nav>
   </div>
 </section>
+
+<script type="module" src="/admin/js/utils/admin-books.js"></script>
