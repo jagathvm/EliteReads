@@ -95,7 +95,6 @@ export const fetchAggregatedOrderByOrderId = async (orderId) => {
         userId: 1,
         address: 1,
         totalPrice: 1,
-        paymentMethod: 1,
         orderStatus: 1,
         createdAt: 1,
         items: {
@@ -116,10 +115,30 @@ export const fetchAggregatedOrderByOrderId = async (orderId) => {
         userId: { $first: "$userId" },
         address: { $first: "$address" },
         totalPrice: { $first: "$totalPrice" },
-        paymentMethod: { $first: "$paymentMethod" },
         orderStatus: { $first: "$orderStatus" },
         createdAt: { $first: "$createdAt" },
         items: { $push: "$items" },
+      },
+    },
+    {
+      $addFields: {
+        orderIdStr: { $toString: "$_id" },
+      },
+    },
+    {
+      $lookup: {
+        from: "payments",
+        localField: "orderIdStr",
+        foreignField: "orderId",
+        as: "payment",
+      },
+    },
+    {
+      $unwind: "$payment",
+    },
+    {
+      $project: {
+        orderIdStr: 0,
       },
     },
   ];
@@ -135,6 +154,40 @@ export const fetchAggregatedOrderByOrderId = async (orderId) => {
     return order;
   } catch (error) {
     console.error("Error retrieving order", error);
+    throw error;
+  }
+};
+
+export const fetchAggregatedOrders = async (status, dateRange) => {
+  const pipeline = [];
+
+  if (status !== null) {
+    pipeline.push({
+      $match: {
+        "orderStatus.id": status,
+      },
+    });
+  }
+
+  if (dateRange) {
+    pipeline.push({
+      $match: {
+        createdAt: dateRange,
+      },
+    });
+  }
+
+  try {
+    const { found, value } = await getAggregatedDocuments(
+      pipeline,
+      getOrdersCollection,
+      "Orders not found."
+    );
+
+    const orders = found ? value : [];
+    return orders;
+  } catch (error) {
+    console.error("Error retrieving orders", error);
     throw error;
   }
 };
