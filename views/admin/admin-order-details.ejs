@@ -62,8 +62,7 @@
               <h6 class="mb-1">Order Info</h6>
               <p class="mb-1">
                 Shipping: Fargo Express <br />
-                Payment Method: <%= order.paymentMethod.method %> <br />
-                  Status: <%= order.orderStatus.status %>
+                Status: <%= order.orderStatus.status %>
               </p>
               <a href="#">Download info</a>
             </div>
@@ -142,24 +141,115 @@
         </div>
         <!-- col// -->
         <div class="col-lg-1"></div>
+
         <div class="col-lg-4">
-          <div class="box shadow-sm bg-light">
-            <h6 class="mb-15">Payment Info</h6>
-            <p>
-              <img src="/admin/imgs/card-brands/2.png" class="border" height="20" />
-              Master Card **** **** 4768 <br />
-              Business name: Grand Market LLC <br />
-              Phone: +1 (800) 555-154-52
+          <div class="box shadow-sm bg-light p-3 rounded">
+            <h6 class="mb-3 border-bottom pb-2">Payment Info</h6>
+
+            <p class="mb-1"><strong>Method:</strong>
+              <%= order.payment.paymentMethod?.method %>
             </p>
+            <p class="mb-1"><strong>Status:</strong>
+              <%= order.payment.paymentStatus?.status %>
+            </p>
+
+            <% if (razorpayPayment) { %>
+              <% if (razorpayPayment.status==='captured' ) { %>
+                <% // Payment Successful %>
+
+                  <% if (razorpayPayment.method==='card' ) { %>
+                    <div class="d-flex align-items-center gap-3 mt-3">
+                      <img
+                        src="/admin/imgs/card-brands/<%= razorpayPayment.card.network.toLowerCase() === 'visa' ? '1' : razorpayPayment.card.network.toLowerCase() === 'mastercard' ? '2' : 'default' %>.png"
+                        class="border rounded p-1" height="28" alt="Card Brand" />
+                      <div>
+                        <p class="mb-1"><strong>
+                            <%= razorpayPayment.card.network %>
+                          </strong> ending in **** <%= razorpayPayment.card.last4 %>
+                        </p>
+                        <p class="mb-1">Card Type: <%= razorpayPayment.card.type %> (<%= razorpayPayment.card.sub_type
+                              %>)</p>
+                        <p class="mb-1">Issuer: <%= razorpayPayment.card.issuer %>
+                        </p>
+                      </div>
+                    </div>
+
+                    <% } else if (razorpayPayment.method==='wallet' ) { %>
+                      <div class="mt-3">
+                        <p class="mb-1"><strong>Wallet:</strong>
+                          <%= razorpayPayment.wallet==='rzpx_postpaid' ? 'Razorpay Pay Later' :
+                            razorpayPayment.wallet.charAt(0).toUpperCase() + razorpayPayment.wallet.slice(1) %>
+                        </p>
+                      </div>
+
+                      <% } else if (razorpayPayment.method==='paylater' ) { %>
+                        <div class="mt-3">
+                          <p class="mb-1"><strong>Pay Later Option:</strong> Razorpay Pay Later</p>
+                        </div>
+
+                        <% } else if (razorpayPayment.method==='netbanking' ) { %>
+                          <div class="mt-3">
+                            <p class="mb-1"><strong>Bank:</strong>
+                              <%= razorpayPayment.bank %>
+                            </p>
+                            <% if (razorpayPayment.acquirer_data?.bank_transaction_id) { %>
+                              <p class="mb-1"><strong>Bank Txn ID:</strong>
+                                <%= razorpayPayment.acquirer_data.bank_transaction_id %>
+                              </p>
+                              <% } %>
+                          </div>
+                          <% } %>
+
+                            <hr class="my-3" />
+
+                            <p class="mb-1"><strong>Transaction ID:</strong>
+                              <%= razorpayPayment.id %>
+                            </p>
+                            <p class="mb-1"><strong>Order ID:</strong>
+                              <%= razorpayPayment.order_id %>
+                            </p>
+
+                            <hr class="my-3" />
+
+                            <p class="mb-1"><strong>Email:</strong>
+                              <%= razorpayPayment.email %>
+                            </p>
+                            <p class="mb-0"><strong>Phone:</strong>
+                              <%= razorpayPayment.contact %>
+                            </p>
+
+                            <% } else if (razorpayPayment.status==='attempted' ) { %>
+                              <% // Payment Failed or Not Captured %>
+                                <div class="alert alert-warning mt-3">
+                                  <strong>Payment Attempt Failed</strong>
+                                </div>
+                                <p class="mb-1"><strong>Razorpay Order ID:</strong>
+                                  <%= razorpayPayment.id %>
+                                </p>
+                                <p class="mb-1"><strong>Status:</strong>
+                                  <%= razorpayPayment.status %>
+                                </p>
+                                <p class="mb-1"><strong>Amount:</strong> ₹<%= (razorpayPayment.amount / 100).toFixed(2)
+                                    %>
+                                </p>
+                                <p class="mb-1"><strong>Amount Paid:</strong> ₹<%= (razorpayPayment.amount_paid /
+                                    100).toFixed(2) %>
+                                </p>
+                                <p class="mb-1"><strong>Attempts:</strong>
+                                  <%= razorpayPayment.attempts %>
+                                </p>
+                                <p class="mb-0"><strong>Created At:</strong>
+                                  <%= new Date(razorpayPayment.created_at * 1000).toLocaleString() %>
+                                </p>
+
+                                <% } else { %>
+                                  <p class="text-muted mt-2">Payment details not available.</p>
+                                  <% } %>
+                                    <% } else { %>
+                                      <p class="text-muted mt-2">Payment details not available.</p>
+                                      <% } %>
+
           </div>
-          <!-- Notes -->
-          <!-- <div class="h-25 pt-4">
-            <div class="mb-3">
-              <label>Notes</label>
-              <textarea class="form-control" name="notes" id="notes" placeholder="Type some note"></textarea>
-            </div>
-            <button class="btn btn-primary">Save Note</button>
-          </div> -->
         </div>
         <!-- col// -->
       </div>
