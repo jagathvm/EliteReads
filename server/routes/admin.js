@@ -14,8 +14,8 @@ const router = Router();
 
 router.use(authenticateToken);
 router.get("/dashboard", adminController.getAdminDashboard);
-router.get("/books/add-book", adminController.getAdminAddBook);
 router.get("/books", adminController.getAdminBooks);
+router.get("/books/add-book", adminController.getAdminAddBook);
 router.get("/books/:bookSlug", adminController.getAdminBookDetails);
 router.get("/categories/add-category", adminController.getAdminAddCategory);
 router.get("/categories", adminController.getAdminCategories);
